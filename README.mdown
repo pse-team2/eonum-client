@@ -1,0 +1,18 @@
+#Some notes
+
+##Deployment with Maven
+**Prerequirements: Maven 3.0.3+ installed.**
+*For Ubuntu users, you may consider this [installation guide] (http://yarovoy.com/post/14363197336/maven-how-to-install-maven-3-on-ubuntu-11-10)*
+
+1. Make sure a Android device (Android 2.3+) is running.
+2. For building & deploying the application (on Linux), open the folder "health" and execute the following:
+
+     mvn3 clean install android:deploy -Dandroid.sdk.path=...
+
+where ... is the path of your android sdk folder, (typically named "android-sdk-linux"). Another option is to add ANDROID_HOME to your path.
+
+The app is then built (first time make take a while) and deployed.
+Contrary to Eclipse it is *not* started, so you'll have to open it manually on your real or virtual device.
+
+##More...
+
