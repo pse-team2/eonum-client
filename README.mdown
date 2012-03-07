@@ -4,8 +4,8 @@
 **Prerequirements: Maven 3.0.3+ installed.**
 *For Ubuntu users, you may consider this [installation guide] (http://yarovoy.com/post/14363197336/maven-how-to-install-maven-3-on-ubuntu-11-10)*
 
-1. Make sure a Android device (Android 2.3+) is running.
-2. For building & deploying the application (on Linux), open the folder "health" and execute the following:
+Make sure a Android device (Android 2.3+) is running!
+For building & deploying the application (on Linux), open the folder "health" and execute the following:
 
      mvn3 clean install android:deploy -Dandroid.sdk.path=...
 
