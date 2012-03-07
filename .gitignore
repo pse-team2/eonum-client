@@ -67,3 +67,4 @@ Desktop.ini
 target/
 ./target/
 deploy.sh
+skeleton.sh
