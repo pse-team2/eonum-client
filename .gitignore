@@ -66,5 +66,4 @@ Desktop.ini
 # ignore Maven scripts
 target/
 ./target/
-deploy.sh
-skeleton.sh
+*.sh
