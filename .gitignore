@@ -67,6 +67,7 @@ Desktop.ini
 target/
 ./target/
 *.sh
-project.properties
+
+# other stuff
 gen
 R.java
