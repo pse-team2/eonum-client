@@ -7,7 +7,7 @@
 *More on the maven-android-plugin [here] (http://code.google.com/p/maven-android-plugin/wiki/GettingStarted). For Ubuntu users, you may consider this [installation guide] (http://yarovoy.com/post/14363197336/maven-how-to-install-maven-3-on-ubuntu-11-10)*
 
 Make sure a Android device (Android 2.3+) is running!
-For building & deploying the application (on Linux), open the folder "health" and execute the following:
+For building & deploying the application (on Linux) execute the following:
 
      mvn3 clean install android:deploy -Dandroid.sdk.path=...
 
@@ -18,11 +18,5 @@ Contrary to Eclipse it is *not* started, so you'll have to open it manually on y
 
 
 ##Development with Eclipse
-To start developing with eclipse, "eclipsify" the current project with the following command:
 
-     mvn3 eclipse:eclipse -Dandroid.sdk.path=...
-
-where ... is the path to your android sdk folder again.
-
-After this, all the files needed by eclipse should be created to import it as a project into eclipse.
-
+See <http://rgladwell.github.com/m2e-android/> for instructions on how to use the project with eclipse.
