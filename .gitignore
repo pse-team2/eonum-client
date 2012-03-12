@@ -68,3 +68,5 @@ target/
 ./target/
 *.sh
 project.properties
+gen
+R.java
