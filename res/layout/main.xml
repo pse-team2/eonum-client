@@ -7,19 +7,19 @@
     <TextView
         android:id="@+id/textView1"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.18"
+        android:layout_height="0dip"
+        android:layout_weight="1.00"
         android:text="Welcome screen"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/location"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Get location" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/getdata"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Get Data from server" />
