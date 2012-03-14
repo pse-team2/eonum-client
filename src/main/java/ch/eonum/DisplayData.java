@@ -92,18 +92,9 @@ public class DisplayData extends ListActivity {
 		String[] results;
 
 		if (entries != null) {
-			// sort entries
-			assert ((entries.length % 3) == 0);
-			String[] tmp = new String[Math.min(entries.length / 3, 50)];
 			
-			// TODO rearrangement for display, for improvement
-			for (int i = 0, j = 0; i < entries.length; i += 3) {
-				if (j >= 50)
-					break;
-				tmp[j++] = entries[i + 2] + " - " + entries[i + 1] + " - "
-						+ entries[i];
-			}
-			results = tmp;
+			// TODO Put here some code to specify what to show
+			results = entries;
 
 		} else {
 			results = new String[] {"Leider keine Resultate zurückerhalten.",  "Abfrage: "+latitude+"/"+longitude};

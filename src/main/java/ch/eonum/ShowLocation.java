@@ -35,7 +35,7 @@ public class ShowLocation extends MapActivity
 			String Text = "Location: " + ShowLocation.this.latitude + " : " + ShowLocation.this.longitude;
 			ShowLocation.this.locationTxt.setText(Text);
 			Log.i("Location change", "" + ShowLocation.this.latitude + " : " + ShowLocation.this.longitude);
-			Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
+			// Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
