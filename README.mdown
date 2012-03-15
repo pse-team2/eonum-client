@@ -4,6 +4,13 @@
 ##Deployment with Maven
 **Prerequirements: Maven 3.0.3+ installed.**
 
+You need to have adndroid sdk and the needed android maven artifacts in your local repository (as they are not in maven central).
+
+For this get the tool from https://github.com/mosabua/maven-android-sdk-deployer and do something like
+export ANDROID_HOME=/path/to/android-sdk-linux/
+mvn clean install -P 2.3.3
+
+
 *More on the maven-android-plugin [here] (http://code.google.com/p/maven-android-plugin/wiki/GettingStarted). For Ubuntu users, you may consider this [installation guide] (http://yarovoy.com/post/14363197336/maven-how-to-install-maven-3-on-ubuntu-11-10)*
 
 Make sure a Android device (Android 2.3+) is running!
