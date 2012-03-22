@@ -17,6 +17,12 @@
                         </version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+		  <groupId>com.google.android.maps</groupId>
+		  <artifactId>maps</artifactId>
+		  <version>7_r1</version>
+		  <scope>provided</scope>
+		</dependency>
     </dependencies>
 
     <build>
