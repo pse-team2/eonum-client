@@ -1,6 +1,7 @@
 package ch.eonum;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JSONParser {
@@ -20,7 +21,7 @@ public class JSONParser {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				result[i] = jsonObject.getString("name");
 			}
-		} catch (Exception e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		

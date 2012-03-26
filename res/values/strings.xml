@@ -3,6 +3,8 @@
     <!-- English (default) -->
     <string name="app_name">Eonum health</string>
     <string name="welcome">Welcome screen</string>
+    <string name="where">Where</string>
+    <string name="what">What</string>
     <string name="getlocation">Get location</string>
     <string name="serverdata">Get data from server</string>
     <string name="location">Location</string>

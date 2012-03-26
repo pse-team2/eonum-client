@@ -98,7 +98,7 @@ public class DisplayData extends ListActivity {
 			results = entries;
 
 		} else {
-			results = new String[] {getString(R.string.noresults),  getString(R.string.query)+": "+latitude+"/"+longitude};
+			results = new String[] {getString(R.string.noresults), getString(R.string.query) + ": " + latitude + "/" + longitude};
 		}
 		return results;
 	}

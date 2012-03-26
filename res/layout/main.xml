@@ -5,12 +5,71 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/textviewWelcome"
         android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1.00"
+        android:layout_height="wrap_content"
         android:text="@string/welcome"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <TableRow
+            android:id="@+id/tableRowWhere"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textviewWhat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/where"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <AutoCompleteTextView
+                android:id="@+id/searchforWhere"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textAutoComplete"
+                android:singleLine="true"
+				android:hint="@string/where"
+                android:text="" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRowWhat"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textviewWhere"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/what"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <AutoCompleteTextView
+                android:id="@+id/searchforWhat"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textAutoComplete"
+                android:singleLine="true"
+                android:hint="@string/what"
+                android:text="" />
+        </TableRow>
+
+    </TableLayout>
+
+    <com.google.android.maps.MapView
+        android:id="@+id/mapview"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.73"
+        android:apiKey="API_KEY_HERE"
+        android:clickable="true" />
 
     <Button
         android:id="@+id/location"
