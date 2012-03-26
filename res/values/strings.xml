@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- English (default) -->
     <string name="app_name">Eonum health</string>
+    <string name="welcome">Welcome screen</string>
+    <string name="getlocation">Get location</string>
+    <string name="serverdata">Get data from server</string>
+    <string name="location">Location</string>
+    <string name="loadlocation">Loading Location\.\.\.</string>
+    <string name="pleasewait">Please wait\.\.\.</string>
+    <string name="sendingrequest">Sending request</string>
+    <string name="query">Query</string>
+    <string name="noresults">No results from server</string>
+    <string name="searchresults">Search results</string>
+    <string name="gpsenabled">GPS enabled</string>
+    <string name="gpsdisabled">GPS disabled</string>
+    <string name="askusertoenablegps">GPS is disabled\nOpen settings in order to enable it?</string>
 </resources>

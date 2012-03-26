@@ -25,6 +25,11 @@ public class MapItemizedOverlay extends ItemizedOverlay
 		populate();
 	}
 
+	public void clear()
+	{
+		this.mOverlays.clear();
+	}
+
 	@Override
 	protected OverlayItem createItem(int i)
 	{

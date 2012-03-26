@@ -32,14 +32,14 @@ public class HTTPRequest {
 		    	resultString += str;
 		    }
 		    in.close();
-		} catch (Exception e) {
+		/*} catch (Exception e) {
 			e.printStackTrace();
-		}/*
+		}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		*/} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 		
 		Log.i(HTTPRequest.class.getName(), "Size of HTTP answer: "+resultString.length());
 		return resultString;

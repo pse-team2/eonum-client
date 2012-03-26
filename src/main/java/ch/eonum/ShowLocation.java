@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
@@ -32,22 +33,38 @@ public class ShowLocation extends MapActivity
 		{
 			ShowLocation.this.latitude = location.getLatitude();
 			ShowLocation.this.longitude = location.getLongitude();
-			String Text = "Location: " + ShowLocation.this.latitude + " : " + ShowLocation.this.longitude;
+			String Text = getString(R.string.location) + ": " + ShowLocation.this.latitude + " : " + ShowLocation.this.longitude;
 			ShowLocation.this.locationTxt.setText(Text);
 			Log.i("Location change", "" + ShowLocation.this.latitude + " : " + ShowLocation.this.longitude);
 			// Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
+
+			// Remove other points
+			ShowLocation.this.mapOverlays.clear(); // Not visible
+			ShowLocation.this.itemizedOverlay.clear(); // Visible
+
+			GeoPoint initGeoPoint = new GeoPoint(
+					(int) (ShowLocation.this.locMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude() * 1000000),
+					(int) (ShowLocation.this.locMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude() * 1000000)
+					);
+				OverlayItem overlayitem = new OverlayItem(initGeoPoint, "", "");
+				ShowLocation.this.itemizedOverlay.addOverlay(overlayitem);
+				ShowLocation.this.mapOverlays.add(ShowLocation.this.itemizedOverlay);
+
+				MapController mc = ShowLocation.this.mapView.getController();
+				mc.setZoom(16);
+				mc.animateTo(initGeoPoint);
 		}
 
 		@Override
 		public void onProviderDisabled(String provider)
 		{
-			Toast.makeText(getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), getString(R.string.gpsdisabled), Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
 		public void onProviderEnabled(String provider)
 		{
-			Toast.makeText(getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), getString(R.string.gpsenabled), Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
@@ -94,18 +111,17 @@ public class ShowLocation extends MapActivity
 		return false;
 	}
 
-	public void onPostExecute()
+	@Override
+	public void onPause()
 	{
-		GeoPoint initGeoPoint = new GeoPoint(
-			(int) (this.locMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude() * 1000000),
-			(int) (this.locMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude() * 1000000)
-			);
-		OverlayItem overlayitem = new OverlayItem(initGeoPoint, "", "");
-
-		this.itemizedOverlay.addOverlay(overlayitem);
-		this.mapOverlays.add(this.itemizedOverlay);
-
+		super.onPause();
 		this.locMgr.removeUpdates(this.locLst);
 	}
 
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		this.locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this.locLst);
+	}
 }

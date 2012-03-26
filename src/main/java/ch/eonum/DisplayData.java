@@ -19,8 +19,8 @@ public class DisplayData extends ListActivity {
 	public class GetQuery extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected void onPreExecute() {
-			dialog = ProgressDialog.show(DisplayData.this, "Bitte warten...",
-					"Abfrage wird gesendet", true, false);
+			dialog = ProgressDialog.show(DisplayData.this, getString(R.string.pleasewait),
+					getString(R.string.sendingrequest), true, false);
 		}
 
 		@Override
@@ -38,6 +38,7 @@ public class DisplayData extends ListActivity {
 		}
 	}
 
+	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
@@ -97,7 +98,7 @@ public class DisplayData extends ListActivity {
 			results = entries;
 
 		} else {
-			results = new String[] {"Leider keine Resultate zurückerhalten.",  "Abfrage: "+latitude+"/"+longitude};
+			results = new String[] {getString(R.string.noresults),  getString(R.string.query)+": "+latitude+"/"+longitude};
 		}
 		return results;
 	}
