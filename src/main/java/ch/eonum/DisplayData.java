@@ -85,21 +85,21 @@ public class DisplayData extends ListActivity {
 		
 		// parse results
 		JSONParser parser = new JSONParser();
-		String[] entries = parser.deserialize(resultString);
-		
-		// TODO some temporary data, delete when JSONParser works
-		//String[] entries = {};
+		Location[] entries = parser.deserialize(resultString);
 
-		String[] results;
+		String[] results = new String[entries.length];
 
 		if (entries != null) {
-			
-			// TODO Put here some code to specify what to show
-			results = entries;
-
-		} else {
+			for (int i = 0; i < entries.length; i++) {
+				results[i] = entries[i].getName() + " (" + entries[i].getType() + ")";
+			}
+		}
+		// TODO handle case with no results
+		/*	
+		else {
 			results = new String[] {getString(R.string.noresults), getString(R.string.query) + ": " + latitude + "/" + longitude};
 		}
+		*/
 		return results;
 	}
 }

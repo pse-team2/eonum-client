@@ -19,25 +19,22 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyCharacterMap;
+//import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class HealthActivity extends MapActivity
-{
+public class HealthActivity extends MapActivity {
 
 	private double latitude;
 	private double longitude;
 	private LocationManager locMgr = null;
 	/* Implement Location Listener */
-	private LocationListener locLst = new LocationListener()
-	{
+	private LocationListener locLst = new LocationListener() {
 		@Override
-		public void onLocationChanged(Location location)
-		{
+		public void onLocationChanged(Location location) {
 			HealthActivity.this.latitude = location.getLatitude();
 			HealthActivity.this.longitude = location.getLongitude();
 			String Text = getString(R.string.location) + ": " + HealthActivity.this.latitude + " : " + HealthActivity.this.longitude;
@@ -62,20 +59,17 @@ public class HealthActivity extends MapActivity
 		}
 
 		@Override
-		public void onProviderDisabled(String provider)
-		{
+		public void onProviderDisabled(String provider) {
 			Toast.makeText(getApplicationContext(), getString(R.string.gpsdisabled), Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
-		public void onProviderEnabled(String provider)
-		{
+		public void onProviderEnabled(String provider) {
 			Toast.makeText(getApplicationContext(), getString(R.string.gpsenabled), Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras)
-		{
+		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
 	};
 	/* End of implemented LocationListener */
@@ -95,22 +89,18 @@ public class HealthActivity extends MapActivity
 	 * Called when the activity is first created.
 	 */
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(HealthActivity.class.getName(), "Main Activity started.");
 		setContentView(R.layout.main);
 
 		/** searchforWhere */
 		TextView searchforWhere = (TextView) findViewById(R.id.searchforWhere);
-		searchforWhere.setOnKeyListener(new View.OnKeyListener()
-		{
+		searchforWhere.setOnKeyListener(new View.OnKeyListener() {
 			
 			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event)
-			{
-				if(keyCode == KeyEvent.KEYCODE_ENTER)
-				{
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if(keyCode == KeyEvent.KEYCODE_ENTER) {
 					Toast.makeText(getApplicationContext(), "Where is "+((TextView) findViewById(R.id.searchforWhere)).getText()+"?", Toast.LENGTH_SHORT).show();
 				}
 				return false;
@@ -119,14 +109,11 @@ public class HealthActivity extends MapActivity
 
 		/** searchforWhat */
 		TextView searchforWhat = (TextView) findViewById(R.id.searchforWhat);
-		searchforWhat.setOnKeyListener(new View.OnKeyListener()
-		{
+		searchforWhat.setOnKeyListener(new View.OnKeyListener() {
 			
 			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event)
-			{
-				if(keyCode == KeyEvent.KEYCODE_ENTER)
-				{
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if(keyCode == KeyEvent.KEYCODE_ENTER) {
 					Toast.makeText(getApplicationContext(), "What is "+((TextView) findViewById(R.id.searchforWhat)).getText()+"?", Toast.LENGTH_SHORT).show();
 				}
 				return false;
@@ -150,42 +137,33 @@ public class HealthActivity extends MapActivity
 
 		/** Button "location" */
 		Button location = (Button) findViewById(R.id.location);
-		location.setOnClickListener(new View.OnClickListener()
-		{
+		location.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View view)
-			{
+			public void onClick(View view) {
 				LocationManager tmpLocMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-				if (!tmpLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER))
-				{
+				if (!tmpLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
 					builder.setMessage(getString(R.string.askusertoenablegps))
 							.setCancelable(true)
 							.setPositiveButton(android.R.string.yes,
-									new DialogInterface.OnClickListener()
-									{
+									new DialogInterface.OnClickListener() {
 										@Override
-										public void onClick(DialogInterface dialog, int id)
-										{
+										public void onClick(DialogInterface dialog, int id) {
 											Intent gpsOptionsIntent = new Intent(
 													android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 											startActivity(gpsOptionsIntent);
 										}
 									});
 					builder.setNegativeButton(android.R.string.no,
-							new DialogInterface.OnClickListener()
-							{
+							new DialogInterface.OnClickListener() {
 								@Override
-								public void onClick(DialogInterface dialog, int id)
-								{
+								public void onClick(DialogInterface dialog, int id) {
 									dialog.cancel();
 								}
 							});
 					AlertDialog alert = builder.create();
 					alert.show();
-				}
-				else
-				{
+				} else {
 					startActivity(new Intent(view.getContext(), ShowLocation.class));
 				}
 			}
@@ -193,11 +171,9 @@ public class HealthActivity extends MapActivity
 
 		/** Button "getdata" */
 		Button getdata = (Button) findViewById(R.id.getdata);
-		getdata.setOnClickListener(new View.OnClickListener()
-		{
+		getdata.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View view)
-			{
+			public void onClick(View view) {
 				startActivity(new Intent(view.getContext(), DisplayData.class));
 			}
 		});
@@ -205,23 +181,19 @@ public class HealthActivity extends MapActivity
 	}
 
 	@Override
-	protected boolean isRouteDisplayed()
-	{
+	protected boolean isRouteDisplayed() {
 		return false;
 	}
 
 	@Override
-	public void onPause()
-	{
+	public void onPause() {
 		super.onPause();
 		this.locMgr.removeUpdates(this.locLst);
 	}
 
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
 		this.locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this.locLst);
 	}
-
 }
