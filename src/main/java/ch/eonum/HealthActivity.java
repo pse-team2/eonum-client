@@ -57,9 +57,13 @@ public class HealthActivity extends MapActivity
 			HealthActivity.this.itemizedLocationOverlay.clear(); // Visible
 
 			GeoPoint initGeoPoint = new GeoPoint(
-				(int) (location.getLatitude() * 1000000), //(int) (HealthActivity.this.locMgr.getLastKnownLocation(locProvider).getLatitude() * 1000000),
-				(int) (location.getLongitude() * 1000000) //(int) (HealthActivity.this.locMgr.getLastKnownLocation(locProvider).getLongitude() * 1000000)
-				);
+				(int) (location.getLatitude() * 1000000), // (int)
+															// (HealthActivity.this.locMgr.getLastKnownLocation(locProvider).getLatitude()
+															// * 1000000),
+				(int) (location.getLongitude() * 1000000) // (int)
+															// (HealthActivity.this.locMgr.getLastKnownLocation(locProvider).getLongitude()
+															// * 1000000)
+			);
 			OverlayItem overlayitem = new OverlayItem(initGeoPoint, "Our Location", "We are here");
 			HealthActivity.this.itemizedLocationOverlay.addOverlay(overlayitem);
 			HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedLocationOverlay);
@@ -69,7 +73,8 @@ public class HealthActivity extends MapActivity
 			mc.animateTo(initGeoPoint);
 
 			// Search for results around that point and display them
-			AsyncTask<Double, Void, ch.eonum.Location[]> queryAnswer = new QueryData(HealthActivity.this).execute(location.getLatitude(), location.getLongitude());
+			AsyncTask<Double, Void, ch.eonum.Location[]> queryAnswer = new QueryData(HealthActivity.this).execute(
+				location.getLatitude(), location.getLongitude());
 			ch.eonum.Location[] results = {};
 			try
 			{
@@ -83,10 +88,11 @@ public class HealthActivity extends MapActivity
 			{
 				e.printStackTrace();
 			}
-			Log.i("Results from server", "Length: "+results.length);
-			for(ch.eonum.Location point : results)
+			Log.i("Results from server", "Length: " + results.length);
+			for (ch.eonum.Location point : results)
 			{
-				Log.i(String.format("GeoPoint is at %f : %f",point.getLocation()[0], point.getLocation()[1]), String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
+				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
+					String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
 				GeoPoint matchingResult = new GeoPoint(
 					(int) (point.getLocation()[0] * 1000000),
 					(int) (point.getLocation()[1] * 1000000)
@@ -117,22 +123,28 @@ public class HealthActivity extends MapActivity
 			{
 				case LocationProvider.OUT_OF_SERVICE:
 				{
-					Toast.makeText(getApplicationContext(), String.format("Provider %s: Status Changed: Out of Service", provider), Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),
+						String.format("Provider %s: Status Changed: Out of Service", provider), Toast.LENGTH_SHORT)
+						.show();
 					break;
 				}
 				case LocationProvider.TEMPORARILY_UNAVAILABLE:
 				{
-					Toast.makeText(getApplicationContext(), String.format("Provider %s: Status Changed: Temporarily Unavailable", provider), Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),
+						String.format("Provider %s: Status Changed: Temporarily Unavailable", provider),
+						Toast.LENGTH_SHORT).show();
 					break;
 				}
 				case LocationProvider.AVAILABLE:
 				{
-					Toast.makeText(getApplicationContext(), String.format("Provider %s: Status Changed: Available", provider), Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),
+						String.format("Provider %s: Status Changed: Available", provider), Toast.LENGTH_SHORT).show();
 					break;
 				}
 				default:
-					Toast.makeText(getApplicationContext(), String.format("Provider %s: Unknown status", provider), Toast.LENGTH_LONG).show();
-		    }
+					Toast.makeText(getApplicationContext(), String.format("Provider %s: Unknown status", provider),
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	};
 	/* End of implemented LocationListener */
@@ -250,16 +262,16 @@ public class HealthActivity extends MapActivity
 					AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
 					builder.setMessage(getString(R.string.askusertoenablenetwork)).setCancelable(true);
 					builder.setPositiveButton(android.R.string.yes,
-							new DialogInterface.OnClickListener()
+						new DialogInterface.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int id)
 							{
-								@Override
-								public void onClick(DialogInterface dialog, int id)
-								{
-									Intent gpsOptionsIntent = new Intent(
-										android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-									startActivity(gpsOptionsIntent);
-								}
-							});
+								Intent gpsOptionsIntent = new Intent(
+									android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+								startActivity(gpsOptionsIntent);
+							}
+						});
 					builder.setNegativeButton(android.R.string.no,
 						new DialogInterface.OnClickListener()
 						{
@@ -310,7 +322,7 @@ public class HealthActivity extends MapActivity
 	protected void onPause()
 	{
 		this.locMgr.removeUpdates(this.locLst);
-	    super.onPause();
+		super.onPause();
 	}
 
 	@Override

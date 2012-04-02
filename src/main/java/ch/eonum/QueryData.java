@@ -29,7 +29,8 @@ public class QueryData extends AsyncTask<Double, Void, Location[]>
 			this.activity.getString(R.string.sendingrequest), true, false);
 	}
 
-	/** Main part comes here
+	/**
+	 * Main part comes here
 	 * The datatype of the first parameter in the class definition matches the one passed to this method
 	 * The datatype of the last parameter in the class definition matches the return type of this method
 	 */
@@ -38,12 +39,13 @@ public class QueryData extends AsyncTask<Double, Void, Location[]>
 	{
 		double myLatitude = params[0];
 		double myLongitude = params[1];
-		//publishProgress();
+		// publishProgress();
 		return queryServer(myLatitude, myLongitude);
 
 	}
 
-	/** Called from the publish progress
+	/**
+	 * Called from the publish progress
 	 * The datatype of the second parameter gets passed to this method
 	 */
 	@Override
@@ -52,19 +54,20 @@ public class QueryData extends AsyncTask<Double, Void, Location[]>
 		// Increment Progress Dialog with the update from the doInBackgroundMethod
 	}
 
-	/** Called as soon as doInBackground method completes
+	/**
+	 * Called as soon as doInBackground method completes
 	 * The third parameter gets passed to this method
 	 */
 	@Override
 	protected void onPostExecute(Location[] result)
 	{
-		Log.i(QueryData.class.getName(), "Size of results from server in onPostExecute: "+result.length);
+		Log.i(QueryData.class.getName(), "Size of results from server in onPostExecute: " + result.length);
 		this.dialog.dismiss();
 	}
 
 	private ch.eonum.Location[] queryServer(double latitude, double longitude)
 	{
-		Log.i(this.getClass().getName(), "Location to query: "+latitude+" : "+longitude);
+		Log.i(this.getClass().getName(), "Location to query: " + latitude + " : " + longitude);
 		// Send query to server
 		HTTPRequest request = new HTTPRequest(latitude, longitude);
 		String resultString = request.getResults();

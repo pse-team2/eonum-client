@@ -9,40 +9,49 @@ import java.net.URL;
 import android.util.Log;
 
 /** Fetches the raw data from the server */
-public class HTTPRequest {
-	
+public class HTTPRequest
+{
+
 	URL url;
 	String resultString;
-	
-	public HTTPRequest(double latitude, double longitude) {
-		
+
+	public HTTPRequest(double latitude, double longitude)
+	{
+
 		resultString = "";
-		
-	    try {
-			url = new URL("http://77.95.120.72:8080/finder?lat="+latitude+"&long="+longitude);
-		} catch (MalformedURLException e) {
+
+		try
+		{
+			url = new URL("http://77.95.120.72:8080/finder?lat=" + latitude + "&long=" + longitude);
+		}
+		catch (MalformedURLException e)
+		{
 			e.printStackTrace();
 		}
 	}
-	
-	public String getResults() {
-		try {
-		    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-		    String str;
-		    while ((str = in.readLine()) != null) {
-		    	resultString += str;
-		    }
-		    in.close();
-		/*} catch (Exception e) {
+
+	public String getResults()
+	{
+		try
+		{
+			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+			String str;
+			while ((str = in.readLine()) != null)
+			{
+				resultString += str;
+			}
+			in.close();
+			/* } catch (Exception e) {
+			 * e.printStackTrace();
+			 * }
+			 * } catch (MalformedURLException e) {
+			 * e.printStackTrace(); */}
+		catch (IOException e)
+		{
 			e.printStackTrace();
 		}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		*/} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		Log.i(HTTPRequest.class.getName(), "Size of HTTP answer: "+resultString.length());
+
+		Log.i(HTTPRequest.class.getName(), "Size of HTTP answer: " + resultString.length());
 		return resultString;
 	}
 }

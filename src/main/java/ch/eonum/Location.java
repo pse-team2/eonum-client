@@ -5,13 +5,12 @@ import android.util.Log;
 /**
  * Represents a single address (data set) returned by the server.
  * Can be a medical practice, hospital, doctor office etc.
- * 
  * Will provide public methods for name, type and location.
  * Type depends on TypeResolver, which matches the returned categories to names.
- *
  */
-public class Location {
-	
+public class Location
+{
+
 	TypeResolver Resolver = new TypeResolver();
 	private String name;
 	private String arztTyp;
@@ -20,8 +19,9 @@ public class Location {
 	@SuppressWarnings("unused")
 	private double longitude;
 	Double[] location = new Double[2];
-	
-	public Location (String name, String arztTyp, double latitude, double longitude) {
+
+	public Location(String name, String arztTyp, double latitude, double longitude)
+	{
 		this.name = name;
 		this.latitude = latitude;
 		this.location[0] = latitude;
@@ -30,20 +30,21 @@ public class Location {
 		this.arztTyp = Resolver.resolve(arztTyp);
 		Log.i("Arzttyp", arztTyp);
 	}
-	
-	/*
-	 * GETTERS & SETTERS
-	 */
-	
-	public String getName() {
+
+	/* GETTERS & SETTERS */
+
+	public String getName()
+	{
 		return name;
 	}
-	
-	public String getType() {
+
+	public String getType()
+	{
 		return arztTyp;
 	}
-	
-	public Double[] getLocation() {
+
+	public Double[] getLocation()
+	{
 		return location;
 	}
 }

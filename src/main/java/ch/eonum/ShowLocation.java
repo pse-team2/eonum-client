@@ -33,7 +33,8 @@ public class ShowLocation extends MapActivity
 		{
 			ShowLocation.this.latitude = location.getLatitude();
 			ShowLocation.this.longitude = location.getLongitude();
-			String Text = getString(R.string.location) + ": " + ShowLocation.this.latitude + " : " + ShowLocation.this.longitude;
+			String Text = getString(R.string.location) + ": " + ShowLocation.this.latitude + " : "
+				+ ShowLocation.this.longitude;
 			ShowLocation.this.locationTxt.setText(Text);
 			Log.i("Location change", ShowLocation.this.latitude + " : " + ShowLocation.this.longitude);
 			// Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
@@ -43,16 +44,16 @@ public class ShowLocation extends MapActivity
 			ShowLocation.this.itemizedOverlay.clear(); // Visible
 
 			GeoPoint initGeoPoint = new GeoPoint(
-					(int) (ShowLocation.this.locMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude() * 1000000),
-					(int) (ShowLocation.this.locMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude() * 1000000)
-					);
-				OverlayItem overlayitem = new OverlayItem(initGeoPoint, "", "");
-				ShowLocation.this.itemizedOverlay.addOverlay(overlayitem);
-				ShowLocation.this.mapOverlays.add(ShowLocation.this.itemizedOverlay);
+				(int) (ShowLocation.this.locMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude() * 1000000),
+				(int) (ShowLocation.this.locMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude() * 1000000)
+				);
+			OverlayItem overlayitem = new OverlayItem(initGeoPoint, "", "");
+			ShowLocation.this.itemizedOverlay.addOverlay(overlayitem);
+			ShowLocation.this.mapOverlays.add(ShowLocation.this.itemizedOverlay);
 
-				MapController mc = ShowLocation.this.mapView.getController();
-				mc.setZoom(16);
-				mc.animateTo(initGeoPoint);
+			MapController mc = ShowLocation.this.mapView.getController();
+			mc.setZoom(16);
+			mc.animateTo(initGeoPoint);
 		}
 
 		@Override
@@ -86,7 +87,8 @@ public class ShowLocation extends MapActivity
 
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.location);
 
