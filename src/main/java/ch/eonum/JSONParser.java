@@ -4,13 +4,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/** Fills the data obtained from the server into arrays as defined in {@link Location} */
+/** Fills the data obtained from the server into arrays as defined in {@link MedicalLocation} */
 public class JSONParser
 {
 
-	public Location[] deserialize(String str)
+	public MedicalLocation[] deserialize(String str)
 	{
-		Location[] results = null;
+		MedicalLocation[] results = null;
 
 		try
 		{
@@ -18,7 +18,7 @@ public class JSONParser
 			JSONArray jsonArray = jsonObj.getJSONArray("results");
 
 			// split up into addresses
-			results = new Location[jsonArray.length()];
+			results = new MedicalLocation[jsonArray.length()];
 			double latitude, longitude;
 
 			for (int i = 0; i < jsonArray.length(); i++)
@@ -34,7 +34,7 @@ public class JSONParser
 				latitude = location.getDouble("lat");
 				longitude = location.getDouble("lng");
 
-				results[i] = new Location(name, type, latitude, longitude);
+				results[i] = new MedicalLocation(name, type, latitude, longitude);
 			}
 		}
 		catch (JSONException e)

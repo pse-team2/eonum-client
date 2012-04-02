@@ -73,9 +73,9 @@ public class HealthActivity extends MapActivity
 			mc.animateTo(initGeoPoint);
 
 			// Search for results around that point and display them
-			AsyncTask<Double, Void, ch.eonum.Location[]> queryAnswer = new QueryData(HealthActivity.this).execute(
+			AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer = new QueryData(HealthActivity.this).execute(
 				location.getLatitude(), location.getLongitude());
-			ch.eonum.Location[] results = {};
+			ch.eonum.MedicalLocation[] results = {};
 			try
 			{
 				results = queryAnswer.get();
@@ -89,7 +89,7 @@ public class HealthActivity extends MapActivity
 				e.printStackTrace();
 			}
 			Log.i("Results from server", "Length: " + results.length);
-			for (ch.eonum.Location point : results)
+			for (ch.eonum.MedicalLocation point : results)
 			{
 				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
 					String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
@@ -154,25 +154,27 @@ public class HealthActivity extends MapActivity
 	List<Overlay> mapOverlays;
 	Drawable drawableLocation, drawableSearchresult;
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
-
-	private static final String[] CITIES = new String[] {"Aarau", "Adliswil", "Aesch", "Affoltern am Albis",
-			"Allschwil", "Altstätten", "Amriswil", "Arbon", "Arth", "Baar", "Baden", "Basel", "Bassersdorf",
-			"Bellinzona", "Belp", "Bern", "Biel/Bienne", "Binningen", "Birsfelden", "Brig-Glis", "Brugg", "Buchs",
-			"Bülach", "Bulle", "Burgdorf", "Carouge", "Cham", "Chêne-Bougeries", "Chur", "Davos", "Delsberg",
-			"Dietikon", "Dübendorf", "Ebikon", "Ecublens", "Einsiedeln", "Emmen", "Frauenfeld", "Freiburg",
-			"Freienbach", "Genf", "Gland", "Gossau", "Grenchen", "Herisau", "Hinwil", "Horgen", "Horw",
-			"Illnau-Effretikon", "Ittigen", "Kloten", "Köniz", "Kreuzlingen", "Kriens", "Küsnacht", "Küssnacht",
-			"La Chaux-de-Fonds", "La Tour-de-Peilz", "Lancy", "Langenthal", "Lausanne", "Le Grand-Saconnex",
-			"Le Locle", "Liestal", "Locarno", "Lugano", "Luzern", "Lyss", "Männedorf", "Martigny", "Meilen",
-			"Mendrisio", "Meyrin", "Möhlin", "Monthey", "Montreux", "Morges", "Münchenstein", "Münsingen",
-			"Muri bei Bern", "Muttenz", "Neuenburg", "Neuhausen am Rheinfall", "Nyon", "Oberwil", "Oftringen",
-			"Olten", "Onex", "Opfikon", "Ostermundigen", "Pfäffikon", "Pratteln", "Prilly", "Pully", "Rapperswil-Jona",
-			"Regensdorf", "Reinach", "Renens", "Rheinfelden", "Richterswil", "Riehen", "Rüti", "Schaffhausen",
-			"Schlieren", "Schwyz", "Siders", "Sitten", "Solothurn", "Spiez", "Spreitenbach", "St. Gallen", "Stäfa",
-			"Steffisburg", "Thalwil", "Thônex", "Thun", "Uster", "Uzwil", "Val-de-Travers NE", "Vernier", "Versoix",
-			"Vevey", "Veyrier GE", "Villars-sur-Glâne", "Volketswil", "Wädenswil", "Wallisellen", "Weinfelden",
-			"Wettingen", "Wetzikon", "Wil", "Winterthur", "Wohlen", "Worb", "Yverdon-les-Bains", "Zofingen",
-			"Zollikon", "Zug", "Zürich"};
+	
+	private static final String[] CITIES = new CityResolver().getAllCities();
+	
+//	private static final String[] CITIES = new String[] {"Aarau", "Adliswil", "Aesch", "Affoltern am Albis",
+//			"Allschwil", "Altstätten", "Amriswil", "Arbon", "Arth", "Baar", "Baden", "Basel", "Bassersdorf",
+//			"Bellinzona", "Belp", "Bern", "Biel/Bienne", "Binningen", "Birsfelden", "Brig-Glis", "Brugg", "Buchs",
+//			"Bülach", "Bulle", "Burgdorf", "Carouge", "Cham", "Chêne-Bougeries", "Chur", "Davos", "Delsberg",
+//			"Dietikon", "Dübendorf", "Ebikon", "Ecublens", "Einsiedeln", "Emmen", "Frauenfeld", "Freiburg",
+//			"Freienbach", "Genf", "Gland", "Gossau", "Grenchen", "Herisau", "Hinwil", "Horgen", "Horw",
+//			"Illnau-Effretikon", "Ittigen", "Kloten", "Köniz", "Kreuzlingen", "Kriens", "Küsnacht", "Küssnacht",
+//			"La Chaux-de-Fonds", "La Tour-de-Peilz", "Lancy", "Langenthal", "Lausanne", "Le Grand-Saconnex",
+//			"Le Locle", "Liestal", "Locarno", "Lugano", "Luzern", "Lyss", "Männedorf", "Martigny", "Meilen",
+//			"Mendrisio", "Meyrin", "Möhlin", "Monthey", "Montreux", "Morges", "Münchenstein", "Münsingen",
+//			"Muri bei Bern", "Muttenz", "Neuenburg", "Neuhausen am Rheinfall", "Nyon", "Oberwil", "Oftringen",
+//			"Olten", "Onex", "Opfikon", "Ostermundigen", "Pfäffikon", "Pratteln", "Prilly", "Pully", "Rapperswil-Jona",
+//			"Regensdorf", "Reinach", "Renens", "Rheinfelden", "Richterswil", "Riehen", "Rüti", "Schaffhausen",
+//			"Schlieren", "Schwyz", "Siders", "Sitten", "Solothurn", "Spiez", "Spreitenbach", "St. Gallen", "Stäfa",
+//			"Steffisburg", "Thalwil", "Thônex", "Thun", "Uster", "Uzwil", "Val-de-Travers NE", "Vernier", "Versoix",
+//			"Vevey", "Veyrier GE", "Villars-sur-Glâne", "Volketswil", "Wädenswil", "Wallisellen", "Weinfelden",
+//			"Wettingen", "Wetzikon", "Wil", "Winterthur", "Wohlen", "Worb", "Yverdon-les-Bains", "Zofingen",
+//			"Zollikon", "Zug", "Zürich"};
 
 	/**
 	 * Main Activity:

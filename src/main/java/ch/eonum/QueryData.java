@@ -7,13 +7,13 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 /** Used to query results */
-public class QueryData extends AsyncTask<Double, Void, Location[]>
+public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 {
 
 	Activity activity;
 	ProgressDialog dialog;
 	ArrayAdapter<String> adapter;
-	Location[] res;
+	MedicalLocation[] res;
 
 	public QueryData(Activity application)
 	{
@@ -35,7 +35,7 @@ public class QueryData extends AsyncTask<Double, Void, Location[]>
 	 * The datatype of the last parameter in the class definition matches the return type of this method
 	 */
 	@Override
-	protected Location[] doInBackground(Double... params)
+	protected MedicalLocation[] doInBackground(Double... params)
 	{
 		double myLatitude = params[0];
 		double myLongitude = params[1];
@@ -59,13 +59,13 @@ public class QueryData extends AsyncTask<Double, Void, Location[]>
 	 * The third parameter gets passed to this method
 	 */
 	@Override
-	protected void onPostExecute(Location[] result)
+	protected void onPostExecute(MedicalLocation[] result)
 	{
 		Log.i(QueryData.class.getName(), "Size of results from server in onPostExecute: " + result.length);
 		this.dialog.dismiss();
 	}
 
-	private ch.eonum.Location[] queryServer(double latitude, double longitude)
+	private ch.eonum.MedicalLocation[] queryServer(double latitude, double longitude)
 	{
 		Log.i(this.getClass().getName(), "Location to query: " + latitude + " : " + longitude);
 		// Send query to server

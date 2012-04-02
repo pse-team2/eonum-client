@@ -93,7 +93,7 @@ public class DisplayData extends ListActivity
 
 		// parse results
 		JSONParser parser = new JSONParser();
-		Location[] entries = parser.deserialize(resultString);
+		MedicalLocation[] entries = parser.deserialize(resultString);
 
 		String[] results = new String[entries.length];
 
