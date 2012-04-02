@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/** Fills the data obtained from the server into arrays as defined in {@link Location} */
 public class JSONParser {
 
 	public Location[] deserialize(String str) {

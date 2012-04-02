@@ -8,37 +8,43 @@ import android.graphics.drawable.Drawable;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
-@SuppressWarnings("rawtypes")
-public class MapItemizedOverlay extends ItemizedOverlay {
+public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
+{
 	private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
 	Context mContext;
 
-	public MapItemizedOverlay(Drawable defaultMarker, Context context) {
+	public MapItemizedOverlay(Drawable defaultMarker, Context context)
+	{
 		super(boundCenterBottom(defaultMarker));
 		this.mContext = context;
 	}
 
-	public void addOverlay(OverlayItem overlay) {
+	public void addOverlay(OverlayItem overlay)
+	{
 		this.mOverlays.add(overlay);
 		populate();
 	}
 
-	public void clear() {
+	public void clear()
+	{
 		this.mOverlays.clear();
 	}
 
 	@Override
-	protected OverlayItem createItem(int i) {
+	protected OverlayItem createItem(int i)
+	{
 		return this.mOverlays.get(i);
 	}
 
 	@Override
-	public int size() {
+	public int size()
+	{
 		return this.mOverlays.size();
 	}
 
 	@Override
-	protected boolean onTap(int index) {
+	protected boolean onTap(int index)
+	{
 		OverlayItem item = this.mOverlays.get(index);
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this.mContext);
 		dialog.setTitle(item.getTitle());

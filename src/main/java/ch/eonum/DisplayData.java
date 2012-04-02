@@ -89,10 +89,8 @@ public class DisplayData extends ListActivity {
 
 		String[] results = new String[entries.length];
 
-		if (entries != null) {
-			for (int i = 0; i < entries.length; i++) {
-				results[i] = entries[i].getName() + " (" + entries[i].getType() + ")";
-			}
+		for (int i = 0; i < entries.length; i++) {
+			results[i] = entries[i].getName() + " (" + entries[i].getType() + ")";
 		}
 		// TODO handle case with no results
 		/*	

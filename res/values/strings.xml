@@ -16,5 +16,5 @@
     <string name="searchresults">Search results</string>
     <string name="gpsenabled">GPS enabled</string>
     <string name="gpsdisabled">GPS disabled</string>
-    <string name="askusertoenablegps">GPS is disabled\nOpen settings in order to enable it?</string>
+    <string name="askusertoenablenetwork">Network is disabled\nOpen settings in order to enable it?</string>
 </resources>

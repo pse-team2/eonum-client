@@ -1,5 +1,7 @@
 package ch.eonum;
 
+import android.util.Log;
+
 /**
  * Represents a single address (data set) returned by the server.
  * Can be a medical practice, hospital, doctor office etc.
@@ -26,7 +28,7 @@ public class Location {
 		this.longitude = longitude;
 		this.location[1] = longitude;
 		this.arztTyp = Resolver.resolve(arztTyp);
-		System.out.println("Arzttyp: "+arztTyp);
+		Log.i("Arzttyp", arztTyp);
 	}
 	
 	/*

@@ -8,6 +8,7 @@ import java.net.URL;
 
 import android.util.Log;
 
+/** Fetches the raw data from the server */
 public class HTTPRequest {
 	
 	URL url;
