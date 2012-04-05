@@ -31,7 +31,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ZoomControls;
 
 public class HealthActivity extends MapActivity
 {
@@ -40,47 +39,44 @@ public class HealthActivity extends MapActivity
 	private double longitude;
 	private LocationManager locMgr;
 	private String locProvider;
-	
+
 	TextView locationTxt;
 
 	MapView mapView;
 	List<Overlay> mapOverlays;
 	Drawable drawableLocation, drawableSearchresult;
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
-	
+
 	// detect zoom and trigger event
 	private Handler handler = new Handler();
 	private int zoomLevel = 0, newZoomLevel;
 	public static final int zoomCheckingDelay = 500; // in ms
 	private Runnable zoomChecker = new Runnable()
 	{
-	    public void run()
-	    {
-	    	//ZoomControls mZoom = (ZoomControls) mapView.getZoomControls();;
-	    	mapView.getZoomLevel();
-	    	
-	    	if (zoomLevel == 0)
-	    		zoomLevel = mapView.getZoomLevel();
-	    	
-	    	newZoomLevel = mapView.getZoomLevel();
-	    	
-	    	if (newZoomLevel != zoomLevel) {
-	    		Toast.makeText(getApplicationContext(), "You just zoomed!", Toast.LENGTH_SHORT).show();
-	    		zoomLevel = newZoomLevel;
-	    	}
+		public void run()
+		{
+			// ZoomControls mZoom = (ZoomControls) mapView.getZoomControls();;
+			mapView.getZoomLevel();
 
-	    	
-	    	/* TODO
-	    	 * 
-	    	 * Add code for firing a search event
-	    	 * 
-	    	 */
-	    	
-	        handler.removeCallbacks(zoomChecker); // remove the old callback
-	        handler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
-	    }
+			if (zoomLevel == 0)
+				zoomLevel = mapView.getZoomLevel();
+
+			newZoomLevel = mapView.getZoomLevel();
+
+			if (newZoomLevel != zoomLevel)
+			{
+				Toast.makeText(getApplicationContext(), "You just zoomed!", Toast.LENGTH_SHORT).show();
+				zoomLevel = newZoomLevel;
+			}
+
+			/* TODO
+			 * Add code for firing a search event */
+
+			handler.removeCallbacks(zoomChecker); // remove the old callback
+			handler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
+		}
 	};
-	
+
 	/* Implement Location Listener */
 	private LocationListener locLst = new LocationListener()
 	{
@@ -116,8 +112,9 @@ public class HealthActivity extends MapActivity
 			mc.animateTo(initGeoPoint);
 
 			// Search for results around that point and display them
-			AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer = new QueryData(HealthActivity.this).execute(
-				location.getLatitude(), location.getLongitude());
+			AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer = new QueryData(HealthActivity.this)
+				.execute(
+					location.getLatitude(), location.getLongitude());
 			ch.eonum.MedicalLocation[] results = {};
 			try
 			{
@@ -191,7 +188,7 @@ public class HealthActivity extends MapActivity
 		}
 	};
 	/* End of implemented LocationListener */
-	
+
 	private static final String[] CITIES = new CityResolver().getAllCities();
 
 	/**
@@ -343,7 +340,7 @@ public class HealthActivity extends MapActivity
 	{
 		// zoom handler
 		handler.removeCallbacks(zoomChecker);
-		
+
 		this.locMgr.removeUpdates(this.locLst);
 		super.onPause();
 	}
@@ -353,7 +350,7 @@ public class HealthActivity extends MapActivity
 	{
 		// zoom handler
 		handler.postDelayed(zoomChecker, zoomCheckingDelay);
-		
+
 		if (this.locMgr == null)
 		{
 			this.locMgr = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
