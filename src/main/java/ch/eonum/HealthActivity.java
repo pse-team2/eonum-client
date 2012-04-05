@@ -22,6 +22,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,6 +31,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ZoomControls;
 
 public class HealthActivity extends MapActivity
 {
@@ -38,6 +40,47 @@ public class HealthActivity extends MapActivity
 	private double longitude;
 	private LocationManager locMgr;
 	private String locProvider;
+	
+	TextView locationTxt;
+
+	MapView mapView;
+	List<Overlay> mapOverlays;
+	Drawable drawableLocation, drawableSearchresult;
+	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
+	
+	// detect zoom and trigger event
+	private Handler handler = new Handler();
+	private int zoomLevel = 0, newZoomLevel;
+	public static final int zoomCheckingDelay = 500; // in ms
+	private Runnable zoomChecker = new Runnable()
+	{
+	    public void run()
+	    {
+	    	//ZoomControls mZoom = (ZoomControls) mapView.getZoomControls();;
+	    	mapView.getZoomLevel();
+	    	
+	    	if (zoomLevel == 0)
+	    		zoomLevel = mapView.getZoomLevel();
+	    	
+	    	newZoomLevel = mapView.getZoomLevel();
+	    	
+	    	if (newZoomLevel != zoomLevel) {
+	    		Toast.makeText(getApplicationContext(), "You just zoomed!", Toast.LENGTH_SHORT).show();
+	    		zoomLevel = newZoomLevel;
+	    	}
+
+	    	
+	    	/* TODO
+	    	 * 
+	    	 * Add code for firing a search event
+	    	 * 
+	    	 */
+	    	
+	        handler.removeCallbacks(zoomChecker); // remove the old callback
+	        handler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
+	    }
+	};
+	
 	/* Implement Location Listener */
 	private LocationListener locLst = new LocationListener()
 	{
@@ -148,33 +191,8 @@ public class HealthActivity extends MapActivity
 		}
 	};
 	/* End of implemented LocationListener */
-	TextView locationTxt;
-
-	MapView mapView;
-	List<Overlay> mapOverlays;
-	Drawable drawableLocation, drawableSearchresult;
-	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
 	
 	private static final String[] CITIES = new CityResolver().getAllCities();
-	
-//	private static final String[] CITIES = new String[] {"Aarau", "Adliswil", "Aesch", "Affoltern am Albis",
-//			"Allschwil", "Altstätten", "Amriswil", "Arbon", "Arth", "Baar", "Baden", "Basel", "Bassersdorf",
-//			"Bellinzona", "Belp", "Bern", "Biel/Bienne", "Binningen", "Birsfelden", "Brig-Glis", "Brugg", "Buchs",
-//			"Bülach", "Bulle", "Burgdorf", "Carouge", "Cham", "Chêne-Bougeries", "Chur", "Davos", "Delsberg",
-//			"Dietikon", "Dübendorf", "Ebikon", "Ecublens", "Einsiedeln", "Emmen", "Frauenfeld", "Freiburg",
-//			"Freienbach", "Genf", "Gland", "Gossau", "Grenchen", "Herisau", "Hinwil", "Horgen", "Horw",
-//			"Illnau-Effretikon", "Ittigen", "Kloten", "Köniz", "Kreuzlingen", "Kriens", "Küsnacht", "Küssnacht",
-//			"La Chaux-de-Fonds", "La Tour-de-Peilz", "Lancy", "Langenthal", "Lausanne", "Le Grand-Saconnex",
-//			"Le Locle", "Liestal", "Locarno", "Lugano", "Luzern", "Lyss", "Männedorf", "Martigny", "Meilen",
-//			"Mendrisio", "Meyrin", "Möhlin", "Monthey", "Montreux", "Morges", "Münchenstein", "Münsingen",
-//			"Muri bei Bern", "Muttenz", "Neuenburg", "Neuhausen am Rheinfall", "Nyon", "Oberwil", "Oftringen",
-//			"Olten", "Onex", "Opfikon", "Ostermundigen", "Pfäffikon", "Pratteln", "Prilly", "Pully", "Rapperswil-Jona",
-//			"Regensdorf", "Reinach", "Renens", "Rheinfelden", "Richterswil", "Riehen", "Rüti", "Schaffhausen",
-//			"Schlieren", "Schwyz", "Siders", "Sitten", "Solothurn", "Spiez", "Spreitenbach", "St. Gallen", "Stäfa",
-//			"Steffisburg", "Thalwil", "Thônex", "Thun", "Uster", "Uzwil", "Val-de-Travers NE", "Vernier", "Versoix",
-//			"Vevey", "Veyrier GE", "Villars-sur-Glâne", "Volketswil", "Wädenswil", "Wallisellen", "Weinfelden",
-//			"Wettingen", "Wetzikon", "Wil", "Winterthur", "Wohlen", "Worb", "Yverdon-les-Bains", "Zofingen",
-//			"Zollikon", "Zug", "Zürich"};
 
 	/**
 	 * Main Activity:
@@ -323,6 +341,9 @@ public class HealthActivity extends MapActivity
 	@Override
 	protected void onPause()
 	{
+		// zoom handler
+		handler.removeCallbacks(zoomChecker);
+		
 		this.locMgr.removeUpdates(this.locLst);
 		super.onPause();
 	}
@@ -330,6 +351,9 @@ public class HealthActivity extends MapActivity
 	@Override
 	protected void onResume()
 	{
+		// zoom handler
+		handler.postDelayed(zoomChecker, zoomCheckingDelay);
+		
 		if (this.locMgr == null)
 		{
 			this.locMgr = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
