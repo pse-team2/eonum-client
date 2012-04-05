@@ -10,10 +10,10 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+//import android.app.AlertDialog;
+//import android.content.DialogInterface;
 import android.content.Context;
-import android.content.Intent;
+//import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
@@ -28,7 +28,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
+//import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,7 +71,7 @@ public class HealthActivity extends MapActivity
 			}
 
 			/* TODO
-			 * Add code for firing a search event */
+			 * call function for firing a search event */
 
 			handler.removeCallbacks(zoomChecker); // remove the old callback
 			handler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
@@ -267,58 +268,72 @@ public class HealthActivity extends MapActivity
 			Toast.makeText(this, "Failure: No location provider available!", Toast.LENGTH_LONG).show();
 		}
 
-		/** Button "location" */
-		Button location = (Button) findViewById(R.id.location);
-		location.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				if (!HealthActivity.this.locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER))
-				{
-					AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-					builder.setMessage(getString(R.string.askusertoenablenetwork)).setCancelable(true);
-					builder.setPositiveButton(android.R.string.yes,
-						new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int id)
-							{
-								Intent gpsOptionsIntent = new Intent(
-									android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-								startActivity(gpsOptionsIntent);
-							}
-						});
-					builder.setNegativeButton(android.R.string.no,
-						new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int id)
-							{
-								dialog.cancel();
-							}
-						});
-					AlertDialog alert = builder.create();
-					alert.show();
-				}
-				else
-				{
-					startActivity(new Intent(view.getContext(), ShowLocation.class));
-				}
-			}
-		});
+//		/** Button "location" */
+//		Button location = (Button) findViewById(R.id.location);
+//		location.setOnClickListener(new View.OnClickListener()
+//		{
+//			@Override
+//			public void onClick(View view)
+//			{
+//				if (!HealthActivity.this.locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER))
+//				{
+//					AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+//					builder.setMessage(getString(R.string.askusertoenablenetwork)).setCancelable(true);
+//					builder.setPositiveButton(android.R.string.yes,
+//						new DialogInterface.OnClickListener()
+//						{
+//							@Override
+//							public void onClick(DialogInterface dialog, int id)
+//							{
+//								Intent gpsOptionsIntent = new Intent(
+//									android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//								startActivity(gpsOptionsIntent);
+//							}
+//						});
+//					builder.setNegativeButton(android.R.string.no,
+//						new DialogInterface.OnClickListener()
+//						{
+//							@Override
+//							public void onClick(DialogInterface dialog, int id)
+//							{
+//								dialog.cancel();
+//							}
+//						});
+//					AlertDialog alert = builder.create();
+//					alert.show();
+//				}
+//				else
+//				{
+//					startActivity(new Intent(view.getContext(), ShowLocation.class));
+//				}
+//			}
+//		});
 
-		/** Button "getdata" */
-		Button getdata = (Button) findViewById(R.id.getdata);
+//		/** Button "getdata" */
+//		Button getdata = (Button) findViewById(R.id.getdata);
+//		getdata.setOnClickListener(new View.OnClickListener()
+//		{
+//			@Override
+//			public void onClick(View view)
+//			{
+//				startActivity(new Intent(view.getContext(), DisplayData.class));
+//			}
+//		});
+
+		
+		/** Button "" */
+		ImageButton getdata = (ImageButton) findViewById(R.id.getposition);
 		getdata.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View view)
 			{
-				startActivity(new Intent(view.getContext(), DisplayData.class));
+				
+				/* TODO
+				 * call function for firing a search event */
+				Toast.makeText(getApplicationContext(), "You just pushed the 'My position' button.", Toast.LENGTH_SHORT).show();
 			}
 		});
-
 	}
 
 	@Override

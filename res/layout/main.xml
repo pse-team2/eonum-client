@@ -36,6 +36,13 @@
                 android:singleLine="true"
 				android:hint="@string/where"
                 android:text="" />
+
+            <ImageButton
+                android:id="@+id/getposition"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_position" />
+
         </TableRow>
 
         <TableRow
@@ -72,15 +79,9 @@
         android:clickable="true" />
 
     <Button
-        android:id="@+id/location"
+        android:id="@+id/search"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/getlocation" />
-
-    <Button
-        android:id="@+id/getdata"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/serverdata" />
+        android:text="@string/search" />
 
 </LinearLayout>
