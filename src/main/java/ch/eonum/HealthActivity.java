@@ -25,6 +25,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,6 +34,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +46,43 @@ public class HealthActivity extends MapActivity
 	private LocationManager locMgr;
 	private String locProvider;
 	private Location location = null;
+	TextView locationTxt;
+
+	MapView mapView;
+	List<Overlay> mapOverlays;
+	Drawable drawableLocation, drawableSearchresult;
+	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
+
+	// detect zoom and trigger event
+	private Handler handler = new Handler();
+	private int zoomLevel = 0, newZoomLevel;
+	public static final int zoomCheckingDelay = 500; // in ms
+	private Runnable zoomChecker = new Runnable()
+	{
+		public void run()
+		{
+			// ZoomControls mZoom = (ZoomControls) mapView.getZoomControls();;
+			mapView.getZoomLevel();
+
+			if (zoomLevel == 0)
+				zoomLevel = mapView.getZoomLevel();
+
+			newZoomLevel = mapView.getZoomLevel();
+
+			if (newZoomLevel != zoomLevel)
+			{
+				Toast.makeText(getApplicationContext(), "You just zoomed!", Toast.LENGTH_SHORT).show();
+				zoomLevel = newZoomLevel;
+			}
+
+			/* TODO
+			 * call function for firing a search event */
+
+			handler.removeCallbacks(zoomChecker); // remove the old callback
+			handler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
+		}
+	};
+
 	/* Implement Location Listener */
 	private LocationListener locLst = new LocationListener()
 	{
@@ -157,13 +196,7 @@ public class HealthActivity extends MapActivity
 		}
 	};
 	/* End of implemented LocationListener */
-	TextView locationTxt;
 
-	MapView mapView;
-	List<Overlay> mapOverlays;
-	Drawable drawableLocation, drawableSearchresult;
-	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
-	
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private static final String[] CITIES = new CityResolver().getAllCities();
 
@@ -297,58 +330,72 @@ public class HealthActivity extends MapActivity
 		this.locMgr = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		// Register the listener in onResume()
 
-		/** Button "location" */
-		Button location = (Button) findViewById(R.id.location);
-		location.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				if (!HealthActivity.this.locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER))
-				{
-					AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-					builder.setMessage(getString(R.string.askusertoenablenetwork)).setCancelable(true);
-					builder.setPositiveButton(android.R.string.yes,
-						new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int id)
-							{
-								Intent gpsOptionsIntent = new Intent(
-									android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-								startActivity(gpsOptionsIntent);
-							}
-						});
-					builder.setNegativeButton(android.R.string.no,
-						new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int id)
-							{
-								dialog.cancel();
-							}
-						});
-					AlertDialog alert = builder.create();
-					alert.show();
-				}
-				else
-				{
-					startActivity(new Intent(view.getContext(), ShowLocation.class));
-				}
-			}
-		});
+//		/** Button "location" */
+//		Button location = (Button) findViewById(R.id.location);
+//		location.setOnClickListener(new View.OnClickListener()
+//		{
+//			@Override
+//			public void onClick(View view)
+//			{
+//				if (!HealthActivity.this.locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER))
+//				{
+//					AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+//					builder.setMessage(getString(R.string.askusertoenablenetwork)).setCancelable(true);
+//					builder.setPositiveButton(android.R.string.yes,
+//						new DialogInterface.OnClickListener()
+//						{
+//							@Override
+//							public void onClick(DialogInterface dialog, int id)
+//							{
+//								Intent gpsOptionsIntent = new Intent(
+//									android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//								startActivity(gpsOptionsIntent);
+//							}
+//						});
+//					builder.setNegativeButton(android.R.string.no,
+//						new DialogInterface.OnClickListener()
+//						{
+//							@Override
+//							public void onClick(DialogInterface dialog, int id)
+//							{
+//								dialog.cancel();
+//							}
+//						});
+//					AlertDialog alert = builder.create();
+//					alert.show();
+//				}
+//				else
+//				{
+//					startActivity(new Intent(view.getContext(), ShowLocation.class));
+//				}
+//			}
+//		});
 
-		/** Button "getdata" */
-		Button getdata = (Button) findViewById(R.id.getdata);
+//		/** Button "getdata" */
+//		Button getdata = (Button) findViewById(R.id.getdata);
+//		getdata.setOnClickListener(new View.OnClickListener()
+//		{
+//			@Override
+//			public void onClick(View view)
+//			{
+//				startActivity(new Intent(view.getContext(), DisplayData.class));
+//			}
+//		});
+
+		
+		/** Button "" */
+		ImageButton getdata = (ImageButton) findViewById(R.id.getposition);
 		getdata.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View view)
 			{
-				startActivity(new Intent(view.getContext(), DisplayData.class));
+				
+				/* TODO
+				 * call function for firing a search event */
+				Toast.makeText(getApplicationContext(), "You just pushed the 'My position' button.", Toast.LENGTH_SHORT).show();
 			}
 		});
-
 	}
 
 	@Override
@@ -360,6 +407,9 @@ public class HealthActivity extends MapActivity
 	@Override
 	protected void onPause()
 	{
+		// zoom handler
+		handler.removeCallbacks(zoomChecker);
+
 		this.locMgr.removeUpdates(this.locLst);
 		this.locMgr = null;
 		super.onPause();
@@ -368,6 +418,9 @@ public class HealthActivity extends MapActivity
 	@Override
 	protected void onResume()
 	{
+		// zoom handler
+		handler.postDelayed(zoomChecker, zoomCheckingDelay);
+
 		if (this.locMgr == null)
 		{
 			this.locMgr = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);

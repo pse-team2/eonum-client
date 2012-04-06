@@ -5,8 +5,7 @@
     <string name="welcome">Welcome screen</string>
     <string name="where">Where</string>
     <string name="what">What</string>
-    <string name="getlocation">Get location</string>
-    <string name="serverdata">Get data from server</string>
+    <string name="search">Search</string>
     <string name="location">Location</string>
     <string name="loadlocation">Loading Location\.\.\.</string>
     <string name="pleasewait">Please wait\.\.\.</string>
@@ -22,4 +21,5 @@
     <string name="provider_status_available">Provider %s: Status Changed: Available</string>
     <string name="provider_status_unknown">Provider %s: Unknown status</string>
     <string name="fail_no_provider">Failure: No location provider available</string>
+    <string name="myposition"/>
 </resources>
