@@ -53,12 +53,13 @@ public class HealthActivity extends MapActivity
 	Drawable drawableLocation, drawableSearchresult;
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
 
-	// detect zoom and trigger event
+	// Detect zoom and trigger event
 	private Handler handler = new Handler();
 	private int zoomLevel = 0, newZoomLevel;
-	public static final int zoomCheckingDelay = 500; // in ms
+	public static final int zoomCheckingDelay = 500; // Milliseconds
 	private Runnable zoomChecker = new Runnable()
 	{
+		@Override
 		public void run()
 		{
 			// ZoomControls mZoom = (ZoomControls) mapView.getZoomControls();;
@@ -137,6 +138,7 @@ public class HealthActivity extends MapActivity
 			}
 
 			// Draw results to map
+			Log.i(this.getClass().getName(), "Draw "+results.length+" results to map");
 			for (ch.eonum.MedicalLocation point : results)
 			{
 				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
@@ -149,6 +151,7 @@ public class HealthActivity extends MapActivity
 				HealthActivity.this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
 				HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedSearchresultOverlay);
 			}
+			Log.i(this.getClass().getName(), "Finished drawing GeoPoints");
 		}
 
 		@Override
@@ -208,7 +211,7 @@ public class HealthActivity extends MapActivity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		Log.i(HealthActivity.class.getName(), "Main Activity started.");
+		Log.i(this.getClass().getName(), "Main Activity started.");
 		setContentView(R.layout.main);
 
 		/** AutoCompleteTextView searchforWhere */
@@ -383,9 +386,9 @@ public class HealthActivity extends MapActivity
 //		});
 
 		
-		/** Button "" */
-		ImageButton getdata = (ImageButton) findViewById(R.id.getposition);
-		getdata.setOnClickListener(new View.OnClickListener()
+		/** ImageButton "getposition" */
+		ImageButton getposition = (ImageButton) findViewById(R.id.getposition);
+		getposition.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View view)
@@ -394,6 +397,19 @@ public class HealthActivity extends MapActivity
 				/* TODO
 				 * call function for firing a search event */
 				Toast.makeText(getApplicationContext(), "You just pushed the 'My position' button.", Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		/** Button "search" */
+		Button search = (Button) findViewById(R.id.search);
+		search.setOnClickListener(new View.OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				// TODO: Call function for firing a search event
+				Toast.makeText(getApplicationContext(), "You just pushed the 'Search' button.", Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
@@ -407,17 +423,20 @@ public class HealthActivity extends MapActivity
 	@Override
 	protected void onPause()
 	{
+		super.onPause();
+
 		// zoom handler
 		handler.removeCallbacks(zoomChecker);
 
 		this.locMgr.removeUpdates(this.locLst);
 		this.locMgr = null;
-		super.onPause();
 	}
 
 	@Override
 	protected void onResume()
 	{
+		super.onResume();
+
 		// zoom handler
 		handler.postDelayed(zoomChecker, zoomCheckingDelay);
 
@@ -428,7 +447,6 @@ public class HealthActivity extends MapActivity
 		// Register the listener with the Location Manager to receive location updates
 		// Moved from onCreate() here to avoid displaying the dialogue multiple times
 		locationUpdateOrNetworkFail();
-		super.onResume();
 	}
 
 	@Override

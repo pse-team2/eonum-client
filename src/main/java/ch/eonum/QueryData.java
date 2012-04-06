@@ -61,7 +61,7 @@ public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 	@Override
 	protected void onPostExecute(MedicalLocation[] result)
 	{
-		Log.i(QueryData.class.getName(), "Size of results from server in onPostExecute: " + result.length);
+		Log.i(this.getClass().getName(), "Size of results from server in onPostExecute: " + result.length);
 		this.dialog.dismiss();
 	}
 
@@ -71,7 +71,7 @@ public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 		// Send query to server
 		HTTPRequest request = new HTTPRequest(latitude, longitude);
 		String resultString = request.getResults();
-		Log.i(QueryData.class.getName(), "Size of results from server in queryServer: " + resultString.length());
+		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
 		JSONParser parser = new JSONParser();
 		return parser.deserialize(resultString);

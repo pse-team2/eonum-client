@@ -32,6 +32,7 @@ public class HTTPRequest
 
 	public String getResults()
 	{
+		Log.i(this.getClass().getName(), "Start reading answer from server");
 		try
 		{
 			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -51,7 +52,7 @@ public class HTTPRequest
 			e.printStackTrace();
 		}
 
-		Log.i(HTTPRequest.class.getName(), "Size of HTTP answer: " + resultString.length());
+		Log.i(this.getClass().getName(), "Size of HTTP answer: " + resultString.length());
 		return resultString;
 	}
 }

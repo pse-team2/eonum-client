@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 /** Fills the data obtained from the server into arrays as defined in {@link MedicalLocation} */
 public class JSONParser
 {
@@ -21,6 +23,7 @@ public class JSONParser
 			results = new MedicalLocation[jsonArray.length()];
 			double latitude, longitude;
 
+			Log.i(this.getClass().getName(), "Start parsing "+jsonArray.length()+" results");
 			for (int i = 0; i < jsonArray.length(); i++)
 			{
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -42,6 +45,7 @@ public class JSONParser
 			e.printStackTrace();
 		}
 
+		Log.i(this.getClass().getName(), "Finished, return results");
 		return results;
 	}
 }
