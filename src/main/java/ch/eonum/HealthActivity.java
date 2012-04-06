@@ -1,5 +1,6 @@
 package ch.eonum;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -15,7 +16,9 @@ import android.content.DialogInterface;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,6 +28,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -38,12 +43,18 @@ public class HealthActivity extends MapActivity
 	private double longitude;
 	private LocationManager locMgr;
 	private String locProvider;
+	private Location location = null;
 	/* Implement Location Listener */
 	private LocationListener locLst = new LocationListener()
 	{
 		@Override
-		public void onLocationChanged(Location location)
+		public void onLocationChanged(Location newLocation)
 		{
+			if (isBetterLocation(newLocation, location))
+			{
+				location = newLocation;
+			}
+
 			HealthActivity.this.latitude = location.getLatitude();
 			HealthActivity.this.longitude = location.getLongitude();
 			String Text = getString(R.string.location) + ": "
@@ -56,14 +67,11 @@ public class HealthActivity extends MapActivity
 			HealthActivity.this.mapOverlays.clear(); // Not visible
 			HealthActivity.this.itemizedLocationOverlay.clear(); // Visible
 
+			// Draw current location and move to this point
 			GeoPoint initGeoPoint = new GeoPoint(
-				(int) (location.getLatitude() * 1000000), // (int)
-															// (HealthActivity.this.locMgr.getLastKnownLocation(locProvider).getLatitude()
-															// * 1000000),
-				(int) (location.getLongitude() * 1000000) // (int)
-															// (HealthActivity.this.locMgr.getLastKnownLocation(locProvider).getLongitude()
-															// * 1000000)
-			);
+				(int) (location.getLatitude() * 1000000),
+				(int) (location.getLongitude() * 1000000)
+				);
 			OverlayItem overlayitem = new OverlayItem(initGeoPoint, "Our Location", "We are here");
 			HealthActivity.this.itemizedLocationOverlay.addOverlay(overlayitem);
 			HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedLocationOverlay);
@@ -73,8 +81,8 @@ public class HealthActivity extends MapActivity
 			mc.animateTo(initGeoPoint);
 
 			// Search for results around that point and display them
-			AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer = new QueryData(HealthActivity.this).execute(
-				location.getLatitude(), location.getLongitude());
+			AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer =
+				new QueryData(HealthActivity.this).execute(location.getLatitude(), location.getLongitude());
 			ch.eonum.MedicalLocation[] results = {};
 			try
 			{
@@ -88,7 +96,8 @@ public class HealthActivity extends MapActivity
 			{
 				e.printStackTrace();
 			}
-			Log.i("Results from server", "Length: " + results.length);
+
+			// Draw results to map
 			for (ch.eonum.MedicalLocation point : results)
 			{
 				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
@@ -124,25 +133,25 @@ public class HealthActivity extends MapActivity
 				case LocationProvider.OUT_OF_SERVICE:
 				{
 					Toast.makeText(getApplicationContext(),
-						String.format("Provider %s: Status Changed: Out of Service", provider), Toast.LENGTH_SHORT)
+						getString(R.string.provider_status_out_of_service, provider), Toast.LENGTH_SHORT)
 						.show();
 					break;
 				}
 				case LocationProvider.TEMPORARILY_UNAVAILABLE:
 				{
 					Toast.makeText(getApplicationContext(),
-						String.format("Provider %s: Status Changed: Temporarily Unavailable", provider),
+						getString(R.string.provider_status_temp_univailable, provider),
 						Toast.LENGTH_SHORT).show();
 					break;
 				}
 				case LocationProvider.AVAILABLE:
 				{
 					Toast.makeText(getApplicationContext(),
-						String.format("Provider %s: Status Changed: Available", provider), Toast.LENGTH_SHORT).show();
+						getString(R.string.provider_status_available, provider), Toast.LENGTH_SHORT).show();
 					break;
 				}
 				default:
-					Toast.makeText(getApplicationContext(), String.format("Provider %s: Unknown status", provider),
+					Toast.makeText(getApplicationContext(), getString(R.string.provider_status_unknown, provider),
 						Toast.LENGTH_LONG).show();
 			}
 		}
@@ -155,26 +164,8 @@ public class HealthActivity extends MapActivity
 	Drawable drawableLocation, drawableSearchresult;
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
 	
+	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private static final String[] CITIES = new CityResolver().getAllCities();
-	
-//	private static final String[] CITIES = new String[] {"Aarau", "Adliswil", "Aesch", "Affoltern am Albis",
-//			"Allschwil", "Altstätten", "Amriswil", "Arbon", "Arth", "Baar", "Baden", "Basel", "Bassersdorf",
-//			"Bellinzona", "Belp", "Bern", "Biel/Bienne", "Binningen", "Birsfelden", "Brig-Glis", "Brugg", "Buchs",
-//			"Bülach", "Bulle", "Burgdorf", "Carouge", "Cham", "Chêne-Bougeries", "Chur", "Davos", "Delsberg",
-//			"Dietikon", "Dübendorf", "Ebikon", "Ecublens", "Einsiedeln", "Emmen", "Frauenfeld", "Freiburg",
-//			"Freienbach", "Genf", "Gland", "Gossau", "Grenchen", "Herisau", "Hinwil", "Horgen", "Horw",
-//			"Illnau-Effretikon", "Ittigen", "Kloten", "Köniz", "Kreuzlingen", "Kriens", "Küsnacht", "Küssnacht",
-//			"La Chaux-de-Fonds", "La Tour-de-Peilz", "Lancy", "Langenthal", "Lausanne", "Le Grand-Saconnex",
-//			"Le Locle", "Liestal", "Locarno", "Lugano", "Luzern", "Lyss", "Männedorf", "Martigny", "Meilen",
-//			"Mendrisio", "Meyrin", "Möhlin", "Monthey", "Montreux", "Morges", "Münchenstein", "Münsingen",
-//			"Muri bei Bern", "Muttenz", "Neuenburg", "Neuhausen am Rheinfall", "Nyon", "Oberwil", "Oftringen",
-//			"Olten", "Onex", "Opfikon", "Ostermundigen", "Pfäffikon", "Pratteln", "Prilly", "Pully", "Rapperswil-Jona",
-//			"Regensdorf", "Reinach", "Renens", "Rheinfelden", "Richterswil", "Riehen", "Rüti", "Schaffhausen",
-//			"Schlieren", "Schwyz", "Siders", "Sitten", "Solothurn", "Spiez", "Spreitenbach", "St. Gallen", "Stäfa",
-//			"Steffisburg", "Thalwil", "Thônex", "Thun", "Uster", "Uzwil", "Val-de-Travers NE", "Vernier", "Versoix",
-//			"Vevey", "Veyrier GE", "Villars-sur-Glâne", "Volketswil", "Wädenswil", "Wallisellen", "Weinfelden",
-//			"Wettingen", "Wetzikon", "Wil", "Winterthur", "Wohlen", "Worb", "Yverdon-les-Bains", "Zofingen",
-//			"Zollikon", "Zug", "Zürich"};
 
 	/**
 	 * Main Activity:
@@ -193,17 +184,80 @@ public class HealthActivity extends MapActivity
 			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, CITIES);
 		searchforWhere.setAdapter(adapter);
 
+		// Item from autocompletion selected
+		searchforWhere.setOnItemClickListener(new OnItemClickListener()
+		{
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+			{
+				String cityString = String.valueOf(((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText());
+				City city = new CityResolver().getCoordinates(cityString);
+				GeoPoint cityPoint = new GeoPoint(
+					(int) (city.getLocation()[0] * 1000000),
+					(int) (city.getLocation()[1] * 1000000));
+				MapController mc = HealthActivity.this.mapView.getController();
+				mc.setZoom(16);
+				mc.animateTo(cityPoint);
+			}
+		});
+
+		// Enter key pressed
 		searchforWhere.setOnKeyListener(new View.OnKeyListener()
 		{
-
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)
 			{
-				if (keyCode == KeyEvent.KEYCODE_ENTER)
+				if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)
 				{
-					Toast.makeText(getApplicationContext(),
-						"Where is " + ((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText() + "?",
-						Toast.LENGTH_SHORT).show();
+					String citySearchString = String.valueOf(((AutoCompleteTextView) findViewById(R.id.searchforWhere))
+						.getText());
+					Geocoder geocoder = new Geocoder(HealthActivity.this, HealthActivity.this.getResources()
+						.getConfiguration().locale);
+					List<Address> resultsList = null;
+					try
+					{
+						resultsList = geocoder.getFromLocationName(citySearchString, 5);
+						Log.i("resultsList", resultsList.toString());
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+					if (resultsList == null || resultsList.isEmpty())
+					{
+						AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+						builder.setMessage(getString(R.string.noresults)).setCancelable(true);
+						AlertDialog alert = builder.create();
+						alert.show();
+						return false;
+					}
+					Double[] coordinates = new Double[2];
+					coordinates[0] = resultsList.get(0).getLatitude();
+					coordinates[1] = resultsList.get(0).getLongitude();
+					if (resultsList.size() > 2)
+					{
+						String ambiguousString = "";
+						for (int i = 0; i < resultsList.size(); i++)
+						{
+							ambiguousString += (i + 1) + ": " + resultsList.get(i).getAddressLine(0) + ", "
+								+ resultsList.get(i).getAddressLine(1) + ", "
+								+ resultsList.get(i).getAddressLine(2) + "\n";
+						}
+						AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+						builder.setTitle(resultsList.size() + " ambiguous results");
+						builder.setMessage(ambiguousString);
+						AlertDialog alert = builder.create();
+						alert.show();
+						return false;
+					}
+
+					GeoPoint cityPoint = new GeoPoint(
+						(int) (coordinates[0] * 1000000),
+						(int) (coordinates[1] * 1000000));
+					MapController mc = HealthActivity.this.mapView.getController();
+					mc.setZoom(16);
+					mc.animateTo(cityPoint);
+					return true;
 				}
 				return false;
 			}
@@ -217,7 +271,7 @@ public class HealthActivity extends MapActivity
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)
 			{
-				if (keyCode == KeyEvent.KEYCODE_ENTER)
+				if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)
 				{
 					Toast.makeText(getApplicationContext(),
 						"What is " + ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText() + "?",
@@ -241,16 +295,7 @@ public class HealthActivity extends MapActivity
 		// Use the LocationManager class to obtain GPS locations
 		this.locationTxt = (TextView) findViewById(R.id.locationlabel);
 		this.locMgr = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-		// Register the listener with the Location Manager to receive location updates
-		if (isLocationSensingAvailable())
-		{
-			this.locMgr.requestLocationUpdates(this.locProvider, 1000, 10, this.locLst);
-		}
-		else
-		{
-			Toast.makeText(this, "Failure: No location provider available!", Toast.LENGTH_LONG).show();
-		}
+		// Register the listener in onResume()
 
 		/** Button "location" */
 		Button location = (Button) findViewById(R.id.location);
@@ -309,14 +354,6 @@ public class HealthActivity extends MapActivity
 	@Override
 	protected void onStart()
 	{
-		if (isLocationSensingAvailable())
-		{
-			this.locMgr.requestLocationUpdates(this.locProvider, 1000, 10, this.locLst);
-		}
-		else
-		{
-			Toast.makeText(this, "Failure: No location provider available!", Toast.LENGTH_LONG).show();
-		}
 		super.onStart();
 	}
 
@@ -324,6 +361,7 @@ public class HealthActivity extends MapActivity
 	protected void onPause()
 	{
 		this.locMgr.removeUpdates(this.locLst);
+		this.locMgr = null;
 		super.onPause();
 	}
 
@@ -334,14 +372,9 @@ public class HealthActivity extends MapActivity
 		{
 			this.locMgr = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
 		}
-		if (isLocationSensingAvailable())
-		{
-			this.locMgr.requestLocationUpdates(this.locProvider, 1000, 10, this.locLst);
-		}
-		else
-		{
-			Toast.makeText(this, "Failure: No location provider available!", Toast.LENGTH_LONG).show();
-		}
+		// Register the listener with the Location Manager to receive location updates
+		// Moved from onCreate() here to avoid displaying the dialogue multiple times
+		locationUpdateOrNetworkFail();
 		super.onResume();
 	}
 
@@ -377,7 +410,56 @@ public class HealthActivity extends MapActivity
 		return c;
 	}
 
-	/** Network connection check */
+	/**
+	 * Perform network check and alert user if nothing works
+	 * Make use of {@link #isLocationSensingAvailable()} to test for available location update providers.
+	 * If one was found, everything is fine. Updates are requested and the method returns.
+	 * If this is not the case, the user is informed and assisted to fix the problem by displaying the network
+	 * and location configuration activity
+	 */
+	private void locationUpdateOrNetworkFail()
+	{
+		if (isLocationSensingAvailable())
+		{
+			this.locMgr.requestLocationUpdates(this.locProvider, 1000, 10, this.locLst);
+			return;
+		}
+		Toast.makeText(this, getString(R.string.fail_no_provider), Toast.LENGTH_LONG).show();
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(getString(R.string.askusertoenablenetwork)).setCancelable(true);
+		builder.setPositiveButton(android.R.string.yes,
+			new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int id)
+				{
+					Intent gpsOptionsIntent = new Intent(
+						android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+					startActivity(gpsOptionsIntent);
+				}
+			});
+		builder.setNegativeButton(android.R.string.no,
+			new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int id)
+				{
+					dialog.cancel();
+				}
+			});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	/**
+	 * Location provider search
+	 * Searches for available location providers and chooses one based on {@link createCoarseCriteria} and
+	 * {@link createFineCriteria}
+	 * 
+	 * @return {@code True} if at least one provider was found, {@code False} if no reliable provider for
+	 *         location updates is available
+	 */
 	private boolean isLocationSensingAvailable()
 	{
 		String mBestProvider = null;
@@ -391,6 +473,77 @@ public class HealthActivity extends MapActivity
 			this.locProvider = mBestProvider;
 			return true;
 		}
+		// Even fine provider is not available
 		return false;
 	}
+
+	/**
+	 * Determines whether one Location reading is better than the current Location fix
+	 * 
+	 * @param location
+	 *            The new Location that you want to evaluate
+	 * @param currentBestLocation
+	 *            The current Location fix, to which you want to compare the new one
+	 */
+	protected boolean isBetterLocation(Location location, Location currentBestLocation)
+	{
+		if (currentBestLocation == null)
+		{
+			// A new location is always better than no location
+			return true;
+		}
+
+		// Check whether the new location fix is newer or older
+		long timeDelta = location.getTime() - currentBestLocation.getTime();
+		boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+		boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+		boolean isNewer = timeDelta > 0;
+
+		// If it's been more than two minutes since the current location, use the new location
+		// because the user has likely moved
+		if (isSignificantlyNewer)
+		{
+			return true;
+			// If the new location is more than two minutes older, it must be worse
+		}
+		else if (isSignificantlyOlder)
+		{
+			return false;
+		}
+
+		// Check whether the new location fix is more or less accurate
+		int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+		boolean isLessAccurate = accuracyDelta > 0;
+		boolean isMoreAccurate = accuracyDelta < 0;
+		boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+		// Check if the old and new location are from the same provider
+		boolean isFromSameProvider = isSameProvider(location.getProvider(), currentBestLocation.getProvider());
+
+		// Determine location quality using a combination of timeliness and accuracy
+		if (isMoreAccurate)
+		{
+			return true;
+		}
+		else if (isNewer && !isLessAccurate)
+		{
+			return true;
+		}
+		else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/** Checks whether two providers are the same */
+	private boolean isSameProvider(String provider1, String provider2)
+	{
+		if (provider1 == null)
+		{
+			return provider2 == null;
+		}
+		return provider1.equals(provider2);
+	}
+
 }

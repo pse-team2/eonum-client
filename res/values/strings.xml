@@ -17,4 +17,9 @@
     <string name="gpsenabled">GPS enabled</string>
     <string name="gpsdisabled">GPS disabled</string>
     <string name="askusertoenablenetwork">Network is disabled\nOpen settings in order to enable it?</string>
+    <string name="provider_status_out_of_service">Provider %s: Status Changed: Out of Service</string>
+    <string name="provider_status_temp_univailable">Provider %s: Status Changed: Temporarily Unavailable</string>
+    <string name="provider_status_available">Provider %s: Status Changed: Available</string>
+    <string name="provider_status_unknown">Provider %s: Unknown status</string>
+    <string name="fail_no_provider">Failure: No location provider available</string>
 </resources>

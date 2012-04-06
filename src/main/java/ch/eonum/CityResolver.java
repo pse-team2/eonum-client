@@ -143,5 +143,4 @@ public class CityResolver
 	{
 		return cities.keySet().toArray(new String[] {});
 	}
-	
 }
