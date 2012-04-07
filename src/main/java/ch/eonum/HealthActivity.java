@@ -64,15 +64,17 @@ public class HealthActivity extends MapActivity
 		{
 			// ZoomControls mZoom = (ZoomControls) mapView.getZoomControls();;
 			mapView.getZoomLevel();
-
 			if (zoomLevel == 0)
+			{
 				zoomLevel = mapView.getZoomLevel();
+			}
 
 			newZoomLevel = mapView.getZoomLevel();
 
 			if (newZoomLevel != zoomLevel)
 			{
-				Toast.makeText(getApplicationContext(), "You just zoomed!", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(),
+					"You just zoomed " + (newZoomLevel > zoomLevel ? "in" : "out") + "!", Toast.LENGTH_SHORT).show();
 				zoomLevel = newZoomLevel;
 			}
 
@@ -202,6 +204,7 @@ public class HealthActivity extends MapActivity
 
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private static final String[] CITIES = new CityResolver().getAllCities();
+	private static final TypeResolver TYPES = new TypeResolver();
 
 	/**
 	 * Main Activity:
@@ -216,9 +219,9 @@ public class HealthActivity extends MapActivity
 
 		/** AutoCompleteTextView searchforWhere */
 		AutoCompleteTextView searchforWhere = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
-		ArrayAdapter<String> adapter =
+		ArrayAdapter<String> adapterWhere =
 			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, CITIES);
-		searchforWhere.setAdapter(adapter);
+		searchforWhere.setAdapter(adapterWhere);
 
 		// Item from autocompletion selected
 		searchforWhere.setOnItemClickListener(new OnItemClickListener()
@@ -301,9 +304,11 @@ public class HealthActivity extends MapActivity
 
 		/** AutoCompleteTextView searchforWhat */
 		AutoCompleteTextView searchforWhat = (AutoCompleteTextView) findViewById(R.id.searchforWhat);
+		ArrayAdapter<String> adapterWhat =
+			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, TYPES.getCategories());
+		searchforWhat.setAdapter(adapterWhat);
 		searchforWhat.setOnKeyListener(new View.OnKeyListener()
 		{
-
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)
 			{
