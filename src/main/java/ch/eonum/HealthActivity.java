@@ -334,7 +334,7 @@ public class HealthActivity extends MapActivity
 		this.itemizedSearchresultOverlay = new MapItemizedOverlay(this.drawableSearchresult, this);
 
 		// Use the LocationManager class to obtain GPS locations
-		this.locationTxt = (TextView) findViewById(R.id.locationlabel);
+		//this.locationTxt = (TextView) findViewById(R.id.locationlabel);
 		this.locMgr = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		// Register the listener in onResume()
 
