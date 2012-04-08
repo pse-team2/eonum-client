@@ -71,3 +71,4 @@ target/
 # other stuff
 gen
 R.java
+res/layout/main.xml
