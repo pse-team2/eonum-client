@@ -15,10 +15,10 @@ public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 	ArrayAdapter<String> adapter;
 	MedicalLocation[] res;
 
-	public QueryData(Activity application)
+	public QueryData()
 	{
-		this.activity = application;
-		this.dialog = new ProgressDialog(application.getApplicationContext());
+		this.activity = HealthActivity.mainActivity;
+		this.dialog = new ProgressDialog(this.activity.getApplicationContext());
 	}
 
 	/** Gets called just before the thread begins */
@@ -74,6 +74,6 @@ public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
 		JSONParser parser = new JSONParser();
-		return parser.deserialize(resultString);
+		return parser.deserializeLocations(resultString);
 	}
 }

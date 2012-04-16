@@ -34,7 +34,7 @@
                 android:ems="10"
                 android:inputType="textAutoComplete"
                 android:singleLine="true"
-                android:hint="Ort"
+                android:hint="@string/location"
                 android:completionThreshold="1"
                 android:text="" />
 
@@ -42,7 +42,8 @@
                 android:id="@+id/getposition"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@android:drawable/ic_menu_mylocation" />
+                android:src="@android:drawable/ic_menu_mylocation"
+                android:contentDescription="@string/myposition" />
 
         </TableRow>
 

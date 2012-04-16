@@ -28,23 +28,26 @@ public class MedicalLocation implements Location
 		this.longitude = longitude;
 		this.location[1] = longitude;
 		this.arztTyp = Resolver.resolve(arztTyp);
-		Log.i("Arzttyp", arztTyp);
+		if (this.arztTyp == null)
+		{
+			Log.w("Arzttyp is Null", "this.name = " + this.name + ", this.arztTyp = " + this.arztTyp);
+		}
 	}
 
 	/* GETTERS & SETTERS */
 	@Override
 	public String getName()
 	{
-		return name;
+		return this.name;
 	}
 
 	public String getType()
 	{
-		return arztTyp;
+		return this.arztTyp;
 	}
 	@Override
 	public Double[] getLocation()
 	{
-		return location;
+		return this.location;
 	}
 }

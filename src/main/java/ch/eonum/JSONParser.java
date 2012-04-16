@@ -10,7 +10,7 @@ import android.util.Log;
 public class JSONParser
 {
 
-	public MedicalLocation[] deserialize(String str)
+	public MedicalLocation[] deserializeLocations(String str)
 	{
 		MedicalLocation[] results = null;
 
@@ -46,6 +46,34 @@ public class JSONParser
 		}
 
 		Log.i(this.getClass().getName(), "Finished, return "+results.length+" results");
+		return results;
+	}
+
+	public String[] deserializeCategories(String str)
+	{
+		Log.i(this.getClass().getName(), "Start deserializing categories");
+		String[] results = null;
+		JSONObject jsonObj;
+		try
+		{
+			jsonObj = new JSONObject(str);
+			JSONArray jsonArray = jsonObj.getJSONArray("categories");
+			results = new String[jsonArray.length()];
+
+			Log.i(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
+			for (int i = 0; i < jsonArray.length(); i++)
+			{
+				String category = jsonArray.getString(i);
+				// Log.i(this.getClass().getName(), "Parse category " + category);
+				results[i] = category;
+			}
+		}
+		catch (JSONException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Log.i(this.getClass().getName(), "Finished, return " + results.length + " results");
 		return results;
 	}
 }

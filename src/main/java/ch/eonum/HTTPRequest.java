@@ -30,6 +30,21 @@ public class HTTPRequest
 		}
 	}
 
+	public HTTPRequest()
+	{
+
+		resultString = "";
+
+		try
+		{
+			url = new URL("http://77.95.120.72:8080/categories");
+		}
+		catch (MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public String getResults()
 	{
 		Log.i(this.getClass().getName(), "Start reading answer from server");
@@ -42,11 +57,7 @@ public class HTTPRequest
 				resultString += str;
 			}
 			in.close();
-			/* } catch (Exception e) {
-			 * e.printStackTrace();
-			 * }
-			 * } catch (MalformedURLException e) {
-			 * e.printStackTrace(); */}
+		}
 		catch (IOException e)
 		{
 			e.printStackTrace();

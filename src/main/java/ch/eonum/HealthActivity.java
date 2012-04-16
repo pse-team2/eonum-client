@@ -11,10 +11,12 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Context;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
@@ -41,6 +43,7 @@ import android.widget.Toast;
 public class HealthActivity extends MapActivity
 {
 
+	public static Activity mainActivity;
 	private double latitude;
 	private double longitude;
 	private LocationManager locMgr;
@@ -54,7 +57,7 @@ public class HealthActivity extends MapActivity
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
 
 	// Detect zoom and trigger event
-	private Handler handler = new Handler();
+	private Handler zoomHandler = new Handler();
 	private int zoomLevel = 0, newZoomLevel;
 	public static final int zoomCheckingDelay = 500; // Milliseconds
 	private Runnable zoomChecker = new Runnable()
@@ -81,8 +84,8 @@ public class HealthActivity extends MapActivity
 			/* TODO
 			 * call function for firing a search event */
 
-			handler.removeCallbacks(zoomChecker); // remove the old callback
-			handler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
+			zoomHandler.removeCallbacks(zoomChecker); // remove the old callback
+			zoomHandler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
 		}
 	};
 
@@ -124,7 +127,7 @@ public class HealthActivity extends MapActivity
 
 			// Search for results around that point and display them
 			AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer =
-				new QueryData(HealthActivity.this).execute(location.getLatitude(), location.getLongitude());
+				new QueryData().execute(location.getLatitude(), location.getLongitude());
 			ch.eonum.MedicalLocation[] results = {};
 			try
 			{
@@ -141,6 +144,7 @@ public class HealthActivity extends MapActivity
 
 			// Draw results to map
 			Log.i(this.getClass().getName(), "Draw "+results.length+" results to map");
+			Log.i("GeoPoint", "Start drawing");
 			for (ch.eonum.MedicalLocation point : results)
 			{
 				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
@@ -153,7 +157,7 @@ public class HealthActivity extends MapActivity
 				HealthActivity.this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
 				HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedSearchresultOverlay);
 			}
-			Log.i(this.getClass().getName(), "Finished drawing GeoPoints");
+			Log.i("GeoPoint", "Finished drawing");
 		}
 
 		@Override
@@ -177,8 +181,7 @@ public class HealthActivity extends MapActivity
 				case LocationProvider.OUT_OF_SERVICE:
 				{
 					Toast.makeText(getApplicationContext(),
-						getString(R.string.provider_status_out_of_service, provider), Toast.LENGTH_SHORT)
-						.show();
+						getString(R.string.provider_status_out_of_service, provider), Toast.LENGTH_SHORT).show();
 					break;
 				}
 				case LocationProvider.TEMPORARILY_UNAVAILABLE:
@@ -204,7 +207,7 @@ public class HealthActivity extends MapActivity
 
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private static final String[] CITIES = new CityResolver().getAllCities();
-	private static final TypeResolver TYPES = new TypeResolver();
+	private static String[] TYPES;
 
 	/**
 	 * Main Activity:
@@ -216,6 +219,7 @@ public class HealthActivity extends MapActivity
 		super.onCreate(savedInstanceState);
 		Log.i(this.getClass().getName(), "Main Activity started.");
 		setContentView(R.layout.main);
+		mainActivity = this;
 
 		/** AutoCompleteTextView searchforWhere */
 		AutoCompleteTextView searchforWhere = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
@@ -253,6 +257,7 @@ public class HealthActivity extends MapActivity
 					Geocoder geocoder = new Geocoder(HealthActivity.this, HealthActivity.this.getResources()
 						.getConfiguration().locale);
 					List<Address> resultsList = null;
+					String error = null;
 					try
 					{
 						resultsList = geocoder.getFromLocationName(citySearchString, 5);
@@ -260,12 +265,24 @@ public class HealthActivity extends MapActivity
 					}
 					catch (IOException e)
 					{
+						error = e.getMessage();
 						e.printStackTrace();
 					}
 					if (resultsList == null || resultsList.isEmpty())
 					{
 						AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-						builder.setMessage(getString(R.string.noresults)).setCancelable(true);
+						builder.setCancelable(true);
+						builder.setTitle(getString(R.string.noresults));
+						builder.setMessage(error);
+						builder.setIcon(android.R.drawable.ic_dialog_alert);
+						builder.setNeutralButton(android.R.string.ok, new OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								dialog.dismiss();
+							}
+						});
 						AlertDialog alert = builder.create();
 						alert.show();
 						return false;
@@ -285,6 +302,15 @@ public class HealthActivity extends MapActivity
 						AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
 						builder.setTitle(resultsList.size() + " ambiguous results");
 						builder.setMessage(ambiguousString);
+						builder.setIcon(android.R.drawable.ic_dialog_info);
+						builder.setNeutralButton(android.R.string.ok, new OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								dialog.dismiss();
+							}
+						});
 						AlertDialog alert = builder.create();
 						alert.show();
 						return false;
@@ -303,9 +329,24 @@ public class HealthActivity extends MapActivity
 		});
 
 		/** AutoCompleteTextView searchforWhat */
+		AsyncTask<Void, Void, String[]> typesResolved = new TypeResolver().execute();
+		try
+		{
+			TYPES = typesResolved.get();
+		}
+		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (ExecutionException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		AutoCompleteTextView searchforWhat = (AutoCompleteTextView) findViewById(R.id.searchforWhat);
 		ArrayAdapter<String> adapterWhat =
-			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, TYPES.getCategories());
+			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, TYPES);
 		searchforWhat.setAdapter(adapterWhat);
 		searchforWhat.setOnKeyListener(new View.OnKeyListener()
 		{
@@ -431,7 +472,7 @@ public class HealthActivity extends MapActivity
 		super.onPause();
 
 		// zoom handler
-		handler.removeCallbacks(zoomChecker);
+		zoomHandler.removeCallbacks(zoomChecker);
 
 		this.locMgr.removeUpdates(this.locLst);
 		this.locMgr = null;
@@ -443,7 +484,7 @@ public class HealthActivity extends MapActivity
 		super.onResume();
 
 		// zoom handler
-		handler.postDelayed(zoomChecker, zoomCheckingDelay);
+		zoomHandler.postDelayed(zoomChecker, zoomCheckingDelay);
 
 		if (this.locMgr == null)
 		{
@@ -500,10 +541,14 @@ public class HealthActivity extends MapActivity
 			this.locMgr.requestLocationUpdates(this.locProvider, 1000, 10, this.locLst);
 			return;
 		}
+
 		Toast.makeText(this, getString(R.string.fail_no_provider), Toast.LENGTH_LONG).show();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(R.string.askusertoenablenetwork)).setCancelable(true);
+		builder.setCancelable(true);
+		builder.setTitle(getString(R.string.gpsdisabled));
+		builder.setMessage(getString(R.string.askusertoenablenetwork));
+		builder.setIcon(android.R.drawable.ic_dialog_info);
 		builder.setPositiveButton(android.R.string.yes,
 			new DialogInterface.OnClickListener()
 			{
