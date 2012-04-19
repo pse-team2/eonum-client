@@ -250,6 +250,7 @@ public class HealthActivity extends MapActivity
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)
 			{
+				final KeyEvent dispatchedKeyEvent = event;
 				if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)
 				{
 					String citySearchString = String.valueOf(((AutoCompleteTextView) findViewById(R.id.searchforWhere))
@@ -268,6 +269,8 @@ public class HealthActivity extends MapActivity
 						error = e.getMessage();
 						e.printStackTrace();
 					}
+
+					// Inform user if the server returned no results
 					if (resultsList == null || resultsList.isEmpty())
 					{
 						AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
@@ -287,23 +290,30 @@ public class HealthActivity extends MapActivity
 						alert.show();
 						return false;
 					}
-					Double[] coordinates = new Double[2];
-					coordinates[0] = resultsList.get(0).getLatitude();
-					coordinates[1] = resultsList.get(0).getLongitude();
+
+					// Ask user about ambiguous results
 					if (resultsList.size() > 2)
 					{
-						String ambiguousString = "";
+						final String[] ambiguousList = new String[resultsList.size()];
 						for (int i = 0; i < resultsList.size(); i++)
 						{
-							ambiguousString += (i + 1) + ": " + resultsList.get(i).getAddressLine(0) + ", "
-								+ resultsList.get(i).getAddressLine(1) + ", "
-								+ resultsList.get(i).getAddressLine(2) + "\n";
+							ambiguousList[i] = resultsList.get(i).getAddressLine(0) + ", "
+								+ resultsList.get(i).getAddressLine(1);
 						}
 						AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
 						builder.setTitle(resultsList.size() + " ambiguous results");
-						builder.setMessage(ambiguousString);
+						builder.setItems(ambiguousList, new DialogInterface.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int item)
+							{
+								AutoCompleteTextView searchForWhat = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
+								searchForWhat.setText(ambiguousList[item]);
+								searchForWhat.dispatchKeyEvent(dispatchedKeyEvent);
+							}
+						});
 						builder.setIcon(android.R.drawable.ic_dialog_info);
-						builder.setNeutralButton(android.R.string.ok, new OnClickListener()
+						builder.setNeutralButton(android.R.string.cancel, new OnClickListener()
 						{
 							@Override
 							public void onClick(DialogInterface dialog, int which)
@@ -316,6 +326,10 @@ public class HealthActivity extends MapActivity
 						return false;
 					}
 
+					// Everything went fine, go to the location
+					Double[] coordinates = new Double[2];
+					coordinates[0] = resultsList.get(0).getLatitude();
+					coordinates[1] = resultsList.get(0).getLongitude();
 					GeoPoint cityPoint = new GeoPoint(
 						(int) (coordinates[0] * 1000000),
 						(int) (coordinates[1] * 1000000));
