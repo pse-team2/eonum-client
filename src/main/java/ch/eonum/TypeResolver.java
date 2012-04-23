@@ -16,8 +16,8 @@ import android.util.Log;
 public class TypeResolver extends AsyncTask<Void, Void, String[]>
 {
 
-	// Names (german, plural)
-	HashMap<String, String> types = new HashMap<String, String>();
+	// Names (german, plural, male)
+	static HashMap<String, String> types = new HashMap<String, String>();
 	Activity activity;
 	ArrayList<String> error = new ArrayList<String>();
 

@@ -1,6 +1,8 @@
 package ch.eonum;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -24,12 +26,11 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -89,7 +90,9 @@ public class HealthActivity extends MapActivity
 		}
 	};
 
+	private LocationListener locLst = new HealthLocationListener();
 	/* Implement Location Listener */
+	/*
 	private LocationListener locLst = new LocationListener()
 	{
 		@Override
@@ -100,63 +103,14 @@ public class HealthActivity extends MapActivity
 				location = newLocation;
 			}
 
-			HealthActivity.this.latitude = location.getLatitude();
-			HealthActivity.this.longitude = location.getLongitude();
-			String Text = getString(R.string.location) + ": "
-				+ HealthActivity.this.latitude + " : "
-				+ HealthActivity.this.longitude;
-			Log.i("Location change", HealthActivity.this.latitude + " : " + HealthActivity.this.longitude);
-			Toast.makeText(HealthActivity.this.getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
-
-			// Remove other points
-			HealthActivity.this.mapOverlays.clear(); // Not visible
-			HealthActivity.this.itemizedLocationOverlay.clear(); // Visible
-
-			// Draw current location and move to this point
-			GeoPoint initGeoPoint = new GeoPoint(
-				(int) (location.getLatitude() * 1000000),
-				(int) (location.getLongitude() * 1000000)
-				);
-			OverlayItem overlayitem = new OverlayItem(initGeoPoint, "Our Location", "We are here");
-			HealthActivity.this.itemizedLocationOverlay.addOverlay(overlayitem);
-			HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedLocationOverlay);
-
-			MapController mc = HealthActivity.this.mapView.getController();
-			mc.setZoom(16);
-			mc.animateTo(initGeoPoint);
+			// Draw current location to map
+			GeoPoint initGeoPoint = drawMyLocation();
 
 			// Search for results around that point and display them
-			AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer =
-				new QueryData().execute(location.getLatitude(), location.getLongitude());
-			ch.eonum.MedicalLocation[] results = {};
-			try
-			{
-				results = queryAnswer.get();
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-			catch (ExecutionException e)
-			{
-				e.printStackTrace();
-			}
+			MedicalLocation[] results = launchSearchFromCurrentLocation();
 
-			// Draw results to map
 			Log.i(this.getClass().getName(), "Draw "+results.length+" results to map");
-			Log.i("GeoPoint", "Start drawing");
-			for (ch.eonum.MedicalLocation point : results)
-			{
-				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
-					String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
-				GeoPoint matchingResult = new GeoPoint(
-					(int) (point.getLocation()[0] * 1000000),
-					(int) (point.getLocation()[1] * 1000000)
-					);
-				OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType());
-				HealthActivity.this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
-				HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedSearchresultOverlay);
-			}
+			drawSearchResults(results);
 			Log.i("GeoPoint", "Finished drawing");
 		}
 
@@ -203,15 +157,31 @@ public class HealthActivity extends MapActivity
 			}
 		}
 	};
+	*/
 	/* End of implemented LocationListener */
 
-	private static final int TWO_MINUTES = 1000 * 60 * 2;
+//	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private static final String[] CITIES = new CityResolver().getAllCities();
 	private static String[] TYPES;
 
+	protected Location getLocation()
+	{
+		return this.location;
+	}
+
+	protected void setLocation(Location location)
+	{
+		this.location = location;
+	}
+
+	protected MapView getMapView()
+	{
+		return this.mapView;
+	}
+
 	/**
 	 * Main Activity:
-	 * Called when the activity is first created.
+	 * Called once when the activity is first created.
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -245,6 +215,7 @@ public class HealthActivity extends MapActivity
 		});
 
 		// Enter key pressed
+		/*
 		searchforWhere.setOnKeyListener(new View.OnKeyListener()
 		{
 			@Override
@@ -341,6 +312,7 @@ public class HealthActivity extends MapActivity
 				return false;
 			}
 		});
+		*/
 
 		/** AutoCompleteTextView searchforWhat */
 		AsyncTask<Void, Void, String[]> typesResolved = new TypeResolver().execute();
@@ -362,6 +334,7 @@ public class HealthActivity extends MapActivity
 		ArrayAdapter<String> adapterWhat =
 			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, TYPES);
 		searchforWhat.setAdapter(adapterWhat);
+		/*
 		searchforWhat.setOnKeyListener(new View.OnKeyListener()
 		{
 			@Override
@@ -376,6 +349,7 @@ public class HealthActivity extends MapActivity
 				return false;
 			}
 		});
+		*/
 
 		/** MapView */
 		this.mapView = (MapView) findViewById(R.id.mapview);
@@ -383,9 +357,9 @@ public class HealthActivity extends MapActivity
 		this.mapView.setSatellite(true);
 
 		this.mapOverlays = this.mapView.getOverlays();
-		this.drawableLocation = this.getResources().getDrawable(R.drawable.arrow_red);
+		this.drawableLocation = this.getResources().getDrawable(R.drawable.pin_red);
+		this.drawableSearchresult = this.getResources().getDrawable(R.drawable.pin_green);
 		this.itemizedLocationOverlay = new MapItemizedOverlay(this.drawableLocation, this);
-		this.drawableSearchresult = this.getResources().getDrawable(R.drawable.arrow_green);
 		this.itemizedSearchresultOverlay = new MapItemizedOverlay(this.drawableSearchresult, this);
 
 		// Use the LocationManager class to obtain GPS locations
@@ -453,10 +427,7 @@ public class HealthActivity extends MapActivity
 			@Override
 			public void onClick(View view)
 			{
-				
-				/* TODO
-				 * call function for firing a search event */
-				Toast.makeText(getApplicationContext(), "You just pushed the 'My position' button.", Toast.LENGTH_SHORT).show();
+				drawMyLocation(16);
 			}
 		});
 
@@ -464,40 +435,65 @@ public class HealthActivity extends MapActivity
 		Button search = (Button) findViewById(R.id.search);
 		search.setOnClickListener(new View.OnClickListener()
 		{
-			
 			@Override
-			public void onClick(View v)
+			public void onClick(View view)
 			{
-				// TODO: Call function for firing a search event
-				Toast.makeText(getApplicationContext(), "You just pushed the 'Search' button.", Toast.LENGTH_SHORT).show();
+				Editable searchWhere = ((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText();
+				Editable searchWhat = ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText();
+
+				drawMyLocation(16);
+				MedicalLocation[] results = launchUserDefinedSearch(searchWhere.toString(), searchWhat.toString());
+				if(results != null)
+				{
+					if(results.length != 0)
+					{
+						drawSearchResults(results);
+					}
+					else
+					{
+						AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+						builder.setCancelable(true);
+						builder.setTitle(getString(R.string.noresults));
+						builder.setIcon(android.R.drawable.ic_dialog_alert);
+						builder.setNeutralButton(android.R.string.ok, new OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								dialog.dismiss();
+							}
+						});
+						AlertDialog alert = builder.create();
+						alert.show();
+					}
+				}
 			}
 		});
+
+		Log.i(this.getClass().getName(), "Main Activity created.");
 	}
 
+	/**
+	 * Every time, the activity is shown.
+	 */
 	@Override
 	protected void onStart()
 	{
 		super.onStart();
+		Log.i(this.getClass().getName(), "Run onStart()");
 	}
 
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
-
-		// zoom handler
-		zoomHandler.removeCallbacks(zoomChecker);
-
-		this.locMgr.removeUpdates(this.locLst);
-		this.locMgr = null;
-	}
-
+	/**
+	 * Every time, the user returns to the activity.
+	 */
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
 
-		// zoom handler
+		Log.i(this.getClass().getName(), "Run onResume()");
+
+		// Zoom handler
 		zoomHandler.postDelayed(zoomChecker, zoomCheckingDelay);
 
 		if (this.locMgr == null)
@@ -509,14 +505,244 @@ public class HealthActivity extends MapActivity
 		locationUpdateOrNetworkFail();
 	}
 
+	/**
+	 * Activity loses focus.
+	 */
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		Log.i(this.getClass().getName(), "Run onPause()");
+
+		// zoom handler
+		zoomHandler.removeCallbacks(zoomChecker);
+
+		this.locMgr.removeUpdates(this.locLst);
+		this.locMgr = null;
+	}
+
+	/**
+	 * Activity is no longer visible.
+	 */
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
+		Log.i(this.getClass().getName(), "Run onStop()");
+
+		itemizedLocationOverlay.clear();
+		itemizedSearchresultOverlay.clear();
+		mapView.invalidateDrawable(drawableLocation);
+		mapView.invalidateDrawable(drawableSearchresult);
+		mapView.invalidate();
+	}
+
 	@Override
 	protected boolean isRouteDisplayed()
 	{
 		return false;
 	}
 
+	protected MedicalLocation[] launchSearchFromCurrentLocation()
+	{
+		return sendDataToServer(location.getLatitude(), location.getLongitude());
+	}
+
+	/**
+	 * Reads input from the two TextView {@code searchforWhere} and {@code searchforWhat}.
+	 * Handles user interaction in case of an error.
+	 * If an error occurred, the method quits with a {@code null} value.
+	 * @param where Parsed input from TextView {@code searchforWhere}.
+	 * @param what Parsed input from TextView {@code searchforWhat}
+	 * @return Filtered results or {@code null} indicating an error.
+	 */
+	protected MedicalLocation[] launchUserDefinedSearch(String where, String what)
+	{
+		double searchAtLatitude, searchAtLongitude;
+		Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Where: "+where+", What: "+what);
+		if (where.length() != 0)
+		{
+			Geocoder geocoder = new Geocoder(HealthActivity.this, HealthActivity.this.getResources()
+				.getConfiguration().locale);
+			List<Address> resultsList = null;
+			String error = null;
+			try
+			{
+				resultsList = geocoder.getFromLocationName(where, 5);
+			}
+			catch (IOException e)
+			{
+				error = e.getMessage();
+				e.printStackTrace();
+			}
+
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "resultsList: "+resultsList);
+			// Inform user if the server returned no results
+			if (resultsList == null || resultsList.isEmpty())
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+				builder.setCancelable(true);
+				builder.setTitle(getString(R.string.noresults));
+				builder.setMessage(error);
+				builder.setIcon(android.R.drawable.ic_dialog_alert);
+				builder.setNeutralButton(android.R.string.ok, new OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						dialog.dismiss();
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
+				return null;
+			}
+
+			// Ask user about ambiguous results
+			if (resultsList.size() > 2)
+			{
+				final String[] ambiguousList = new String[resultsList.size()];
+				for (int i = 0; i < resultsList.size(); i++)
+				{
+					ambiguousList[i] = resultsList.get(i).getAddressLine(0) + ", "
+						+ resultsList.get(i).getAddressLine(1);
+				}
+				AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+				builder.setTitle(resultsList.size() + " ambiguous results");
+				builder.setItems(ambiguousList, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int item)
+					{
+						AutoCompleteTextView searchForWhat = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
+						searchForWhat.setText(ambiguousList[item]);
+						Button search = (Button) findViewById(R.id.search);
+						search.performClick();
+					}
+				});
+				builder.setIcon(android.R.drawable.ic_dialog_info);
+				builder.setNeutralButton(android.R.string.cancel, new OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						dialog.dismiss();
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
+				return null;
+			}
+
+			// Everything went fine, go to the location
+			searchAtLatitude = resultsList.get(0).getLatitude();
+			searchAtLongitude = resultsList.get(0).getLongitude();
+			GeoPoint cityPoint = new GeoPoint(
+				(int) (searchAtLatitude * 1000000),
+				(int) (searchAtLongitude * 1000000));
+			MapController mc = HealthActivity.this.mapView.getController();
+			mc.setZoom(16);
+			mc.animateTo(cityPoint);
+		}
+		else
+		{
+			// TextView searchForWhere was empty, use current location
+			searchAtLatitude = this.latitude;
+			searchAtLongitude = this.longitude;
+		}
+
+		ch.eonum.MedicalLocation[] answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
+		java.util.ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
+
+		// Do not filter anything if TextView searchForWhat was empty
+		if(what.length() != 0)
+		{
+			for (MedicalLocation r : new ArrayList<MedicalLocation>(results))
+			{
+				if (!r.getType().equals(what))
+				{
+					results.remove(r);
+				}
+			}
+		}
+
+		return results.toArray(new MedicalLocation[] {});
+	}
+
+	/**
+	 * Sends data to server and returns results as list.
+	 */
+	private MedicalLocation[] sendDataToServer(double latitude, double longitude)
+	{
+		// Search for results around that point
+		ch.eonum.MedicalLocation[] results = {};
+		AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer =
+			new QueryData().execute(latitude, longitude);
+		try
+		{
+			results = queryAnswer.get();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ExecutionException e)
+		{
+			e.printStackTrace();
+		}
+		return results;
+	}
+
+	protected void drawMyLocation(int zoomLevel)
+	{
+		HealthActivity.this.latitude = location.getLatitude();
+		HealthActivity.this.longitude = location.getLongitude();
+		String Text = getString(R.string.location) + ": "
+			+ HealthActivity.this.latitude + " : "
+			+ HealthActivity.this.longitude;
+		Log.i(this.getClass().getName() + ": drawMyLocation", HealthActivity.this.latitude + " : " + HealthActivity.this.longitude);
+		Toast.makeText(HealthActivity.this.getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
+
+		// Remove other points
+		HealthActivity.this.itemizedLocationOverlay.clear();
+
+		// Draw current location
+		GeoPoint initGeoPoint = new GeoPoint((int) (location.getLatitude() * 1000000), (int) (location.getLongitude() * 1000000));
+		OverlayItem overlayitem = new OverlayItem(initGeoPoint, "Our Location", "We are here");
+		HealthActivity.this.itemizedLocationOverlay.addOverlay(overlayitem);
+		HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedLocationOverlay);
+
+		// Go there
+		MapController mc = ((HealthActivity) HealthActivity.mainActivity).getMapView().getController();
+		mc.setZoom(zoomLevel);
+		mc.animateTo(initGeoPoint);
+	}
+
+	protected void drawSearchResults(MedicalLocation[] results)
+	{
+		// Remove other points
+		HealthActivity.this.itemizedSearchresultOverlay.clear();
+
+		// Draw results to map
+		Log.i(this.getClass().getName() + ": drawSearchResults", "Draw "+results.length+" results to map");
+		Log.i("GeoPoint", "Start drawing");
+		for (ch.eonum.MedicalLocation point : results)
+		{
+			Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
+				String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
+			GeoPoint matchingResult = new GeoPoint(
+				(int) (point.getLocation()[0] * 1000000),
+				(int) (point.getLocation()[1] * 1000000)
+				);
+			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType());
+			HealthActivity.this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
+			HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedSearchresultOverlay);
+		}
+		Log.i("GeoPoint", "Finished drawing");
+	}
+
 	/** This criteria will settle for less accuracy, high power, and cost */
-	public static Criteria createCoarseCriteria()
+	private static Criteria createCoarseCriteria()
 	{
 		Criteria c = new Criteria();
 		c.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -529,7 +755,7 @@ public class HealthActivity extends MapActivity
 	}
 
 	/** This criteria needs high accuracy, high power, and cost */
-	public static Criteria createFineCriteria()
+	private static Criteria createFineCriteria()
 	{
 		Criteria c = new Criteria();
 		c.setAccuracy(Criteria.ACCURACY_FINE);
@@ -552,7 +778,12 @@ public class HealthActivity extends MapActivity
 	{
 		if (isLocationSensingAvailable())
 		{
-			this.locMgr.requestLocationUpdates(this.locProvider, 1000, 10, this.locLst);
+			// 60000 = 1min
+			// 10 = 100m
+			this.locMgr.requestLocationUpdates(this.locProvider, 60000, 10, this.locLst);
+			Toast.makeText(HealthActivity.this, "Debug message:\n" +
+				"If running on an emulator:\nSend location fix in DDMS to trigger location update.",
+				Toast.LENGTH_SHORT).show();
 			return;
 		}
 
@@ -620,6 +851,7 @@ public class HealthActivity extends MapActivity
 	 * @param currentBestLocation
 	 *            The current Location fix, to which you want to compare the new one
 	 */
+	/*
 	protected boolean isBetterLocation(Location location, Location currentBestLocation)
 	{
 		if (currentBestLocation == null)
@@ -670,8 +902,10 @@ public class HealthActivity extends MapActivity
 		}
 		return false;
 	}
+	*/
 
 	/** Checks whether two providers are the same */
+	/*
 	private boolean isSameProvider(String provider1, String provider2)
 	{
 		if (provider1 == null)
@@ -680,5 +914,6 @@ public class HealthActivity extends MapActivity
 		}
 		return provider1.equals(provider2);
 	}
+	*/
 
 }

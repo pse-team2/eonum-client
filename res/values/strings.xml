@@ -23,6 +23,7 @@
     <string name="provider_status_unknown">Provider %s: Unknown status</string>
     <string name="fail_no_provider">Failure: No location provider available</string>
     <string name="myposition">My position</string>
+    <string name="category">Arztkategorie</string>
     <string name="akupunkturaerzte">Akupunkturärzte</string>
     <string name="allergologen">Allergologen</string>
     <string name="allgemeinaerzte">Allgemeinärzte</string>
