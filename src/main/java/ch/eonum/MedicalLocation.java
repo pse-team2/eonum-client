@@ -8,17 +8,16 @@ import android.util.Log;
  * Will provide public methods for name, type and location.
  * Type depends on TypeResolver, which matches the returned categories to names.
  */
-public class MedicalLocation implements Location
+public class MedicalLocation implements Location, Comparable<MedicalLocation>
 {
 
 	TypeResolver Resolver = new TypeResolver();
 	private String name;
 	private String arztTyp;
-	@SuppressWarnings("unused")
 	private double latitude;
-	@SuppressWarnings("unused")
 	private double longitude;
 	Double[] location = new Double[2];
+	private double distance;
 
 	public MedicalLocation(String name, String arztTyp, double latitude, double longitude)
 	{
@@ -32,8 +31,9 @@ public class MedicalLocation implements Location
 		{
 			Log.w("Arzttyp is Null", "this.name = " + this.name + ", this.arztTyp = " + this.arztTyp);
 		}
+		this.distance = 0;
 	}
-
+	
 	/* GETTERS & SETTERS */
 	@Override
 	public String getName()
@@ -50,4 +50,31 @@ public class MedicalLocation implements Location
 	{
 		return this.location;
 	}
+	
+	public double getDistance() {
+		return this.distance;
+	}
+	
+	public double setDistance(double latCenter, double lngCenter) {
+		this.distance = Math.sqrt(Math.pow(latCenter-latitude, 2) + Math.pow(lngCenter-longitude, 2));
+		return this.distance;
+	}
+
+	@Override
+	public int compareTo(MedicalLocation loc) {
+		if (this.distance > loc.getDistance()) 
+		{
+			return 1;
+		}
+		else if (this.distance < loc.getDistance()) 
+		{
+			return -1;
+		}
+		else 
+		{
+			return 0;
+		}
+	}
+	
+	
 }

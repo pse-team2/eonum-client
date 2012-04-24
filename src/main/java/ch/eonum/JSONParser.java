@@ -20,11 +20,14 @@ public class JSONParser
 			JSONArray jsonArray = jsonObj.getJSONArray("results");
 
 			// split up into addresses
-			results = new MedicalLocation[jsonArray.length()];
+			int MAX_RESULTS = jsonArray.length();
+			
+			results = new MedicalLocation[MAX_RESULTS];
 			double latitude, longitude;
 
 			Log.i(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
-			for (int i = 0; i < jsonArray.length(); i++)
+			
+			for (int i = 0; i < MAX_RESULTS; i++)
 			{
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String name = jsonObject.getString("name");
@@ -61,10 +64,10 @@ public class JSONParser
 			results = new String[jsonArray.length()];
 
 			Log.i(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
+			
 			for (int i = 0; i < jsonArray.length(); i++)
 			{
 				String category = jsonArray.getString(i);
-				// Log.i(this.getClass().getName(), "Parse category " + category);
 				results[i] = category;
 			}
 		}

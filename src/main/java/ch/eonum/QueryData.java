@@ -37,11 +37,17 @@ public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 	@Override
 	protected MedicalLocation[] doInBackground(Double... params)
 	{
-		double myLatitude = params[0];
-		double myLongitude = params[1];
-		// publishProgress();
-		return queryServer(myLatitude, myLongitude);
-
+		Log.i(this.getClass().getName(), "Got arguments: " + params.length);
+		
+		if (params.length == 4) {
+			return queryServer(params[0], params[1], params[2], params[3]);
+		}
+		else {
+			double myLatitude = params[0];
+			double myLongitude = params[1];
+			// publishProgress();
+			return queryServer(myLatitude, myLongitude);
+		}
 	}
 
 	/**
@@ -65,11 +71,24 @@ public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 		this.dialog.dismiss();
 	}
 
-	private ch.eonum.MedicalLocation[] queryServer(double latitude, double longitude)
+	private ch.eonum.MedicalLocation[] queryServer(double lat1, double long1)
 	{
-		Log.i(this.getClass().getName(), "Location to query: " + latitude + " : " + longitude);
+		double d = 0.05;
+		Log.i(this.getClass().getName(), "Single location to query: " + lat1 + " : " + long1);
 		// Send query to server
-		HTTPRequest request = new HTTPRequest(latitude, longitude);
+		HTTPRequest request = new HTTPRequest(lat1-d, long1-d, lat1+d, long1+d);
+		String resultString = request.getResults();
+		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
+		// Parse results
+		JSONParser parser = new JSONParser();
+		return parser.deserializeLocations(resultString);
+	}
+	
+	private ch.eonum.MedicalLocation[] queryServer(double lat1, double long1, double lat2, double long2)
+	{
+		Log.i(this.getClass().getName(), "Map rectangle to query: " + lat1 + "/" + long1+ "," + lat2 + "/" + long2);
+		// Send query to server
+		HTTPRequest request = new HTTPRequest(lat1, long1, lat2, long2);
 		String resultString = request.getResults();
 		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results

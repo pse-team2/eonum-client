@@ -78,7 +78,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dip"
         android:layout_weight="0.73"
-        android:apiKey="API_KEY_HERE"
+        android:apiKey="0TgYVnfeZXcxljrkb63n3SKThmwvIV84CTIGzXg"
         android:clickable="true" />
 
     <Button

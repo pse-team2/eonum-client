@@ -3,6 +3,7 @@ package ch.eonum;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -47,6 +48,15 @@ public class HealthActivity extends MapActivity
 	public static Activity mainActivity;
 	private double latitude;
 	private double longitude;
+	
+	private double lowerLeftLatitude;
+	private double lowerLeftLongitude;
+	private double upperRightLatitude;
+	private double upperRightLongitude;
+	
+	private String what = "";
+	private String where = "";
+	
 	private LocationManager locMgr;
 	private String locProvider;
 	private Location location = null;
@@ -80,11 +90,21 @@ public class HealthActivity extends MapActivity
 				Toast.makeText(getApplicationContext(),
 					"You just zoomed " + (newZoomLevel > zoomLevel ? "in" : "out") + "!", Toast.LENGTH_SHORT).show();
 				zoomLevel = newZoomLevel;
+				
+				lowerLeftLatitude = mapView.getMapCenter().getLatitudeE6() - mapView.getLatitudeSpan()/2; 
+				lowerLeftLongitude = mapView.getMapCenter().getLongitudeE6() - mapView.getLongitudeSpan()/2; 
+				
+				upperRightLatitude = mapView.getMapCenter().getLatitudeE6() + mapView.getLatitudeSpan()/2; 
+				upperRightLongitude = mapView.getMapCenter().getLongitudeE6() + mapView.getLongitudeSpan()/2;
+
+				lowerLeftLatitude /= 1000000;
+				lowerLeftLongitude /= 1000000;
+				upperRightLatitude /= 1000000;
+				upperRightLongitude /= 1000000;
+				
+				launchAndDrawResults();
 			}
-
-			/* TODO
-			 * call function for firing a search event */
-
+			
 			zoomHandler.removeCallbacks(zoomChecker); // remove the old callback
 			zoomHandler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
 		}
@@ -159,7 +179,7 @@ public class HealthActivity extends MapActivity
 	};
 	*/
 	/* End of implemented LocationListener */
-
+	
 //	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private static final String[] CITIES = new CityResolver().getAllCities();
 	private static String[] TYPES;
@@ -441,38 +461,70 @@ public class HealthActivity extends MapActivity
 				Editable searchWhere = ((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText();
 				Editable searchWhat = ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText();
 
-				drawMyLocation(16);
-				MedicalLocation[] results = launchUserDefinedSearch(searchWhere.toString(), searchWhat.toString());
-				if(results != null)
-				{
-					if(results.length != 0)
-					{
-						drawSearchResults(results);
-					}
-					else
-					{
-						AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
-						builder.setCancelable(true);
-						builder.setTitle(getString(R.string.noresults));
-						builder.setIcon(android.R.drawable.ic_dialog_alert);
-						builder.setNeutralButton(android.R.string.ok, new OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-								dialog.dismiss();
-							}
-						});
-						AlertDialog alert = builder.create();
-						alert.show();
-					}
-				}
+				where = searchWhere.toString();
+				what = searchWhat.toString();
+				
+				launchAndDrawResults();
+
 			}
 		});
 
 		Log.i(this.getClass().getName(), "Main Activity created.");
 	}
 
+	
+	public void launchAndDrawResults() {
+		if (zoomLevel < 4) {
+			drawMyLocation(16);
+		}
+		
+		MedicalLocation[] results_ = launchUserDefinedSearch(where, what);
+		
+		// set distance
+		for (MedicalLocation res: results_) {
+			res.setDistance(mapView.getMapCenter().getLatitudeE6()/1000000, 
+					mapView.getMapCenter().getLongitudeE6()/1000000);
+		}
+		
+		// sort
+		Arrays.sort(results_);
+		
+		// filter results
+		int MAX_RESULTS = 20;
+		MedicalLocation[] results = new MedicalLocation[MAX_RESULTS];
+		
+		for (int i = 0; i < Math.min(MAX_RESULTS, results_.length); i++) {
+			results[i] = results_[i];
+			Log.i(this.getClass().getName(), "Dist: "+results[i].getDistance());
+		}
+		
+		if(results != null)
+		{
+			if(results.length != 0)
+			{
+				drawSearchResults(results);
+			}
+			else
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+				builder.setCancelable(true);
+				builder.setTitle(getString(R.string.noresults));
+				builder.setIcon(android.R.drawable.ic_dialog_alert);
+				builder.setNeutralButton(android.R.string.ok, new OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						dialog.dismiss();
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+		}
+	}
+	
+	
 	/**
 	 * Every time, the activity is shown.
 	 */
@@ -559,7 +611,10 @@ public class HealthActivity extends MapActivity
 	protected MedicalLocation[] launchUserDefinedSearch(String where, String what)
 	{
 		double searchAtLatitude, searchAtLongitude;
+		ch.eonum.MedicalLocation[] answer = null;
 		Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Where: "+where+", What: "+what);
+		
+		
 		if (where.length() != 0)
 		{
 			Geocoder geocoder = new Geocoder(HealthActivity.this, HealthActivity.this.getResources()
@@ -643,15 +698,26 @@ public class HealthActivity extends MapActivity
 			MapController mc = HealthActivity.this.mapView.getController();
 			mc.setZoom(16);
 			mc.animateTo(cityPoint);
+			
+			answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
 		}
-		else
+		// 
+		else if (this.lowerLeftLatitude == 0)
 		{
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
+					"Found no corners, querying for Long&Lat.");
+			
 			// TextView searchForWhere was empty, use current location
-			searchAtLatitude = this.latitude;
-			searchAtLongitude = this.longitude;
+			answer = sendDataToServer(this.latitude, this.longitude);
+		}
+		else {
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
+					"Querying for map rectangle.");
+			answer = sendDataToServer(this.lowerLeftLatitude, this.lowerLeftLongitude, 
+					this.upperRightLatitude, this.upperRightLongitude);
 		}
 
-		ch.eonum.MedicalLocation[] answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
+		
 		java.util.ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
 
 		// Do not filter anything if TextView searchForWhat was empty
@@ -667,6 +733,30 @@ public class HealthActivity extends MapActivity
 		}
 
 		return results.toArray(new MedicalLocation[] {});
+	}
+
+	private MedicalLocation[] sendDataToServer(double lowerLeftLatitude,
+			double lowerLeftLongitude, double upperRightLatitude,
+			double upperRightLongitude) {
+		
+		// Search for results around that point
+		ch.eonum.MedicalLocation[] results = {};
+		AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer =
+			new QueryData().execute(lowerLeftLatitude, lowerLeftLongitude, 
+					upperRightLatitude, upperRightLongitude);
+		try
+		{
+			results = queryAnswer.get();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ExecutionException e)
+		{
+			e.printStackTrace();
+		}
+		return results;
 	}
 
 	/**
