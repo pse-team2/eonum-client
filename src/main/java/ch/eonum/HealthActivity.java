@@ -48,11 +48,6 @@ public class HealthActivity extends MapActivity
 	private double latitude;
 	private double longitude;
 	
-	private double lowerLeftLatitude;
-	private double lowerLeftLongitude;
-	private double upperRightLatitude;
-	private double upperRightLongitude;
-	
 	private LocationManager locMgr;
 	private String locProvider;
 	private Location location = null;
@@ -86,21 +81,15 @@ public class HealthActivity extends MapActivity
 				Toast.makeText(getApplicationContext(),
 					"You just zoomed " + (newZoomLevel > zoomLevel ? "in" : "out") + "!", Toast.LENGTH_SHORT).show();
 				zoomLevel = newZoomLevel;
-				
-				lowerLeftLatitude = mapView.getMapCenter().getLatitudeE6() - mapView.getLatitudeSpan()/2; 
-				lowerLeftLongitude = mapView.getMapCenter().getLongitudeE6() - mapView.getLongitudeSpan()/2; 
-				
-				upperRightLatitude = mapView.getMapCenter().getLatitudeE6() + mapView.getLatitudeSpan()/2; 
-				upperRightLongitude = mapView.getMapCenter().getLongitudeE6() + mapView.getLongitudeSpan()/2;
 
-				lowerLeftLatitude /= 1000000;
-				lowerLeftLongitude /= 1000000;
-				upperRightLatitude /= 1000000;
-				upperRightLongitude /= 1000000;
-				
-				launchAndDrawResults();
+				// Do not call drawMyLocation as this moves the user back
+				MedicalLocation[] results = launchSearchFromCurrentLocation(false);
+				MedicalLocation[] filteredResults = filterResults(results);
+				drawSearchResults(filteredResults);
+				// Do not display error mesages if there were no results returned
+				// because we do not want to disturb the user moving around the map.
 			}
-			
+
 			zoomHandler.removeCallbacks(zoomChecker); // remove the old callback
 			zoomHandler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
 		}
@@ -479,32 +468,6 @@ public class HealthActivity extends MapActivity
 		Log.i(this.getClass().getName(), "Main Activity created.");
 	}
 
-	
-	public void launchAndDrawResults() {
-		if (zoomLevel < 4) {
-			drawMyLocation(16);
-		}
-		
-		MedicalLocation[] answer;
-		if (this.lowerLeftLatitude == 0)
- 		{
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
-					"Found no corners, querying for Long&Lat.");
-			
-			// TextView searchForWhere was empty, use current location
-			answer = sendDataToServer(this.latitude, this.longitude);
-		}
-		else {
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
-					"Querying for map rectangle.");
-			answer = sendDataToServer(this.lowerLeftLatitude, this.lowerLeftLongitude, 
-					this.upperRightLatitude, this.upperRightLongitude);
- 		}
-		MedicalLocation[] filteredResults = filterResults(answer);
-
-		drawSearchResults(filteredResults);
-	}
-
 	/**
 	 * Every time, the activity is shown.
 	 */
@@ -513,6 +476,8 @@ public class HealthActivity extends MapActivity
 	{
 		super.onStart();
 		Log.i(this.getClass().getName(), "Run onStart()");
+		//FIXME: Error prone as long as location is unknown ( = null)
+		//launchSearchFromCurrentLocation(true);
 	}
 
 	/**
@@ -575,25 +540,74 @@ public class HealthActivity extends MapActivity
 		return false;
 	}
 
-	protected MedicalLocation[] launchSearchFromCurrentLocation()
+	/**
+	 * Depending of the input, this method launches a search with different arguments for the server.
+	 * A search is launched either with the coordinates where the MyLocation marker is placed
+	 * or with the coordinates where the user has just navigated.
+	 * This method assumes that no user input is involved here and as such does no input checking
+	 * and no error handling either.
+	 * If user input has to be taken into consideration, {@link #launchUserDefinedSearch(String, String)}
+	 * should be used instead.
+	 * 
+	 * @param equalsPhysicalLocation
+	 *            Set {@code true} if there should be searched for results near the MyLocation marker
+	 *            or {@code false} if it should be the location where the user has just navigated.
+	 * @return Filtered results.
+	 */
+	protected MedicalLocation[] launchSearchFromCurrentLocation(boolean equalsPhysicalLocation)
 	{
-		return sendDataToServer(location.getLatitude(), location.getLongitude());
+		MedicalLocation[] answer;
+		double lowerLeftLatitude = mapView.getMapCenter().getLatitudeE6() - mapView.getLatitudeSpan()/2; 
+		double lowerLeftLongitude = mapView.getMapCenter().getLongitudeE6() - mapView.getLongitudeSpan()/2; 
+
+		double upperRightLatitude = mapView.getMapCenter().getLatitudeE6() + mapView.getLatitudeSpan()/2; 
+		double upperRightLongitude = mapView.getMapCenter().getLongitudeE6() + mapView.getLongitudeSpan()/2;
+
+		if (equalsPhysicalLocation
+			|| (lowerLeftLatitude == 0 || lowerLeftLongitude == 0 || upperRightLatitude == 0 || upperRightLongitude == 0))
+		{
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
+					"Found no corners, querying for Long&Lat.");
+			
+			answer = sendDataToServer(this.latitude, this.longitude);
+			//answer = sendDataToServer(location.getLatitude(), location.getLongitude());
+
+		}
+		else
+		{
+			lowerLeftLatitude /= 1000000;
+			lowerLeftLongitude /= 1000000;
+			upperRightLatitude /= 1000000;
+			upperRightLongitude /= 1000000;
+
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
+					"Querying for map rectangle.");
+			answer = sendDataToServer(lowerLeftLatitude, lowerLeftLongitude, 
+					upperRightLatitude, upperRightLongitude);
+		}
+
+		return answer;
 	}
 
 	/**
-	 * Reads input from the two TextView {@code searchforWhere} and {@code searchforWhat}.
+	 * Reads two strings as imput and passes them th the server in order to get results.
+	 * Assumes they are coming from the two TextViews {@code searchforWhere} and {@code searchforWhat} and no
+	 * other values should be taken into consideration.
+	 * If this is nit the case, {@link #launchSearchFromCurrentLocation(boolean)} might be more suitable.
 	 * Handles user interaction in case of an error.
 	 * If an error occurred, the method quits with a {@code null} value.
-	 * @param where Parsed input from TextView {@code searchforWhere}.
-	 * @param what Parsed input from TextView {@code searchforWhat}
+	 * 
+	 * @param where
+	 *            Parsed input from TextView {@code searchforWhere}.
+	 * @param what
+	 *            Parsed input from TextView {@code searchforWhat}
 	 * @return Filtered results or {@code null} indicating an error.
 	 */
 	protected MedicalLocation[] launchUserDefinedSearch(String where, String what)
 	{
 		double searchAtLatitude, searchAtLongitude;
 		Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Where: "+where+", What: "+what);
-		
-		
+
 		if (where.length() != 0)
 		{
 			Geocoder geocoder = new Geocoder(HealthActivity.this, HealthActivity.this.getResources()
@@ -684,7 +698,8 @@ public class HealthActivity extends MapActivity
 			searchAtLatitude = this.latitude;
 			searchAtLongitude = this.longitude;
 		}
-		ch.eonum.MedicalLocation[] answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
+
+		MedicalLocation[] answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
 		ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
 
 		// Do not filter anything if TextView searchForWhat was empty
@@ -824,6 +839,7 @@ public class HealthActivity extends MapActivity
 			HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedSearchresultOverlay);
 		}
 		Log.i("GeoPoint", "Finished drawing");
+		//TODO: Center Map and adjust zoom factor so that all results are displayed.
 	}
 
 	/** This criteria will settle for less accuracy, high power, and cost */
