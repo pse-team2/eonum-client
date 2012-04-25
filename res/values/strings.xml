@@ -7,7 +7,6 @@
     <string name="what">What</string>
     <string name="search">Search</string>
     <string name="location">Location</string>
-    <string name="place">Place</string>
     <string name="loadlocation">Loading Location\.\.\.</string>
     <string name="pleasewait">Please wait\.\.\.</string>
     <string name="sendingrequest">Sending request</string>

@@ -3,7 +3,6 @@ package ch.eonum;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -342,8 +341,9 @@ public class HealthActivity extends MapActivity
 		}
 		catch (InterruptedException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
 		}
 		catch (ExecutionException e)
 		{
@@ -478,31 +478,15 @@ public class HealthActivity extends MapActivity
 			drawMyLocation(16);
 		}
 		
-		MedicalLocation[] results_ = launchUserDefinedSearch(where, what);
+		MedicalLocation[] results = launchUserDefinedSearch(where, what);
 		
-		// set distance
-		for (MedicalLocation res: results_) {
-			res.setDistance(mapView.getMapCenter().getLatitudeE6()/1000000, 
-					mapView.getMapCenter().getLongitudeE6()/1000000);
-		}
+		MedicalLocation[] filteredResults = filterResults(results);
 		
-		// sort
-		Arrays.sort(results_);
-		
-		// filter results
-		int MAX_RESULTS = 20;
-		MedicalLocation[] results = new MedicalLocation[MAX_RESULTS];
-		
-		for (int i = 0; i < Math.min(MAX_RESULTS, results_.length); i++) {
-			results[i] = results_[i];
-			Log.i(this.getClass().getName(), "Dist: "+results[i].getDistance());
-		}
-		
-		if(results != null)
+		if(filteredResults != null)
 		{
-			if(results.length != 0)
+			if(filteredResults.length != 0)
 			{
-				drawSearchResults(results);
+				drawSearchResults(filteredResults);
 			}
 			else
 			{
@@ -735,6 +719,30 @@ public class HealthActivity extends MapActivity
 		return results.toArray(new MedicalLocation[] {});
 	}
 
+	private MedicalLocation[] filterResults(MedicalLocation[] results)
+	{
+		// Calculate distance of all result points from the current displayed position.
+		for (MedicalLocation res : results)
+		{
+			res.setDistance(mapView.getMapCenter().getLatitudeE6() / 1000000,
+				mapView.getMapCenter().getLongitudeE6() / 1000000);
+		}
+
+		// Sort the list, the higher the index, the longer the distance.
+		Arrays.sort(results);
+		
+		// Continue only with the nearest MAX_RESULTS results
+		final int MAX_RESULTS = 20;
+		MedicalLocation[] filteredResults = new MedicalLocation[Math.min(MAX_RESULTS, results.length)];
+
+		for (int i = 0; i < Math.min(MAX_RESULTS, results.length); i++)
+		{
+			filteredResults[i] = results[i];
+			Log.i(this.getClass().getName(), "Dist: " + results[i].getDistance());
+		}
+		return filteredResults;
+	}
+
 	private MedicalLocation[] sendDataToServer(double lowerLeftLatitude,
 			double lowerLeftLongitude, double upperRightLatitude,
 			double upperRightLongitude) {
@@ -751,6 +759,8 @@ public class HealthActivity extends MapActivity
 		catch (InterruptedException e)
 		{
 			e.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
 		}
 		catch (ExecutionException e)
 		{
@@ -775,6 +785,8 @@ public class HealthActivity extends MapActivity
 		catch (InterruptedException e)
 		{
 			e.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
 		}
 		catch (ExecutionException e)
 		{
