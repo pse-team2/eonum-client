@@ -53,9 +53,6 @@ public class HealthActivity extends MapActivity
 	private double upperRightLatitude;
 	private double upperRightLongitude;
 	
-	private String what = "";
-	private String where = "";
-	
 	private LocationManager locMgr;
 	private String locProvider;
 	private Location location = null;
@@ -461,11 +458,21 @@ public class HealthActivity extends MapActivity
 				Editable searchWhere = ((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText();
 				Editable searchWhat = ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText();
 
-				where = searchWhere.toString();
-				what = searchWhat.toString();
-				
-				launchAndDrawResults();
-
+				if (zoomLevel < 4)
+				{
+					drawMyLocation(16);
+				}
+				MedicalLocation[] results = launchUserDefinedSearch(searchWhere.toString(), searchWhat.toString());
+				if(results != null)
+				{
+					if(results.length != 0)
+					{
+						MedicalLocation[] filteredResults = filterResults(results);
+						drawSearchResults(filteredResults);
+					}
+					// There is no need to display an error message in case of an empty result list
+					// as the search method already does this.
+				}
 			}
 		});
 
@@ -494,34 +501,10 @@ public class HealthActivity extends MapActivity
 					this.upperRightLatitude, this.upperRightLongitude);
  		}
 		MedicalLocation[] filteredResults = filterResults(answer);
-		
-		if(filteredResults != null)
-		{
-			if(filteredResults.length != 0)
-			{
-				drawSearchResults(filteredResults);
-			}
-			else
-			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
-				builder.setCancelable(true);
-				builder.setTitle(getString(R.string.noresults));
-				builder.setIcon(android.R.drawable.ic_dialog_alert);
-				builder.setNeutralButton(android.R.string.ok, new OnClickListener()
-				{
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						dialog.dismiss();
-					}
-				});
-				AlertDialog alert = builder.create();
-				alert.show();
-			}
-		}
+
+		drawSearchResults(filteredResults);
 	}
-	
-	
+
 	/**
 	 * Every time, the activity is shown.
 	 */
