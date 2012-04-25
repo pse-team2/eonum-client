@@ -1,10 +1,5 @@
 package ch.eonum;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
