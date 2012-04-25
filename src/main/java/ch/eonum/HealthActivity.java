@@ -478,9 +478,22 @@ public class HealthActivity extends MapActivity
 			drawMyLocation(16);
 		}
 		
-		MedicalLocation[] results = launchUserDefinedSearch(where, what);
-		
-		MedicalLocation[] filteredResults = filterResults(results);
+		MedicalLocation[] answer;
+		if (this.lowerLeftLatitude == 0)
+ 		{
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
+					"Found no corners, querying for Long&Lat.");
+			
+			// TextView searchForWhere was empty, use current location
+			answer = sendDataToServer(this.latitude, this.longitude);
+		}
+		else {
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
+					"Querying for map rectangle.");
+			answer = sendDataToServer(this.lowerLeftLatitude, this.lowerLeftLongitude, 
+					this.upperRightLatitude, this.upperRightLongitude);
+ 		}
+		MedicalLocation[] filteredResults = filterResults(answer);
 		
 		if(filteredResults != null)
 		{
@@ -595,7 +608,6 @@ public class HealthActivity extends MapActivity
 	protected MedicalLocation[] launchUserDefinedSearch(String where, String what)
 	{
 		double searchAtLatitude, searchAtLongitude;
-		ch.eonum.MedicalLocation[] answer = null;
 		Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Where: "+where+", What: "+what);
 		
 		
@@ -682,27 +694,15 @@ public class HealthActivity extends MapActivity
 			MapController mc = HealthActivity.this.mapView.getController();
 			mc.setZoom(16);
 			mc.animateTo(cityPoint);
-			
-			answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
 		}
-		// 
-		else if (this.lowerLeftLatitude == 0)
+		else
 		{
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
-					"Found no corners, querying for Long&Lat.");
-			
 			// TextView searchForWhere was empty, use current location
-			answer = sendDataToServer(this.latitude, this.longitude);
+			searchAtLatitude = this.latitude;
+			searchAtLongitude = this.longitude;
 		}
-		else {
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
-					"Querying for map rectangle.");
-			answer = sendDataToServer(this.lowerLeftLatitude, this.lowerLeftLongitude, 
-					this.upperRightLatitude, this.upperRightLongitude);
-		}
-
-		
-		java.util.ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
+		ch.eonum.MedicalLocation[] answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
+		ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
 
 		// Do not filter anything if TextView searchForWhat was empty
 		if(what.length() != 0)
