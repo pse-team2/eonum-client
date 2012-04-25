@@ -41,7 +41,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class HealthActivity extends MapActivity
+public class HealthActivity extends MapActivity implements HealthMapView.OnChangeListener
 {
 
 	public static Activity mainActivity;
@@ -53,7 +53,7 @@ public class HealthActivity extends MapActivity
 	private Location location = null;
 	TextView locationTxt;
 
-	MapView mapView;
+	HealthMapView mapView;
 	List<Overlay> mapOverlays;
 	Drawable drawableLocation, drawableSearchresult;
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
@@ -358,9 +358,11 @@ public class HealthActivity extends MapActivity
 		*/
 
 		/** MapView */
-		this.mapView = (MapView) findViewById(R.id.mapview);
+		this.mapView = (HealthMapView) findViewById(R.id.mapview);
 		this.mapView.setBuiltInZoomControls(true);
 		this.mapView.setSatellite(true);
+		// Add listener
+		this.mapView.setOnChangeListener(this);
 
 		this.mapOverlays = this.mapView.getOverlays();
 		this.drawableLocation = this.getResources().getDrawable(R.drawable.pin_red);
@@ -538,6 +540,23 @@ public class HealthActivity extends MapActivity
 	protected boolean isRouteDisplayed()
 	{
 		return false;
+	}
+
+	/**
+	 * This method is triggered every time the user moves onwards on the map.
+	 * It calculates the new location and visible map rectangle.
+	 * After this it launches a new search from the targeted location.
+	 */
+	@Override
+	public void onChange(MapView view, GeoPoint newCenter, int newZoom)
+	{
+		// Do not call drawMyLocation as this resets the display
+		//TODO: Check how to limit triggering searches
+		MedicalLocation[] results = launchSearchFromCurrentLocation(false);
+		MedicalLocation[] filteredResults = filterResults(results);
+		drawSearchResults(filteredResults);
+		// Do not display error mesages if there were no results returned
+		// because we do not want to disturb the user moving around the map.
 	}
 
 	/**
