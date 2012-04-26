@@ -13,6 +13,8 @@ import com.google.android.maps.MapView;
 
 public class HealthMapView extends MapView
 {
+	private Logger logger;
+
 	// Change listener
 	public interface OnChangeListener
 	{
@@ -44,6 +46,7 @@ public class HealthMapView extends MapView
 	private void initialize()
 	{
 		mapContext = this;
+		this.logger = new Logger();
 		controller =  this.getController();
 		this.setBuiltInZoomControls(true);
 
@@ -54,6 +57,7 @@ public class HealthMapView extends MapView
 			public void onClick(View v)
 			{
 				Toast.makeText(mapContext.getContext(), "Zoom Out Clicked", Toast.LENGTH_LONG).show();
+				HealthMapView.this.logger.log("Zoomed out.");
 				controller.zoomOut();
 				mapChangeListener.onChange(mapContext, mapContext.getMapCenter(), mapContext.getZoomLevel());
 			}
@@ -64,6 +68,7 @@ public class HealthMapView extends MapView
 			public void onClick(View v)
 			{
 				Toast.makeText(mapContext.getContext(), "Zoom In Clicked", Toast.LENGTH_LONG).show();
+				HealthMapView.this.logger.log("Zoomed in.");
 				controller.zoomIn();
 				mapChangeListener.onChange(mapContext, mapContext.getMapCenter(), mapContext.getZoomLevel());
 			}

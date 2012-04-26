@@ -57,9 +57,15 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		return this.distance;
 	}
 
+	/**
+	 * Calculate distance to center
+	 */
 	public double setDistance(double latCenter, double lngCenter)
 	{
-		this.distance = Math.sqrt(Math.pow(latCenter - latitude, 2) + Math.pow(lngCenter - longitude, 2));
+		double deltaLat = Math.abs(latCenter - latitude);
+		double deltaLng = Math.abs(lngCenter - longitude);
+
+		this.distance = Math.sqrt(Math.pow(deltaLat, 2) + Math.pow(deltaLng, 2));
 		return this.distance;
 	}
 
@@ -82,5 +88,4 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		}
 		*/
 	}
-
 }

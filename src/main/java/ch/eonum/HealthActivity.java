@@ -43,6 +43,8 @@ import android.widget.Toast;
 public class HealthActivity extends MapActivity implements HealthMapView.OnChangeListener
 {
 
+	private Logger logger;
+	
 	public static Activity mainActivity;
 	private double latitude;
 	private double longitude;
@@ -442,6 +444,10 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		super.onStart();
 		Log.i(this.getClass().getName(), "Run onStart()");
+		
+		logger = new Logger();
+		logger.log("App started.");
+		
 		//FIXME: Error prone as long as location is unknown ( = null)
 		//launchSearchFromCurrentLocation(true);
 	}
@@ -700,15 +706,16 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// Calculate distance of all result points from the current displayed position.
 		for (MedicalLocation res : results)
 		{
-			res.setDistance(mapView.getMapCenter().getLatitudeE6() / 1000000,
-				mapView.getMapCenter().getLongitudeE6() / 1000000);
+			double lat = (double)(mapView.getMapCenter().getLatitudeE6()) / 1000000;
+			double lng = (double)(mapView.getMapCenter().getLongitudeE6()) / 1000000;
+			res.setDistance(lat, lng);
 		}
 
 		// Sort the list, the higher the index, the longer the distance.
 		Arrays.sort(results);
 		
 		// Continue only with the nearest MAX_RESULTS results
-		final int MAX_RESULTS = 20;
+		final int MAX_RESULTS = 50;
 		MedicalLocation[] filteredResults = new MedicalLocation[Math.min(MAX_RESULTS, results.length)];
 
 		for (int i = 0; i < Math.min(MAX_RESULTS, results.length); i++)
@@ -804,8 +811,12 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// Draw results to map
 		Log.i(this.getClass().getName() + ": drawSearchResults", "Draw "+results.length+" results to map");
 		Log.i("GeoPoint", "Start drawing");
+
+		int count = 0;
+		
 		for (MedicalLocation point : results)
 		{
+			count++;
 			Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
 				String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
 			GeoPoint matchingResult = new GeoPoint(
@@ -813,9 +824,22 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				(int) (point.getLocation()[1] * 1000000)
 				);
 			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType());
-			HealthActivity.this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
-			HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedSearchresultOverlay);
+			
+			/* TODO clean up after nearest lcoation finder algorithm is correct
+			 * at the moment, 100 results are shown, and the 20 nearest are marked red.
+			 */
+			if (count < 20) {
+				HealthActivity.this.itemizedLocationOverlay.addOverlay(matchingOverlayitem);
+			}
+			else {
+				HealthActivity.this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
+			}
 		}
+		// putting this lines outside the loop improved the perfomance drastically
+		// TODO Remove old Geopoints
+		HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedLocationOverlay);
+		HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedSearchresultOverlay);
+		
 		Log.i("GeoPoint", "Finished drawing");
 		//TODO: Center Map and adjust zoom factor so that all results are displayed.
 	}
@@ -860,9 +884,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			// 60000 = 1min
 			// 10 = 100m
 			this.locMgr.requestLocationUpdates(this.locProvider, 60000, 10, this.locLst);
-			Toast.makeText(HealthActivity.this, "Debug message:\n" +
-				"If running on an emulator:\nSend location fix in DDMS to trigger location update.",
-				Toast.LENGTH_SHORT).show();
+//			Toast.makeText(HealthActivity.this, "Debug message:\n" +
+//				"If running on an emulator:\nSend location fix in DDMS to trigger location update.",
+//				Toast.LENGTH_SHORT).show();
 			return;
 		}
 
