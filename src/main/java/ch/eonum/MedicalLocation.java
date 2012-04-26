@@ -70,11 +70,11 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 	public int compareTo(MedicalLocation loc) {
 		if (this.distance > loc.getDistance()) 
 		{
-			return -1;
+			return 1;
 		}
 		else if (this.distance < loc.getDistance()) 
 		{
-			return 1;
+			return -1;
 		}
 		else 
 		{

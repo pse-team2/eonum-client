@@ -44,6 +44,8 @@ import android.widget.Toast;
 public class HealthActivity extends MapActivity implements HealthMapView.OnChangeListener
 {
 
+	private Logger logger;
+	
 	public static Activity mainActivity;
 	private double latitude;
 	private double longitude;
@@ -78,6 +80,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 			if (newZoomLevel != zoomLevel)
 			{
+				logger.log("Zoomed in.");
 				Toast.makeText(getApplicationContext(),
 					"You just zoomed " + (newZoomLevel > zoomLevel ? "in" : "out") + "!", Toast.LENGTH_SHORT).show();
 				zoomLevel = newZoomLevel;
@@ -478,6 +481,10 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		super.onStart();
 		Log.i(this.getClass().getName(), "Run onStart()");
+		
+		logger = new Logger();
+		logger.log("App started.");
+		
 		//FIXME: Error prone as long as location is unknown ( = null)
 		//launchSearchFromCurrentLocation(true);
 	}
@@ -871,6 +878,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			}
 		}
 		// putting this lines outside the loop improved the perfomance drastically
+		// TODO Remove old Geopoints
 		HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedLocationOverlay);
 		HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedSearchresultOverlay);
 		
