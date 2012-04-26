@@ -45,23 +45,29 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 	{
 		return this.arztTyp;
 	}
+
 	@Override
 	public Double[] getLocation()
 	{
 		return this.location;
 	}
-	
-	public double getDistance() {
+
+	public double getDistance()
+	{
 		return this.distance;
 	}
-	
-	public double setDistance(double latCenter, double lngCenter) {
-		this.distance = Math.sqrt(Math.pow(latCenter-latitude, 2) + Math.pow(lngCenter-longitude, 2));
+
+	public double setDistance(double latCenter, double lngCenter)
+	{
+		this.distance = Math.sqrt(Math.pow(latCenter - latitude, 2) + Math.pow(lngCenter - longitude, 2));
 		return this.distance;
 	}
 
 	@Override
-	public int compareTo(MedicalLocation loc) {
+	public int compareTo(MedicalLocation loc)
+	{
+		return (int) Math.signum(this.distance - loc.getDistance());
+		/*
 		if (this.distance > loc.getDistance()) 
 		{
 			return 1;
@@ -74,7 +80,7 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		{
 			return 0;
 		}
+		*/
 	}
-	
-	
+
 }

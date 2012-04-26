@@ -1,5 +1,7 @@
 package ch.eonum;
 
+import java.util.Arrays;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -38,16 +40,20 @@ public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 	protected MedicalLocation[] doInBackground(Double... params)
 	{
 		Log.i(this.getClass().getName(), "Got arguments: " + params.length);
-		
-		if (params.length == 4) {
+		Log.i(this.getClass().getName(), Arrays.asList(params).toString());
+
+		if (params.length == 4)
+		{
+			// params[0]: lowerLeftLatitude
+			// params[1]: lowerLeftLongitude
+			// params[2]: upperRightLatitude
+			// params[3]: upperRightLongitude
 			return queryServer(params[0], params[1], params[2], params[3]);
 		}
-		else {
-			double myLatitude = params[0];
-			double myLongitude = params[1];
-			// publishProgress();
-			return queryServer(myLatitude, myLongitude);
-		}
+		double myLatitude = params[0];
+		double myLongitude = params[1];
+		// publishProgress();
+		return queryServer(myLatitude, myLongitude);
 	}
 
 	/**

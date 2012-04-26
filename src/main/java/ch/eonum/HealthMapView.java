@@ -1,16 +1,14 @@
 package ch.eonum;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
+import android.widget.ZoomControls;
 
 import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 
 public class HealthMapView extends MapView
@@ -23,6 +21,7 @@ public class HealthMapView extends MapView
 
 	private HealthMapView mapContext;
 	private HealthMapView.OnChangeListener mapChangeListener = null;
+	private MapController controller;
 
 	public HealthMapView(Context context, String apiKey)
 	{
@@ -45,6 +44,30 @@ public class HealthMapView extends MapView
 	private void initialize()
 	{
 		mapContext = this;
+		controller =  this.getController();
+		this.setBuiltInZoomControls(true);
+
+		ZoomControls control = (ZoomControls) this.getZoomButtonsController().getZoomControls();
+		control.setOnZoomOutClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				Toast.makeText(mapContext.getContext(), "Zoom Out Clicked", Toast.LENGTH_LONG).show();
+				controller.zoomOut();
+				mapChangeListener.onChange(mapContext, mapContext.getMapCenter(), mapContext.getZoomLevel());
+			}
+		});
+		control.setOnZoomInClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				Toast.makeText(mapContext.getContext(), "Zoom In Clicked", Toast.LENGTH_LONG).show();
+				controller.zoomIn();
+				mapChangeListener.onChange(mapContext, mapContext.getMapCenter(), mapContext.getZoomLevel());
+			}
+		});
 	}
 
 	public void setOnChangeListener(HealthMapView.OnChangeListener listener)
@@ -58,8 +81,8 @@ public class HealthMapView extends MapView
 		super.onTouchEvent(event);
 		if (event.getAction() == MotionEvent.ACTION_UP)
 		{
-			mapChangeListener.onChange(this, this.getMapCenter(), this.getZoomLevel());
 			Toast.makeText(mapContext.getContext(), "Touch Event Triggered", Toast.LENGTH_LONG).show();
+			mapChangeListener.onChange(this, this.getMapCenter(), this.getZoomLevel());
 		}
 
 		return true;

@@ -28,7 +28,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
@@ -58,42 +57,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	Drawable drawableLocation, drawableSearchresult;
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
 
-	// Detect zoom and trigger event
-	private Handler zoomHandler = new Handler();
-	private int zoomLevel = 0, newZoomLevel;
-	public static final int zoomCheckingDelay = 500; // Milliseconds
-	private Runnable zoomChecker = new Runnable()
-	{
-		@Override
-		public void run()
-		{
-			// ZoomControls mZoom = (ZoomControls) mapView.getZoomControls();;
-			mapView.getZoomLevel();
-			if (zoomLevel == 0)
-			{
-				zoomLevel = mapView.getZoomLevel();
-			}
-
-			newZoomLevel = mapView.getZoomLevel();
-
-			if (newZoomLevel != zoomLevel)
-			{
-				Toast.makeText(getApplicationContext(),
-					"You just zoomed " + (newZoomLevel > zoomLevel ? "in" : "out") + "!", Toast.LENGTH_SHORT).show();
-				zoomLevel = newZoomLevel;
-
-				// Do not call drawMyLocation as this moves the user back
-				MedicalLocation[] results = launchSearchFromCurrentLocation(false);
-				MedicalLocation[] filteredResults = filterResults(results);
-				drawSearchResults(filteredResults);
-				// Do not display error mesages if there were no results returned
-				// because we do not want to disturb the user moving around the map.
-			}
-
-			zoomHandler.removeCallbacks(zoomChecker); // remove the old callback
-			zoomHandler.postDelayed(zoomChecker, zoomCheckingDelay); // register a new one
-		}
-	};
+	private int currentZoomLevel;
 
 	private LocationListener locLst = new HealthLocationListener();
 	/* Implement Location Listener */
@@ -449,7 +413,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				Editable searchWhere = ((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText();
 				Editable searchWhat = ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText();
 
-				if (zoomLevel < 4)
+				if (currentZoomLevel < 4)
 				{
 					drawMyLocation(16);
 				}
@@ -492,9 +456,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 		Log.i(this.getClass().getName(), "Run onResume()");
 
-		// Zoom handler
-		zoomHandler.postDelayed(zoomChecker, zoomCheckingDelay);
-
 		if (this.locMgr == null)
 		{
 			this.locMgr = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
@@ -512,9 +473,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		super.onPause();
 		Log.i(this.getClass().getName(), "Run onPause()");
-
-		// zoom handler
-		zoomHandler.removeCallbacks(zoomChecker);
 
 		this.locMgr.removeUpdates(this.locLst);
 		this.locMgr = null;
@@ -550,6 +508,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	@Override
 	public void onChange(MapView view, GeoPoint newCenter, int newZoom)
 	{
+		this.currentZoomLevel = newZoom;
 		// Do not call drawMyLocation as this resets the display
 		//TODO: Check how to limit triggering searches
 		MedicalLocation[] results = launchSearchFromCurrentLocation(false);
@@ -576,18 +535,18 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected MedicalLocation[] launchSearchFromCurrentLocation(boolean equalsPhysicalLocation)
 	{
 		MedicalLocation[] answer;
-		double lowerLeftLatitude = mapView.getMapCenter().getLatitudeE6() - mapView.getLatitudeSpan()/2; 
-		double lowerLeftLongitude = mapView.getMapCenter().getLongitudeE6() - mapView.getLongitudeSpan()/2; 
+		double lowerLeftLatitude = mapView.getMapCenter().getLatitudeE6() - mapView.getLatitudeSpan() / 2;
+		double lowerLeftLongitude = mapView.getMapCenter().getLongitudeE6() - mapView.getLongitudeSpan() / 2;
 
-		double upperRightLatitude = mapView.getMapCenter().getLatitudeE6() + mapView.getLatitudeSpan()/2; 
-		double upperRightLongitude = mapView.getMapCenter().getLongitudeE6() + mapView.getLongitudeSpan()/2;
+		double upperRightLatitude = mapView.getMapCenter().getLatitudeE6() + mapView.getLatitudeSpan() / 2;
+		double upperRightLongitude = mapView.getMapCenter().getLongitudeE6() + mapView.getLongitudeSpan() / 2;
 
 		if (equalsPhysicalLocation
 			|| (lowerLeftLatitude == 0 || lowerLeftLongitude == 0 || upperRightLatitude == 0 || upperRightLongitude == 0))
 		{
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
-					"Found no corners, querying for Long&Lat.");
-			
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch",
+				"Found no corners, querying for Long&Lat.");
+
 			answer = sendDataToServer(this.latitude, this.longitude);
 			//answer = sendDataToServer(location.getLatitude(), location.getLongitude());
 
@@ -599,20 +558,20 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			upperRightLatitude /= 1000000;
 			upperRightLongitude /= 1000000;
 
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", 
-					"Querying for map rectangle.");
-			answer = sendDataToServer(lowerLeftLatitude, lowerLeftLongitude, 
-					upperRightLatitude, upperRightLongitude);
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch",
+				"Querying for map rectangle.");
+			answer = sendDataToServer(lowerLeftLatitude, lowerLeftLongitude,
+				upperRightLatitude, upperRightLongitude);
 		}
 
 		return answer;
 	}
 
 	/**
-	 * Reads two strings as imput and passes them th the server in order to get results.
+	 * Reads two strings as imput and passes them to the server in order to get results.
 	 * Assumes they are coming from the two TextViews {@code searchforWhere} and {@code searchforWhat} and no
 	 * other values should be taken into consideration.
-	 * If this is nit the case, {@link #launchSearchFromCurrentLocation(boolean)} might be more suitable.
+	 * If this is not the case, {@link #launchSearchFromCurrentLocation(boolean)} might be more suitable.
 	 * Handles user interaction in case of an error.
 	 * If an error occurred, the method quits with a {@code null} value.
 	 * 
@@ -765,8 +724,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			double upperRightLongitude) {
 		
 		// Search for results around that point
-		ch.eonum.MedicalLocation[] results = {};
-		AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer =
+		MedicalLocation[] results = {};
+		AsyncTask<Double, Void, MedicalLocation[]> queryAnswer =
 			new QueryData().execute(lowerLeftLatitude, lowerLeftLongitude, 
 					upperRightLatitude, upperRightLongitude);
 		try
@@ -792,8 +751,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	private MedicalLocation[] sendDataToServer(double latitude, double longitude)
 	{
 		// Search for results around that point
-		ch.eonum.MedicalLocation[] results = {};
-		AsyncTask<Double, Void, ch.eonum.MedicalLocation[]> queryAnswer =
+		MedicalLocation[] results = {};
+		AsyncTask<Double, Void, MedicalLocation[]> queryAnswer =
 			new QueryData().execute(latitude, longitude);
 		try
 		{
@@ -845,7 +804,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// Draw results to map
 		Log.i(this.getClass().getName() + ": drawSearchResults", "Draw "+results.length+" results to map");
 		Log.i("GeoPoint", "Start drawing");
-		for (ch.eonum.MedicalLocation point : results)
+		for (MedicalLocation point : results)
 		{
 			Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
 				String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));

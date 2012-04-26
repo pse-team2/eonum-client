@@ -15,7 +15,7 @@ public class HealthLocationListener implements LocationListener
 	@Override
 	public void onLocationChanged(Location newLocation)
 	{
-		Log.i(this.getClass().getName(), "Location changed");
+		Log.i(this.getClass().getName(), "Location changed: "+newLocation.toString());
 		Location location = ((HealthActivity) HealthActivity.mainActivity).getLocation();
 		if (isBetterLocation(newLocation, location))
 		{
