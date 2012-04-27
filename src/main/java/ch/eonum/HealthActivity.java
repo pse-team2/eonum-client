@@ -43,9 +43,6 @@ import android.widget.Toast;
 
 public class HealthActivity extends MapActivity implements HealthMapView.OnChangeListener
 {
-
-	private Logger logger;
-	
 	public static Activity mainActivity;
 	private double latitude;
 	private double longitude;
@@ -401,23 +398,22 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			@Override
 			public void onClick(View view)
 			{
-				logger.log("Location button pressed.");
+				Logger.log("Location button pressed.");
 				drawMyLocation(16);
 			}
 		});
 
 		/** Button "search" */
-		
 		Button search = (Button) findViewById(R.id.search);
 		search.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View view)
 			{
-				logger.log("Search button pressed.");
 				Editable searchWhere = ((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText();
 				Editable searchWhat = ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText();
-
+				Logger.log("Search button pressed. where: "+searchWhere+", what: "+searchWhat);
+				
 				if (currentZoomLevel < 4)
 				{
 					drawMyLocation(16);
@@ -451,8 +447,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		super.onStart();
 		Log.i(this.getClass().getName(), "Run onStart()");
 		
-		logger = new Logger();
-		logger.log("App started.");
+		Logger.init();
+		Logger.log("App started.");
 		
 		//FIXME: Error prone as long as location is unknown ( = null)
 		//launchSearchFromCurrentLocation(true);
@@ -465,7 +461,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void onResume()
 	{
 		super.onResume();
-		logger.log("App resumed.");
+		Logger.log("App resumed.");
 		//Log.i(this.getClass().getName(), "Run onResume()");
 
 		if (this.locMgr == null)
@@ -484,7 +480,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void onPause()
 	{
 		super.onPause();
-		logger.log("App paused.");
+		Logger.log("App paused.");
 		//Log.i(this.getClass().getName(), "Run onPause()");
 
 		this.locMgr.removeUpdates(this.locLst);
@@ -498,7 +494,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void onStop()
 	{
 		super.onStop();
-		logger.log("App stopped.");
+		Logger.log("App stopped.");
 		//Log.i(this.getClass().getName(), "Run onStop()");
 
 		itemizedLocationOverlay.clear();
@@ -797,7 +793,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			+ HealthActivity.this.latitude + " : "
 			+ HealthActivity.this.longitude;
 		Log.i(this.getClass().getName() + ": drawMyLocation", HealthActivity.this.latitude + " : " + HealthActivity.this.longitude);
-		Toast.makeText(HealthActivity.this.getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
+		//Toast.makeText(HealthActivity.this.getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
 
 		// Remove other points
 		HealthActivity.this.itemizedLocationOverlay.clear();

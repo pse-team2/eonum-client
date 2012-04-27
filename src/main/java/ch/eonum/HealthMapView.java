@@ -86,7 +86,7 @@ public class HealthMapView extends MapView
 		super.onTouchEvent(event);
 		if (event.getAction() == MotionEvent.ACTION_UP)
 		{
-			Toast.makeText(mapContext.getContext(), "Touch Event Triggered", Toast.LENGTH_LONG).show();
+			Logger.log("Touch event triggered.");
 			mapChangeListener.onChange(this, this.getMapCenter(), this.getZoomLevel());
 		}
 
