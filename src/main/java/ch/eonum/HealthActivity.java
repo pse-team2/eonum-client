@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -299,7 +300,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		}
 		catch (ExecutionException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		AutoCompleteTextView searchforWhat = (AutoCompleteTextView) findViewById(R.id.searchforWhat);
@@ -401,17 +401,20 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			@Override
 			public void onClick(View view)
 			{
+				logger.log("Location button pressed.");
 				drawMyLocation(16);
 			}
 		});
 
 		/** Button "search" */
+		
 		Button search = (Button) findViewById(R.id.search);
 		search.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View view)
 			{
+				logger.log("Search button pressed.");
 				Editable searchWhere = ((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText();
 				Editable searchWhat = ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText();
 
@@ -430,6 +433,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 					// There is no need to display an error message in case of an empty result list
 					// as the search method already does this.
 				}
+				//getApplicationContext().getSystemService(LOCATION_SERVICE);
+				InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS); 
 			}
 		});
 
@@ -459,8 +465,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void onResume()
 	{
 		super.onResume();
-
-		Log.i(this.getClass().getName(), "Run onResume()");
+		logger.log("App resumed.");
+		//Log.i(this.getClass().getName(), "Run onResume()");
 
 		if (this.locMgr == null)
 		{
@@ -478,7 +484,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void onPause()
 	{
 		super.onPause();
-		Log.i(this.getClass().getName(), "Run onPause()");
+		logger.log("App paused.");
+		//Log.i(this.getClass().getName(), "Run onPause()");
 
 		this.locMgr.removeUpdates(this.locLst);
 		this.locMgr = null;
@@ -491,7 +498,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void onStop()
 	{
 		super.onStop();
-		Log.i(this.getClass().getName(), "Run onStop()");
+		logger.log("App stopped.");
+		//Log.i(this.getClass().getName(), "Run onStop()");
 
 		itemizedLocationOverlay.clear();
 		itemizedSearchresultOverlay.clear();
@@ -663,6 +671,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				});
 				AlertDialog alert = builder.create();
 				alert.show();
+				InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS); 
+				
 				return null;
 			}
 

@@ -14,6 +14,8 @@ import android.util.Log;
  */
 public class Logger
 {
+	private boolean debug = true;
+	
 	private String fileName = "logfile.csv";
 	private Timer timer;
 	private File file;
@@ -31,6 +33,9 @@ public class Logger
 	public void log(String line)
 	{
 		Log.i(this.getClass().getName(), ">> logged: " + line);
+		
+		if (!debug) return;
+		
 		byte[] data = new String(timer.timeElapsed() + ";" + line+"\n").getBytes();
 		try
 		{
