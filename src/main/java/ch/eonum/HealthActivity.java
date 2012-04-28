@@ -16,7 +16,6 @@ import com.google.android.maps.OverlayItem;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Context;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.drawable.Drawable;
@@ -143,6 +142,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void setLocation(Location location)
 	{
 		this.location = location;
+		this.latitude = location.getLatitude();
+		this.longitude = location.getLongitude();
 	}
 
 	protected MapView getMapView()
@@ -338,7 +339,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 		// Use the LocationManager class to obtain GPS locations
 		//this.locationTxt = (TextView) findViewById(R.id.locationlabel);
-		this.locMgr = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		this.locMgr = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 		// Register the listener in onResume()
 
 //		/** Button "location" */
@@ -444,12 +445,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		super.onStart();
 		Log.i(this.getClass().getName(), "Run onStart()");
-		
+
 		logger = new Logger();
 		logger.log("App started.");
-		
-		//FIXME: Error prone as long as location is unknown ( = null)
-		//launchSearchFromCurrentLocation(true);
 	}
 
 	/**
@@ -512,16 +510,22 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * After this it launches a new search from the targeted location.
 	 */
 	@Override
-	public void onChange(MapView view, GeoPoint newCenter, int newZoom)
+	public void onChange(MapView view, GeoPoint newCenter, GeoPoint oldCenter, int newZoom, int oldZoom)
 	{
 		this.currentZoomLevel = newZoom;
 		// Do not call drawMyLocation as this resets the display
-		//TODO: Check how to limit triggering searches
 		MedicalLocation[] results = launchSearchFromCurrentLocation(false);
 		MedicalLocation[] filteredResults = filterResults(results);
 		drawSearchResults(filteredResults);
 		// Do not display error mesages if there were no results returned
 		// because we do not want to disturb the user moving around the map.
+	}
+
+	public void launchInitialSearch()
+	{
+		MedicalLocation[] results = launchSearchFromCurrentLocation(true);
+		MedicalLocation[] filteredResults = filterResults(results);
+		drawSearchResults(filteredResults);
 	}
 
 	/**
@@ -555,7 +559,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 			answer = sendDataToServer(this.latitude, this.longitude);
 			//answer = sendDataToServer(location.getLatitude(), location.getLongitude());
-
 		}
 		else
 		{
@@ -701,6 +704,11 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		return results.toArray(new MedicalLocation[] {});
 	}
 
+	/**
+	 * Limits number of results to the amount defined in the MAX_RESULTS constant.
+	 * @param results Result list from the server.
+	 * @return Result list shortened to the given amount.
+	 */
 	private MedicalLocation[] filterResults(MedicalLocation[] results)
 	{
 		// Calculate distance of all result points from the current displayed position.
@@ -780,8 +788,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 	protected void drawMyLocation(int zoomLevel)
 	{
-		HealthActivity.this.latitude = location.getLatitude();
-		HealthActivity.this.longitude = location.getLongitude();
+		this.latitude = this.location.getLatitude();
+		this.longitude = this.location.getLongitude();
 		String Text = getString(R.string.location) + ": "
 			+ HealthActivity.this.latitude + " : "
 			+ HealthActivity.this.longitude;
@@ -792,13 +800,13 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		HealthActivity.this.itemizedLocationOverlay.clear();
 
 		// Draw current location
-		GeoPoint initGeoPoint = new GeoPoint((int) (location.getLatitude() * 1000000), (int) (location.getLongitude() * 1000000));
+		GeoPoint initGeoPoint = new GeoPoint((int) (this.latitude * 1000000), (int) (this.longitude * 1000000));
 		OverlayItem overlayitem = new OverlayItem(initGeoPoint, "Our Location", "We are here");
 		HealthActivity.this.itemizedLocationOverlay.addOverlay(overlayitem);
 		HealthActivity.this.mapOverlays.add(HealthActivity.this.itemizedLocationOverlay);
 
 		// Go there
-		MapController mc = ((HealthActivity) HealthActivity.mainActivity).getMapView().getController();
+		MapController mc = getMapView().getController();
 		mc.setZoom(zoomLevel);
 		mc.animateTo(initGeoPoint);
 	}

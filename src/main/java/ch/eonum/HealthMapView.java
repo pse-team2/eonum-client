@@ -13,16 +13,17 @@ import com.google.android.maps.MapView;
 
 public class HealthMapView extends MapView
 {
-	private Logger logger;
-
 	// Change listener
 	public interface OnChangeListener
 	{
-		public void onChange(MapView view, GeoPoint newCenter, int newZoom);
+		public void onChange(MapView view, GeoPoint newCenter, GeoPoint oldCenter, int newZoom, int oldZoom);
 	}
 
 	private HealthMapView mapContext;
+	private Logger logger;
 	private HealthMapView.OnChangeListener mapChangeListener = null;
+	private GeoPoint lastCenterPosition;
+	private int lastZoomLevel;
 	private MapController controller;
 
 	public HealthMapView(Context context, String apiKey)
@@ -45,11 +46,12 @@ public class HealthMapView extends MapView
 
 	private void initialize()
 	{
-		mapContext = this;
+		this.mapContext = this;
+		this.lastCenterPosition = this.getMapCenter();
+		this.lastZoomLevel = this.getZoomLevel();
 		this.logger = new Logger();
-		controller =  this.getController();
 		this.setBuiltInZoomControls(true);
-
+		this.controller = this.getController();
 		ZoomControls control = (ZoomControls) this.getZoomButtonsController().getZoomControls();
 		control.setOnZoomOutClickListener(new View.OnClickListener()
 		{
@@ -59,7 +61,7 @@ public class HealthMapView extends MapView
 				Toast.makeText(mapContext.getContext(), "Zoom Out Clicked", Toast.LENGTH_LONG).show();
 				HealthMapView.this.logger.log("Zoomed out.");
 				controller.zoomOut();
-				mapChangeListener.onChange(mapContext, mapContext.getMapCenter(), mapContext.getZoomLevel());
+				performMapChanges();
 			}
 		});
 		control.setOnZoomInClickListener(new View.OnClickListener()
@@ -70,7 +72,7 @@ public class HealthMapView extends MapView
 				Toast.makeText(mapContext.getContext(), "Zoom In Clicked", Toast.LENGTH_LONG).show();
 				HealthMapView.this.logger.log("Zoomed in.");
 				controller.zoomIn();
-				mapChangeListener.onChange(mapContext, mapContext.getMapCenter(), mapContext.getZoomLevel());
+				performMapChanges();
 			}
 		});
 	}
@@ -84,12 +86,21 @@ public class HealthMapView extends MapView
 	public boolean onTouchEvent(MotionEvent event)
 	{
 		super.onTouchEvent(event);
-		if (event.getAction() == MotionEvent.ACTION_UP)
+		if (event.getAction() == MotionEvent.ACTION_UP && !getMapCenter().equals(this.lastCenterPosition)
+			&& this.mapChangeListener != null)
 		{
 			Toast.makeText(mapContext.getContext(), "Touch Event Triggered", Toast.LENGTH_LONG).show();
-			mapChangeListener.onChange(this, this.getMapCenter(), this.getZoomLevel());
+			performMapChanges();
 		}
 
 		return true;
+	}
+
+	private void performMapChanges()
+	{
+		mapChangeListener.onChange(mapContext, getMapCenter(), lastCenterPosition, getZoomLevel(), lastZoomLevel);
+		// Update map values
+		lastCenterPosition = getMapCenter();
+		lastZoomLevel = getZoomLevel();
 	}
 }

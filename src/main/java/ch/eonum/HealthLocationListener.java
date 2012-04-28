@@ -16,8 +16,8 @@ public class HealthLocationListener implements LocationListener
 	public void onLocationChanged(Location newLocation)
 	{
 		Log.i(this.getClass().getName(), "Location changed: "+newLocation.toString());
-		Location location = ((HealthActivity) HealthActivity.mainActivity).getLocation();
-		if (isBetterLocation(newLocation, location))
+		Location currentLocation = ((HealthActivity) HealthActivity.mainActivity).getLocation();
+		if (isBetterLocation(newLocation, currentLocation))
 		{
 			Log.i(this.getClass().getName(), "It is a better location");
 			((HealthActivity) HealthActivity.mainActivity).setLocation(newLocation);
@@ -25,6 +25,11 @@ public class HealthLocationListener implements LocationListener
 
 		// Draw current location to map and move to this point
 		((HealthActivity) HealthActivity.mainActivity).drawMyLocation(16);
+		// If it seems the first location update, launch an initial search
+		if(currentLocation == null)
+		{
+			((HealthActivity) HealthActivity.mainActivity).launchInitialSearch();
+		}
 
 		// Search for results around that point
 		//MedicalLocation[] results = ((HealthActivity) HealthActivity.mainActivity).launchSearchFromCurrentLocation();
