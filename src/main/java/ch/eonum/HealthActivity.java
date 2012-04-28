@@ -797,9 +797,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		this.latitude = this.location.getLatitude();
 		this.longitude = this.location.getLongitude();
-		String Text = getString(R.string.location) + ": "
-			+ HealthActivity.this.latitude + " : "
-			+ HealthActivity.this.longitude;
+		//String Text = getString(R.string.location) + ": " + HealthActivity.this.latitude + " : " + HealthActivity.this.longitude;
 		Log.i(this.getClass().getName() + ": drawMyLocation", HealthActivity.this.latitude + " : " + HealthActivity.this.longitude);
 		//Toast.makeText(HealthActivity.this.getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
 

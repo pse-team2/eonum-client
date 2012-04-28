@@ -20,7 +20,6 @@ public class HealthMapView extends MapView
 	}
 
 	private HealthMapView mapContext;
-	private Logger logger;
 	private HealthMapView.OnChangeListener mapChangeListener = null;
 	private GeoPoint lastCenterPosition;
 	private int lastZoomLevel;
@@ -49,7 +48,6 @@ public class HealthMapView extends MapView
 		this.mapContext = this;
 		this.lastCenterPosition = this.getMapCenter();
 		this.lastZoomLevel = this.getZoomLevel();
-		this.logger = new Logger();
 		this.setBuiltInZoomControls(true);
 		this.controller = this.getController();
 		ZoomControls control = (ZoomControls) this.getZoomButtonsController().getZoomControls();
@@ -59,7 +57,7 @@ public class HealthMapView extends MapView
 			public void onClick(View v)
 			{
 				Toast.makeText(mapContext.getContext(), "Zoom Out Clicked", Toast.LENGTH_LONG).show();
-				HealthMapView.this.logger.log("Zoomed out.");
+				Logger.log("Zoomed out.");
 				controller.zoomOut();
 				performMapChanges();
 			}
@@ -70,7 +68,7 @@ public class HealthMapView extends MapView
 			public void onClick(View v)
 			{
 				Toast.makeText(mapContext.getContext(), "Zoom In Clicked", Toast.LENGTH_LONG).show();
-				HealthMapView.this.logger.log("Zoomed in.");
+				Logger.log("Zoomed in.");
 				controller.zoomIn();
 				performMapChanges();
 			}
