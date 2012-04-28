@@ -46,6 +46,8 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 	protected boolean onTap(int index)
 	{
 		OverlayItem item = this.mOverlays.get(index);
+		Logger.log("Pressed on Geopoint "+item.getTitle()+".");
+		
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this.mContext);
 		dialog.setTitle(item.getTitle());
 		dialog.setMessage(item.getSnippet());

@@ -14,38 +14,45 @@ import android.util.Log;
  */
 public class Logger
 {
-	private String fileName = "logfile.csv";
-	private Timer timer;
-	private File file;
-	private File sdCard;
-	private FileOutputStream fos;
+	private static boolean debugMode = true;
+	
+	private static String fileName = "logfile.csv";
+	private static Timer timer;
+	private static File file;
+	private static File sdCard;
+	private static FileOutputStream fos;
 
-	public Logger()
+	public static void init()
 	{
 		sdCard = Environment.getExternalStorageDirectory();
 		file = new File(sdCard.getAbsolutePath() + "/Logs", fileName);
 		timer = new Timer();
-		this.log("Logger initialized.");
+		Logger.log("Logger initialized.");
 	}
 
-	public void log(String line)
+	public static void log(String line)
 	{
-		Log.i(this.getClass().getName(), ">> logged: " + line);
-		byte[] data = new String(timer.timeElapsed() + ";" + line+"\n").getBytes();
-		try
+		Log.i("Logger", ">> logged: " + line);
+
+		if (debugMode)
 		{
-			fos = new FileOutputStream(file, true);
-			fos.write(data);
-			fos.flush();
-			fos.close();
-		}
-		catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
+
+			byte[] data = new String(timer.timeElapsed() + ";" + line + "\n").getBytes();
+			try
+			{
+				fos = new FileOutputStream(file, true);
+				fos.write(data);
+				fos.flush();
+				fos.close();
+			}
+			catch (FileNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 }

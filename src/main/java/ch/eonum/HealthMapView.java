@@ -89,7 +89,7 @@ public class HealthMapView extends MapView
 		if (event.getAction() == MotionEvent.ACTION_UP && !getMapCenter().equals(this.lastCenterPosition)
 			&& this.mapChangeListener != null)
 		{
-			Toast.makeText(mapContext.getContext(), "Touch Event Triggered", Toast.LENGTH_LONG).show();
+			Logger.log("Touch event triggered.");
 			performMapChanges();
 		}
 
