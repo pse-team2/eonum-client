@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
@@ -25,7 +23,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
@@ -120,21 +117,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		});
 
 		/** AutoCompleteTextView searchforWhat */
-		AsyncTask<Void, Void, String[]> typesResolved = new TypeResolver().execute();
-		try
-		{
-			TYPES = typesResolved.get();
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-			// Restore the interrupted status
-			Thread.currentThread().interrupt();
-		}
-		catch (ExecutionException e)
-		{
-			e.printStackTrace();
-		}
+		TypeResolver typesResolved = TypeResolver.getInstance();
+		TYPES = typesResolved.tr();
+
 		AutoCompleteTextView searchforWhat = (AutoCompleteTextView) findViewById(R.id.searchforWhat);
 		ArrayAdapter<String> adapterWhat =
 			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, TYPES);
@@ -328,7 +313,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				"Found no corners, querying for Long&Lat.");
 
 			answer = sendDataToServer(this.latitude, this.longitude);
-			// answer = sendDataToServer(location.getLatitude(), location.getLongitude());
 		}
 		else
 		{
@@ -461,7 +445,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			searchAtLongitude = this.longitude;
 		}
 
-		MedicalLocation[] answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
+		MedicalLocation[] answer = sendDataToServer(searchAtLatitude, searchAtLongitude, what);
 		ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
 
 		// Do not filter anything if TextView searchForWhat was empty
@@ -519,26 +503,10 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		double lowerLeftLongitude, double upperRightLatitude,
 		double upperRightLongitude)
 	{
-
 		// Search for results around that point
-		MedicalLocation[] results = {};
-		AsyncTask<Double, Void, MedicalLocation[]> queryAnswer =
-			new QueryData().execute(lowerLeftLatitude, lowerLeftLongitude,
-				upperRightLatitude, upperRightLongitude);
-		try
-		{
-			results = queryAnswer.get();
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-			// Restore the interrupted status
-			Thread.currentThread().interrupt();
-		}
-		catch (ExecutionException e)
-		{
-			e.printStackTrace();
-		}
+		MedicalLocation[] results = new MedicalLocation[] {};
+		QueryData queryAnswer = new QueryData();
+		results = queryAnswer.getData(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
 		return results;
 	}
 
@@ -550,22 +518,17 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		// Search for results around that point
 		MedicalLocation[] results = {};
-		AsyncTask<Double, Void, MedicalLocation[]> queryAnswer =
-			new QueryData().execute(latitude, longitude);
-		try
-		{
-			results = queryAnswer.get();
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-			// Restore the interrupted status
-			Thread.currentThread().interrupt();
-		}
-		catch (ExecutionException e)
-		{
-			e.printStackTrace();
-		}
+		QueryData queryAnswer = new QueryData();
+		results = queryAnswer.getData(latitude, longitude);
+		return results;
+	}
+
+	private MedicalLocation[] sendDataToServer(double latitude, double longitude, String category)
+	{
+		// Search for results around that point
+		MedicalLocation[] results = {};
+		QueryData queryAnswer = new QueryData();
+		results = queryAnswer.getData(latitude, longitude, category);
 		return results;
 	}
 

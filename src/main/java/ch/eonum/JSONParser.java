@@ -12,7 +12,7 @@ public class JSONParser
 
 	public MedicalLocation[] deserializeLocations(String str)
 	{
-		MedicalLocation[] results = null;
+		MedicalLocation[] results = new MedicalLocation[] {};
 
 		try
 		{
@@ -55,7 +55,7 @@ public class JSONParser
 	public String[] deserializeCategories(String str)
 	{
 		Log.i(this.getClass().getName(), "Start deserializing categories");
-		String[] results = null;
+		String[] results = new String[] {};
 		JSONObject jsonObj;
 		try
 		{

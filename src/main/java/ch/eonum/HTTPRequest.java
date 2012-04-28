@@ -6,34 +6,22 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.util.Log;
 
 /** Fetches the raw data from the server */
-public class HTTPRequest
+public class HTTPRequest extends AsyncTask<Void, Void, String>
 {
 
 	URL url;
 	String resultString;
+	ProgressDialog dialog;
 
-//	public HTTPRequest(double lat1, double long1)
-//	{
-//
-//		resultString = "";
-//		double d = 0.05;
-//		
-//		try
-//		{
-//			url = new URL("http://77.95.120.72:8080/finder?lat1=" + (lat1-d) + "&long1=" + (long1-d) + "&lat2=" + (lat1+d) + "&long2=" + (long1+d));
-//		}
-//		catch (MalformedURLException e)
-//		{
-//			e.printStackTrace();
-//		}
-//	}
-	
 	public HTTPRequest(double lat1, double long1, double lat2, double long2)
 	{
 
+		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		resultString = "";
 
 		try
@@ -46,9 +34,26 @@ public class HTTPRequest
 		}
 	}
 
+	public HTTPRequest(double lat1, double long1, double lat2, double long2, String category)
+	{
+
+		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
+		resultString = "";
+
+		try
+		{
+			url = new URL("http://77.95.120.72:8080/finder?lat1=" + lat1 + "&long1=" + long1 + "&lat2=" + lat2 + "&long2=" + long2 + "&category=" + category);
+		}
+		catch (MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public HTTPRequest()
 	{
 
+		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		resultString = "";
 
 		try
@@ -61,7 +66,16 @@ public class HTTPRequest
 		}
 	}
 
-	public String getResults()
+	@Override
+	protected void onPreExecute()
+	{
+		this.dialog = ProgressDialog.show(HealthActivity.mainActivity,
+			HealthActivity.mainActivity.getString(R.string.pleasewait),
+			HealthActivity.mainActivity.getString(R.string.sendingrequest), true, false);
+	}
+
+	@Override
+	protected String doInBackground(Void... params)
 	{
 		Log.i(this.getClass().getName(), "Start reading answer from server with url:");
 		Log.i(this.getClass().getName(), "   " + url);
@@ -82,5 +96,12 @@ public class HTTPRequest
 
 		Log.i(this.getClass().getName(), "Size of HTTP answer: " + resultString.length());
 		return resultString;
+	}
+
+	@Override
+	protected void onPostExecute(String resString)
+	{
+		Log.i(this.getClass().getName(), "Size of results from server in onPostExecute: " + resString.length());
+		this.dialog.dismiss();
 	}
 }

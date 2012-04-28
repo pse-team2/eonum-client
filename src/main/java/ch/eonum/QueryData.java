@@ -1,89 +1,89 @@
 package ch.eonum;
 
-import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 /** Used to query results */
-public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
+public class QueryData
 {
-
-	Activity activity;
-	ProgressDialog dialog;
-	ArrayAdapter<String> adapter;
-	MedicalLocation[] res;
 
 	public QueryData()
 	{
-		this.activity = HealthActivity.mainActivity;
-		this.dialog = new ProgressDialog(this.activity.getApplicationContext());
 	}
 
-	/** Gets called just before the thread begins */
-	@Override
-	protected void onPreExecute()
+	public MedicalLocation[] getData(double lowerLeftLatitude, double lowerLeftLongitude, double upperRightLatitude, double upperRightLongitude)
 	{
-		this.dialog = ProgressDialog.show(this.activity, this.activity.getString(R.string.pleasewait),
-			this.activity.getString(R.string.sendingrequest), true, false);
+		MedicalLocation[] result = this.queryServer(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
+		Log.i(this.getClass().getName(), "Size of results from server: " + result.length);
+		return result;
 	}
 
-	/**
-	 * Main part comes here
-	 * The datatype of the first parameter in the class definition matches the one passed to this method
-	 * The datatype of the last parameter in the class definition matches the return type of this method
-	 */
-	@Override
-	protected MedicalLocation[] doInBackground(Double... params)
+	public MedicalLocation[] getData(double lat1, double long1)
 	{
-		Log.i(this.getClass().getName(), "Got arguments: " + params.length);
-		Log.i(this.getClass().getName(), Arrays.asList(params).toString());
+		MedicalLocation[] result = this.queryServer(lat1, long1);
+		Log.i(this.getClass().getName(), "Size of results from server: " + result.length);
+		return result;
+	}
 
-		if (params.length == 4)
+	public MedicalLocation[] getData(double lat1, double long1, String category)
+	{
+		MedicalLocation[] result = this.queryServer(lat1, long1, category);
+		Log.i(this.getClass().getName(), "Size of results from server: " + result.length);
+		return result;
+	}
+
+	private ch.eonum.MedicalLocation[] queryServer(double lat1, double long1, String category)
+	{
+		double d = 0.05;
+		Log.i(this.getClass().getName(), "location to query: " + lat1 + " : " + long1 + ", limited to category " + category);
+		// Send query to server
+		HTTPRequest request = new HTTPRequest(lat1-d, long1-d, lat1+d, long1+d, category);
+		String resultString = "";
+		AsyncTask<Void, Void, String> httpTask = request.execute();
+		try
 		{
-			// params[0]: lowerLeftLatitude
-			// params[1]: lowerLeftLongitude
-			// params[2]: upperRightLatitude
-			// params[3]: upperRightLongitude
-			return queryServer(params[0], params[1], params[2], params[3]);
+			resultString = httpTask.get();
 		}
-		double myLatitude = params[0];
-		double myLongitude = params[1];
-		// publishProgress();
-		return queryServer(myLatitude, myLongitude);
+		catch (InterruptedException e1)
+		{
+			e1.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
+		catch (ExecutionException e1)
+		{
+			e1.printStackTrace();
+		}
+		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
+		// Parse results
+		JSONParser parser = new JSONParser();
+		return parser.deserializeLocations(resultString);
 	}
-
-	/**
-	 * Called from the publish progress
-	 * The datatype of the second parameter gets passed to this method
-	 */
-	@Override
-	protected void onProgressUpdate(Void... values)
-	{
-		// Increment Progress Dialog with the update from the doInBackgroundMethod
-	}
-
-	/**
-	 * Called as soon as doInBackground method completes
-	 * The third parameter gets passed to this method
-	 */
-	@Override
-	protected void onPostExecute(MedicalLocation[] result)
-	{
-		Log.i(this.getClass().getName(), "Size of results from server in onPostExecute: " + result.length);
-		this.dialog.dismiss();
-	}
-
+	
 	private ch.eonum.MedicalLocation[] queryServer(double lat1, double long1)
 	{
 		double d = 0.05;
 		Log.i(this.getClass().getName(), "Single location to query: " + lat1 + " : " + long1);
 		// Send query to server
 		HTTPRequest request = new HTTPRequest(lat1-d, long1-d, lat1+d, long1+d);
-		String resultString = request.getResults();
+		String resultString = "";
+		AsyncTask<Void, Void, String> httpTask = request.execute();
+		try
+		{
+			resultString = httpTask.get();
+		}
+		catch (InterruptedException e1)
+		{
+			e1.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
+		catch (ExecutionException e1)
+		{
+			e1.printStackTrace();
+		}
 		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
 		JSONParser parser = new JSONParser();
@@ -95,7 +95,22 @@ public class QueryData extends AsyncTask<Double, Void, MedicalLocation[]>
 		Log.i(this.getClass().getName(), "Map rectangle to query: " + lat1 + "/" + long1+ "," + lat2 + "/" + long2);
 		// Send query to server
 		HTTPRequest request = new HTTPRequest(lat1, long1, lat2, long2);
-		String resultString = request.getResults();
+		String resultString = "";
+		AsyncTask<Void, Void, String> httpTask = request.execute();
+		try
+		{
+			resultString = httpTask.get();
+		}
+		catch (InterruptedException e1)
+		{
+			e1.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
+		catch (ExecutionException e1)
+		{
+			e1.printStackTrace();
+		}
 		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
 		JSONParser parser = new JSONParser();

@@ -6,12 +6,12 @@ import android.util.Log;
  * Represents a single address (data set) returned by the server.
  * Can be a medical practice, hospital, doctor office etc.
  * Will provide public methods for name, type and location.
- * Type depends on TypeResolver, which matches the returned categories to names.
+ * Type depends on {@link TypeResolver}, which matches the returned categories to names.
  */
 public class MedicalLocation implements Location, Comparable<MedicalLocation>
 {
 
-	TypeResolver Resolver = new TypeResolver();
+	TypeResolver resolver = TypeResolver.getInstance();
 	private String name;
 	private String arztTyp;
 	private double latitude;
@@ -26,7 +26,7 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		this.location[0] = latitude;
 		this.longitude = longitude;
 		this.location[1] = longitude;
-		this.arztTyp = Resolver.resolve(arztTyp);
+		this.arztTyp = resolver.resolve(arztTyp);
 		if (this.arztTyp == null)
 		{
 			Log.w("Arzttyp is Null", "this.name = " + this.name + ", this.arztTyp = " + this.arztTyp);
@@ -58,7 +58,10 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 	}
 
 	/**
-	 * Calculate distance to center
+	 * Calculate distance from current map center.
+	 * @param latCenter Latitude of map center.
+	 * @param lngCenter Longitude of map center.
+	 * @return The approximate distance of the location from the current center of the map.
 	 */
 	public double setDistance(double latCenter, double lngCenter)
 	{

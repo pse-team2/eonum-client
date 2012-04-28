@@ -2,7 +2,8 @@ package ch.eonum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import android.app.Activity;
+import java.util.concurrent.ExecutionException;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -13,35 +14,46 @@ import android.util.Log;
 /**
  * Resolves a medical type to a String.
  */
-public class TypeResolver extends AsyncTask<Void, Void, String[]>
+public class TypeResolver
 {
+
+	private static TypeResolver instance;
 
 	// Names (german, plural, male)
 	static HashMap<String, String> types = new HashMap<String, String>();
-	Activity activity;
-	ArrayList<String> error = new ArrayList<String>();
 
-	/**
-	 * Gets a list of available categories from the server and parses them into an array.
-	 * The main thread is denied to establish network connections resulting in an
-	 * android.os.NetworkOnMainThreadException when doing so.
-	 * For this reason the task of fetching the category list from the server is detached in an AsyncTask.
-	 */
-	public TypeResolver()
+	private TypeResolver()
 	{
 	}
 
-	@Override
-	protected void onPreExecute()
+	public synchronized static TypeResolver getInstance()
 	{
-		this.activity = HealthActivity.mainActivity;
+		if (instance == null)
+		{
+			instance = new TypeResolver();
+		}
+		return instance;
 	}
 
-	@Override
-	protected String[] doInBackground(Void... params)
+	protected String[] tr()
 	{
 		HTTPRequest request = new HTTPRequest();
-		String resultString = request.getResults();
+		String resultString = "";
+		AsyncTask<Void, Void, String> httpTask = request.execute();
+		try
+		{
+			resultString = httpTask.get();
+		}
+		catch (InterruptedException e1)
+		{
+			e1.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
+		catch (ExecutionException e1)
+		{
+			e1.printStackTrace();
+		}
 		Log.i(this.getClass().getName(), "Size of results in TypeResolver: " + resultString.length());
 
 		// Parse results
@@ -49,37 +61,35 @@ public class TypeResolver extends AsyncTask<Void, Void, String[]>
 
 		ArrayList<String> typesList = new ArrayList<String>();
 		String[] typesArray = new String[types.size()];
+		ArrayList<String> error = new ArrayList<String>();
+
 		for (String categoryEntry : parser.deserializeCategories(resultString))
 		{
-			int id = this.activity.getResources().getIdentifier(categoryEntry, "string",
+			int id = HealthActivity.mainActivity.getResources().getIdentifier(categoryEntry, "string",
 				this.getClass().getPackage().getName());
 			String visibleDescription;
 			try
 			{
-				visibleDescription = this.activity.getString(id);
+				visibleDescription = HealthActivity.mainActivity.getString(id);
 			}
 			catch (NotFoundException e)
 			{
 				visibleDescription = categoryEntry;
-				this.error.add(visibleDescription);
+				error.add(visibleDescription);
 			}
 			types.put(categoryEntry, visibleDescription);
 			typesList.add(visibleDescription);
 			// Log.i("visibleDescription", visibleDescription);
 		}
-		return typesList.toArray(typesArray);
-	}
 
-	@Override
-	protected void onPostExecute(String[] categories)
-	{
+		// Display missing translation resources
 		if (!error.isEmpty())
 		{
-			Log.e("Resource not found", this.error.toString());
-			AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
+			Log.e("Resource not found", error.toString());
+			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
 			builder.setCancelable(false);
 			builder.setTitle("Error: Missing translation resources");
-			builder.setMessage(String.format("String resources for\n%s\nwere not found!", this.error.toString()));
+			builder.setMessage(String.format("String resources for\n%s\nwere not found!", error.toString()));
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setNeutralButton(android.R.string.ok, new OnClickListener()
 				{
@@ -92,6 +102,8 @@ public class TypeResolver extends AsyncTask<Void, Void, String[]>
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
+
+		return typesList.toArray(typesArray);
 	}
 
 	public String resolve(String type)
