@@ -17,25 +17,21 @@ import android.util.Log;
 public class TypeResolver
 {
 
-	private static TypeResolver instance;
+	private static final TypeResolver instance = new TypeResolver();
 
 	// Names (german, plural, male)
-	static HashMap<String, String> types = new HashMap<String, String>();
+	private static HashMap<String, String> types = new HashMap<String, String>();
 
 	private TypeResolver()
 	{
 	}
 
-	public synchronized static TypeResolver getInstance()
+	public static TypeResolver getInstance()
 	{
-		if (instance == null)
-		{
-			instance = new TypeResolver();
-		}
 		return instance;
 	}
 
-	protected String[] tr()
+	public String[] getAllCategories()
 	{
 		HTTPRequest request = new HTTPRequest();
 		String resultString = "";

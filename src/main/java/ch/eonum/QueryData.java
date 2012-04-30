@@ -16,28 +16,28 @@ public class QueryData
 	public MedicalLocation[] getData(double lowerLeftLatitude, double lowerLeftLongitude, double upperRightLatitude, double upperRightLongitude)
 	{
 		MedicalLocation[] result = this.queryServer(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
-		Log.i(this.getClass().getName(), "Size of results from server: " + result.length);
+		Log.i(this.getClass().getName(), "Number of results from server: " + result.length);
 		return result;
 	}
 
 	public MedicalLocation[] getData(double lat1, double long1)
 	{
 		MedicalLocation[] result = this.queryServer(lat1, long1);
-		Log.i(this.getClass().getName(), "Size of results from server: " + result.length);
+		Log.i(this.getClass().getName(), "Number of results from server: " + result.length);
 		return result;
 	}
 
 	public MedicalLocation[] getData(double lat1, double long1, String category)
 	{
 		MedicalLocation[] result = this.queryServer(lat1, long1, category);
-		Log.i(this.getClass().getName(), "Size of results from server: " + result.length);
+		Log.i(this.getClass().getName(), "Number of results from server: " + result.length);
 		return result;
 	}
 
 	private ch.eonum.MedicalLocation[] queryServer(double lat1, double long1, String category)
 	{
 		double d = 0.05;
-		Log.i(this.getClass().getName(), "location to query: " + lat1 + " : " + long1 + ", limited to category " + category);
+		Log.i(this.getClass().getName(), "Location to query: " + lat1 + " : " + long1 + ", limited to category " + category);
 		// Send query to server
 		HTTPRequest request = new HTTPRequest(lat1-d, long1-d, lat1+d, long1+d, category);
 		String resultString = "";
@@ -46,15 +46,15 @@ public class QueryData
 		{
 			resultString = httpTask.get();
 		}
-		catch (InterruptedException e1)
+		catch (InterruptedException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 			// Restore the interrupted status
 			Thread.currentThread().interrupt();
 		}
-		catch (ExecutionException e1)
+		catch (ExecutionException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
@@ -74,15 +74,15 @@ public class QueryData
 		{
 			resultString = httpTask.get();
 		}
-		catch (InterruptedException e1)
+		catch (InterruptedException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 			// Restore the interrupted status
 			Thread.currentThread().interrupt();
 		}
-		catch (ExecutionException e1)
+		catch (ExecutionException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
@@ -101,15 +101,15 @@ public class QueryData
 		{
 			resultString = httpTask.get();
 		}
-		catch (InterruptedException e1)
+		catch (InterruptedException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 			// Restore the interrupted status
 			Thread.currentThread().interrupt();
 		}
-		catch (ExecutionException e1)
+		catch (ExecutionException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
