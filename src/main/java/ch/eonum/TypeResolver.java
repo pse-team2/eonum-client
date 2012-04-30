@@ -2,6 +2,7 @@ package ch.eonum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import android.app.AlertDialog;
@@ -105,5 +106,15 @@ public class TypeResolver
 	public String resolve(String type)
 	{
 		return types.get(type);
+	}
+	
+	
+	public static String getKeyByValue(String value) {
+	    for (Entry<String, String> entry : types.entrySet()) {
+	        if (value.equals(entry.getValue())) {
+	            return entry.getKey();
+	        }
+	    }
+	    return null;
 	}
 }

@@ -54,6 +54,11 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	private Location location = null;
 	TextView locationTxt;
 	private LocationListener locLst = new HealthLocationListener();
+	static boolean userRequestedMyLocation = true;
+
+	/* Location Listener */
+	private final int locationUpdateAfterSeconds = 5;
+	private final float locationUpdateAfterDistance = 100;
 
 	/* Zoom */
 	private int currentZoomLevel;
@@ -149,6 +154,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			public void onClick(View view)
 			{
 				Logger.log("Location button pressed.");
+				userRequestedMyLocation = true;
 				drawMyLocation(16);
 			}
 		});
@@ -160,6 +166,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			@Override
 			public void onClick(View view)
 			{
+				userRequestedMyLocation = false;
 				Editable searchWhere = ((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText();
 				Editable searchWhat = ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText();
 				Logger.log("Search button pressed. where: " + searchWhere + ", what: " + searchWhat);
@@ -266,10 +273,14 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		this.currentZoomLevel = newZoom;
 		// Do not call drawMyLocation as this resets the display
+		// Editable searchWhat = ((AutoCompleteTextView) findViewById(R.id.searchforWhat)).getText();
+		// MedicalLocation[] results = launchUserDefinedSearch("",
+		// searchWhat.toString());//launchSearchFromCurrentLocation(false);
+
 		MedicalLocation[] results = launchSearchFromCurrentLocation(false);
 		MedicalLocation[] filteredResults = filterResults(results);
 		drawSearchResults(filteredResults);
-		// Do not display error mesages if there were no results returned
+		// Do not display error messages if there were no results returned
 		// because we do not want to disturb the user moving around the map.
 	}
 
@@ -356,7 +367,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			String error = null;
 			try
 			{
-				resultsList = geocoder.getFromLocationName(where + " Schweiz", 5);
+				resultsList = geocoder.getFromLocationName(where + ", Schweiz", 5);
 			}
 			catch (IOException e)
 			{
@@ -444,20 +455,33 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			searchAtLongitude = this.longitude;
 		}
 
-		MedicalLocation[] answer = sendDataToServer(searchAtLatitude, searchAtLongitude, what);
+		MedicalLocation[] answer = new MedicalLocation[] {};
+
+		if (!what.isEmpty())
+		{
+			what = TypeResolver.getKeyByValue(what);
+			answer = sendDataToServer(searchAtLatitude, searchAtLongitude, what);
+		}
+		else
+		{
+			answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
+		}
+
 		ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
 
+		// Removed old filter
+
 		// Do not filter anything if TextView searchForWhat was empty
-		if (what.length() != 0)
-		{
-			for (MedicalLocation r : new ArrayList<MedicalLocation>(results))
-			{
-				if (!r.getType().equals(what))
-				{
-					results.remove(r);
-				}
-			}
-		}
+		// if (what.length() != 0)
+		// {
+		// for (MedicalLocation r : new ArrayList<MedicalLocation>(results))
+		// {
+		// if (!r.getType().equals(what))
+		// {
+		// results.remove(r);
+		// }
+		// }
+		// }
 
 		return results.toArray(new MedicalLocation[] {});
 	}
@@ -539,6 +563,12 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 */
 	protected void drawMyLocation(int zoomLevel)
 	{
+		// Avoid NullPointerException in case location is not yet available
+		if (this.location == null)
+		{
+			return;
+		}
+
 		this.latitude = this.location.getLatitude();
 		this.longitude = this.location.getLongitude();
 		// String Text = getString(R.string.location) + ": " + this.latitude + " : " + this.longitude;
@@ -579,24 +609,18 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 		for (MedicalLocation point : results)
 		{
-			count++;
-			Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
-				String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
-			GeoPoint matchingResult = new GeoPoint(
-				(int) (point.getLocation()[0] * 1000000),
-				(int) (point.getLocation()[1] * 1000000)
-				);
-			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType());
-
-			/* TODO clean up after nearest location finder algorithm is correct
-			 * at the moment, 20 results are shown */
+			/* at the moment, 20 results are shown */
 			if (count < 20)
 			{
-				this.itemizedLocationOverlay.addOverlay(matchingOverlayitem);
-			}
-			else
-			{
-				// this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
+				count++;
+				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
+					String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
+				GeoPoint matchingResult = new GeoPoint(
+					(int) (point.getLocation()[0] * 1000000),
+					(int) (point.getLocation()[1] * 1000000)
+					);
+				OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType());
+				this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
 			}
 		}
 		// putting this lines outside the loop improved the perfomance drastically
@@ -645,9 +669,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		if (isLocationSensingAvailable())
 		{
-			// 60000 = 1min
-			// 10 = 100m
-			this.locMgr.requestLocationUpdates(this.locProvider, 60000, 10, this.locLst);
+			this.locMgr.requestLocationUpdates(this.locProvider, locationUpdateAfterSeconds * 1000,
+				locationUpdateAfterDistance, this.locLst);
 			/* Toast.makeText(this, "Debug message:\n" +
 			 * "If running on an emulator:\nSend location fix in DDMS to trigger location update.",
 			 * Toast.LENGTH_SHORT).show(); */
