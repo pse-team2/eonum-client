@@ -15,7 +15,7 @@ public class HealthLocationListener implements LocationListener
 	@Override
 	public void onLocationChanged(Location newLocation)
 	{
-		Log.i(this.getClass().getName(), "Location changed: "+newLocation.toString());
+		Log.i(this.getClass().getName(), "Location changed: " + newLocation.toString());
 		Location currentLocation = ((HealthActivity) HealthActivity.mainActivity).getLocation();
 		if (isBetterLocation(newLocation, currentLocation))
 		{
@@ -23,20 +23,24 @@ public class HealthLocationListener implements LocationListener
 			((HealthActivity) HealthActivity.mainActivity).setLocation(newLocation);
 		}
 
-		// Draw current location to map and move to this point
-		((HealthActivity) HealthActivity.mainActivity).drawMyLocation(16);
+		if (HealthActivity.userRequestedMyLocation)
+		{
+			// Draw current location to map and move to this point
+			((HealthActivity) HealthActivity.mainActivity).drawMyLocation(16);
+		}
 		// If it seems the first location update, launch an initial search
-		if(currentLocation == null)
+		if (currentLocation == null)
 		{
 			((HealthActivity) HealthActivity.mainActivity).launchInitialSearch();
 		}
 
 		// Search for results around that point
-		//MedicalLocation[] results = ((HealthActivity) HealthActivity.mainActivity).launchSearchFromCurrentLocation();
+		// MedicalLocation[] results = ((HealthActivity)
+		// HealthActivity.mainActivity).launchSearchFromCurrentLocation();
 
-		//Log.i(this.getClass().getName(), "Draw " + results.length + " results to map");
-		//((HealthActivity) HealthActivity.mainActivity).drawSearchResults(results);
-		//Log.i("GeoPoint", "Finished drawing");
+		// Log.i(this.getClass().getName(), "Draw " + results.length + " results to map");
+		// ((HealthActivity) HealthActivity.mainActivity).drawSearchResults(results);
+		// Log.i("GeoPoint", "Finished drawing");
 	}
 
 	@Override
