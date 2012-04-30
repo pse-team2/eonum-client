@@ -580,24 +580,19 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 		for (MedicalLocation point : results)
 		{
-			count++;
-			Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
-				String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
-			GeoPoint matchingResult = new GeoPoint(
-				(int) (point.getLocation()[0] * 1000000),
-				(int) (point.getLocation()[1] * 1000000)
-				);
-			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType());
-
 			/* TODO clean up after nearest location finder algorithm is correct
 			 * at the moment, 20 results are shown */
 			if (count < 20)
 			{
+				count++;
+				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
+					String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
+				GeoPoint matchingResult = new GeoPoint(
+					(int) (point.getLocation()[0] * 1000000),
+					(int) (point.getLocation()[1] * 1000000)
+					);
+				OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType());
 				HealthActivity.this.itemizedLocationOverlay.addOverlay(matchingOverlayitem);
-			}
-			else
-			{
-				// HealthActivity.this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
 			}
 		}
 		// putting this lines outside the loop improved the perfomance drastically

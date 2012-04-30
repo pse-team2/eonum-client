@@ -17,6 +17,7 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 	{
 		super(boundCenterBottom(defaultMarker));
 		this.mContext = context;
+		populate();
 	}
 
 	public void addOverlay(OverlayItem overlay)
