@@ -45,7 +45,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	public static Activity mainActivity;
 
 	/* Other static variables */
-	private static final String[] CITIES = new CityResolver().getAllCities();
+	private static final String[] CITIES = CityResolver.getInstance().getAllCities();
 	private static String[] TYPES;
 
 	/* Location */
@@ -129,7 +129,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
 				String cityString = String.valueOf(((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText());
-				City city = new CityResolver().getCoordinates(cityString);
+				City city = CityResolver.getInstance().getCoordinates(cityString);
 				GeoPoint cityPoint = new GeoPoint(
 					(int) (city.getLocation()[0] * 1000000),
 					(int) (city.getLocation()[1] * 1000000));
@@ -338,9 +338,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		if (equalsPhysicalLocation
 			|| (lowerLeftLatitude == 0 || lowerLeftLongitude == 0 || upperRightLatitude == 0 || upperRightLongitude == 0))
 		{
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch",
-				"Found no corners, querying for Long&Lat.");
-
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Found no corners, querying for Long&Lat.");
 			answer = sendDataToServer(this.latitude, this.longitude);
 		}
 		else
@@ -350,10 +348,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			upperRightLatitude /= 1000000;
 			upperRightLongitude /= 1000000;
 
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch",
-				"Querying for map rectangle.");
-			answer = sendDataToServer(lowerLeftLatitude, lowerLeftLongitude,
-				upperRightLatitude, upperRightLongitude);
+			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Querying for map rectangle.");
+			answer = sendDataToServer(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
 		}
 
 		return answer;
@@ -426,7 +422,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 						+ resultsList.get(i).getAddressLine(1);
 				}
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(resultsList.size() + " ambiguous results");
+				builder.setTitle(String.format(getString(R.string.ambiguousresults), resultsList.size()));
 				builder.setItems(ambiguousList, new DialogInterface.OnClickListener()
 				{
 					@Override
@@ -479,8 +475,27 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// Evaluate TextView searchForWhat
 		if (what.length() != 0)
 		{
-			what = TypeResolver.getKeyByValue(what);
-			answer = sendDataToServer(searchAtLatitude, searchAtLongitude, what);
+			String whatValue = TypeResolver.getKeyByValue(what);
+			if(whatValue == null)
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(String.format(getString(R.string.no_valid_category), what));
+				builder.setMessage(R.string.choose_category_from_list);
+				builder.setIcon(android.R.drawable.ic_dialog_info);
+				builder.setNeutralButton(android.R.string.cancel, new OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						dialog.dismiss();
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
+				return null;
+			}
+
+			answer = sendDataToServer(searchAtLatitude, searchAtLongitude, whatValue);
 		}
 		else
 		{
@@ -488,20 +503,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		}
 
 		ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
-
-		// Removed old filter
-
-		// Do not filter anything if TextView searchForWhat was empty
-		// if (what.length() != 0)
-		// {
-		// for (MedicalLocation r : new ArrayList<MedicalLocation>(results))
-		// {
-		// if (!r.getType().equals(what))
-		// {
-		// results.remove(r);
-		// }
-		// }
-		// }
 
 		return results.toArray(new MedicalLocation[] {});
 	}

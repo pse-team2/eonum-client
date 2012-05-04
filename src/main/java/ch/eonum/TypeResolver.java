@@ -41,15 +41,15 @@ public class TypeResolver
 		{
 			resultString = httpTask.get();
 		}
-		catch (InterruptedException e1)
+		catch (InterruptedException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 			// Restore the interrupted status
 			Thread.currentThread().interrupt();
 		}
-		catch (ExecutionException e1)
+		catch (ExecutionException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 		Log.i(this.getClass().getName(), "Size of results in TypeResolver: " + resultString.length());
 
@@ -82,20 +82,20 @@ public class TypeResolver
 		// Display missing translation resources
 		if (!error.isEmpty())
 		{
-			Log.e("Resource not found", error.toString());
+			Log.w("Resource not found", error.toString());
 			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
 			builder.setCancelable(false);
-			builder.setTitle("Error: Missing translation resources");
-			builder.setMessage(String.format("String resources for\n%s\nwere not found!", error.toString()));
+			builder.setTitle(HealthActivity.mainActivity.getString(R.string.missing_translations));
+			builder.setMessage(String.format(HealthActivity.mainActivity.getString(R.string.missing_translations_list), error.toString()));
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setNeutralButton(android.R.string.ok, new OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
 				{
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						dialog.dismiss();
-					}
-				});
+					dialog.dismiss();
+				}
+			});
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
@@ -107,14 +107,16 @@ public class TypeResolver
 	{
 		return types.get(type);
 	}
-	
-	
-	public static String getKeyByValue(String value) {
-	    for (Entry<String, String> entry : types.entrySet()) {
-	        if (value.equals(entry.getValue())) {
-	            return entry.getKey();
-	        }
-	    }
-	    return null;
+
+	public static String getKeyByValue(String value)
+	{
+		for (Entry<String, String> entry : types.entrySet())
+		{
+			if (value.equals(entry.getValue()))
+			{
+				return entry.getKey();
+			}
+		}
+		return null;
 	}
 }
