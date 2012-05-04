@@ -33,14 +33,6 @@ public class HealthLocationListener implements LocationListener
 		{
 			((HealthActivity) HealthActivity.mainActivity).launchInitialSearch();
 		}
-
-		// Search for results around that point
-		// MedicalLocation[] results = ((HealthActivity)
-		// HealthActivity.mainActivity).launchSearchFromCurrentLocation();
-
-		// Log.i(this.getClass().getName(), "Draw " + results.length + " results to map");
-		// ((HealthActivity) HealthActivity.mainActivity).drawSearchResults(results);
-		// Log.i("GeoPoint", "Finished drawing");
 	}
 
 	@Override

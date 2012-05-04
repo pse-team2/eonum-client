@@ -658,9 +658,26 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// Remove other points
 		this.itemizedLocationOverlay.clear();
 
+		// Get address from current location
+		Address myLocationAddress;
+		try
+		{
+			Geocoder geocoder = new Geocoder(this);
+			myLocationAddress = geocoder.getFromLocation(this.latitude, this.longitude, 1).get(0);
+		}
+		catch(IOException e)
+		{
+			Address unknownAddress = new Address(getResources().getConfiguration().locale);
+			myLocationAddress=unknownAddress;
+		}
+		String myAddressDescription = "";
+		for (int i = 0; i <= myLocationAddress.getMaxAddressLineIndex(); i++)
+		{
+			myAddressDescription += myLocationAddress.getAddressLine(i) + (i + 1 <= myLocationAddress.getMaxAddressLineIndex() ? "\n" : "");
+		}
 		// Draw current location
 		GeoPoint initGeoPoint = new GeoPoint((int) (this.latitude * 1000000), (int) (this.longitude * 1000000));
-		OverlayItem overlayitem = new OverlayItem(initGeoPoint, "Our Location", "We are here");
+		OverlayItem overlayitem = new OverlayItem(initGeoPoint, getString(R.string.myposition), myAddressDescription);
 		this.itemizedLocationOverlay.addOverlay(overlayitem);
 		this.mapOverlays.add(this.itemizedLocationOverlay);
 
