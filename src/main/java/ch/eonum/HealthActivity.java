@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
@@ -23,6 +25,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
@@ -34,7 +37,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class HealthActivity extends MapActivity implements HealthMapView.OnChangeListener
@@ -47,18 +49,34 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	private static String[] TYPES;
 
 	/* Location */
-	private double latitude;
-	private double longitude;
+	/**
+	 * Variables indicating the last known physical location of the user.
+	 * The value {@link #location} is provided by an external source to
+	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.
+	 * From there these variables are updated using using the {@link #setLocation(Location)} method.
+	 */
+	private double latitude, longitude;
+	/**
+	 * Variable that is provided from an external source to
+	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.
+	 * From there the method {@link #setLocation(Location)} is used to update 
+	 * the variables {@link #latitude} and {@link #longitude} which are dependent from this value.
+	 */
+	private Location location = null;
+	/** Variables involved in the process of getting location updates. */
 	private LocationManager locMgr;
 	private String locProvider;
-	private Location location = null;
-	TextView locationTxt;
 	private LocationListener locLst = new HealthLocationListener();
-	static boolean userRequestedMyLocation = true;
+	/**
+	 * Involved in location updates to help decide if location updates should cause
+	 * {@link #drawMyLocation(int)} to run.
+	 */
+	public static boolean userRequestedMyLocation = true;
 
 	/* Location Listener */
-	private final int locationUpdateAfterSeconds = 5;
-	private final float locationUpdateAfterDistance = 100;
+	/** Constants defining when a location update shall be delivered. */
+	private final int LOCATION_UPDATE_AFTER_SECONDS = 5;
+	private final float LOCATION_UPDATE_AFTER_DISTANCE = 100;
 
 	/* Zoom */
 	private int currentZoomLevel;
@@ -342,7 +360,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	}
 
 	/**
-	 * Reads two strings as imput and passes them to the server in order to get results.
+	 * Reads two strings as input and passes them to the server in order to get results.
 	 * Assumes they are coming from the two TextViews {@code searchforWhere} and {@code searchforWhat} and no
 	 * other values should be taken into consideration.
 	 * If this is not the case, {@link #launchSearchFromCurrentLocation(boolean)} might be more suitable.
@@ -360,6 +378,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		double searchAtLatitude, searchAtLongitude;
 		Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Where: " + where + ", What: " + what);
 
+		// Evaluate TextView searchforWhere
 		if (where.length() != 0)
 		{
 			Geocoder geocoder = new Geocoder(this, getResources().getConfiguration().locale);
@@ -379,7 +398,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			// Inform user if the server returned no results
 			if (resultsList == null || resultsList.isEmpty())
 			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCancelable(true);
 				builder.setTitle(getString(R.string.noresults));
 				builder.setMessage(error);
@@ -406,7 +425,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 					ambiguousList[i] = resultsList.get(i).getAddressLine(0) + ", "
 						+ resultsList.get(i).getAddressLine(1);
 				}
-				AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(resultsList.size() + " ambiguous results");
 				builder.setItems(ambiguousList, new DialogInterface.OnClickListener()
 				{
@@ -457,7 +476,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 		MedicalLocation[] answer = new MedicalLocation[] {};
 
-		if (!what.isEmpty())
+		// Evaluate TextView searchForWhat
+		if (what.length() != 0)
 		{
 			what = TypeResolver.getKeyByValue(what);
 			answer = sendDataToServer(searchAtLatitude, searchAtLongitude, what);
@@ -527,10 +547,29 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		double upperRightLongitude)
 	{
 		// Search for results around that point
-		MedicalLocation[] results = {};
-		QueryData queryAnswer = new QueryData();
-		results = queryAnswer.getData(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
-		return results;
+		Log.i(this.getClass().getName(), "Map rectangle to query: " + lowerLeftLatitude + "/" + lowerLeftLongitude+ "," + upperRightLatitude + "/" + upperRightLongitude);
+		// Send query to server
+		HTTPRequest request = new HTTPRequest(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
+		String resultString = "";
+		AsyncTask<Void, Void, String> httpTask = request.execute();
+		try
+		{
+			resultString = httpTask.get();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
+		catch (ExecutionException e)
+		{
+			e.printStackTrace();
+		}
+		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
+		// Parse results
+		JSONParser parser = new JSONParser();
+		return parser.deserializeLocations(resultString);
 	}
 
 	/**
@@ -540,19 +579,59 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	private MedicalLocation[] sendDataToServer(double latitude, double longitude)
 	{
 		// Search for results around that point
-		MedicalLocation[] results = {};
-		QueryData queryAnswer = new QueryData();
-		results = queryAnswer.getData(latitude, longitude);
-		return results;
+		double d = 0.05;
+		Log.i(this.getClass().getName(), "Single location to query: " + latitude + " : " + longitude);
+		// Send query to server
+		HTTPRequest request = new HTTPRequest(latitude-d, longitude-d, latitude+d, longitude+d);
+		String resultString = "";
+		AsyncTask<Void, Void, String> httpTask = request.execute();
+		try
+		{
+			resultString = httpTask.get();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
+		catch (ExecutionException e)
+		{
+			e.printStackTrace();
+		}
+		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
+		// Parse results
+		JSONParser parser = new JSONParser();
+		return parser.deserializeLocations(resultString);
 	}
 
 	private MedicalLocation[] sendDataToServer(double latitude, double longitude, String category)
 	{
 		// Search for results around that point
-		MedicalLocation[] results = {};
-		QueryData queryAnswer = new QueryData();
-		results = queryAnswer.getData(latitude, longitude, category);
-		return results;
+		double d = 0.05;
+		Log.i(this.getClass().getName(), "Location to query: " + latitude + " : " + latitude + ", limited to category " + category);
+		// Send query to server
+		HTTPRequest request = new HTTPRequest(latitude-d, longitude-d, latitude+d, longitude+d, category);
+		String resultString = "";
+		AsyncTask<Void, Void, String> httpTask = request.execute();
+		try
+		{
+			resultString = httpTask.get();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
+		catch (ExecutionException e)
+		{
+			e.printStackTrace();
+		}
+		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
+		// Parse results
+		JSONParser parser = new JSONParser();
+		return parser.deserializeLocations(resultString);
 	}
 
 	/**
@@ -669,8 +748,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		if (isLocationSensingAvailable())
 		{
-			this.locMgr.requestLocationUpdates(this.locProvider, locationUpdateAfterSeconds * 1000,
-				locationUpdateAfterDistance, this.locLst);
+			this.locMgr.requestLocationUpdates(this.locProvider, LOCATION_UPDATE_AFTER_SECONDS * 1000,
+				LOCATION_UPDATE_AFTER_DISTANCE, this.locLst);
 			/* Toast.makeText(this, "Debug message:\n" +
 			 * "If running on an emulator:\nSend location fix in DDMS to trigger location update.",
 			 * Toast.LENGTH_SHORT).show(); */
@@ -682,7 +761,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setCancelable(true);
 		builder.setTitle(getString(R.string.locationservice));
-		builder.setMessage(getString(R.string.askusertoenablenetwork));
+		builder.setMessage(getString(R.string.ask_user_to_enable_network));
 		builder.setIcon(android.R.drawable.ic_dialog_info);
 		builder.setPositiveButton(R.string.settings,
 			new DialogInterface.OnClickListener()

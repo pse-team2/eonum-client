@@ -18,7 +18,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 
 	URL url;
 	String resultString;
-	ProgressDialog dialog;
+	private ProgressDialog dialog;
 
 	public HTTPRequest(double lat1, double long1, double lat2, double long2)
 	{
@@ -71,9 +71,12 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	@Override
 	protected void onPreExecute()
 	{
-		this.dialog = ProgressDialog.show(HealthActivity.mainActivity,
-			HealthActivity.mainActivity.getString(R.string.pleasewait),
-			HealthActivity.mainActivity.getString(R.string.sendingrequest), true, false);
+		this.dialog.setCancelable(true);
+		this.dialog.setIndeterminate(true);
+		this.dialog.setTitle(HealthActivity.mainActivity.getString(R.string.pleasewait));
+		this.dialog.setMessage(HealthActivity.mainActivity.getString(R.string.sendingrequest));
+		this.dialog.show();
+		super.onPreExecute();
 	}
 
 	@Override
@@ -116,5 +119,6 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	{
 		Log.i(this.getClass().getName(), "Size of results from server in onPostExecute: " + resString.length());
 		this.dialog.dismiss();
+		super.onPostExecute(resString);
 	}
 }
