@@ -18,21 +18,20 @@ import android.util.Log;
 public class TypeResolver
 {
 
-	private static final TypeResolver instance = new TypeResolver();
-
 	// Names (german, plural, male)
 	private static HashMap<String, String> types = new HashMap<String, String>();
-
-	private TypeResolver()
-	{
-	}
+	private static final TypeResolver instance = new TypeResolver();
 
 	public static TypeResolver getInstance()
 	{
 		return instance;
 	}
 
-	public String[] getAllCategories()
+	/**
+	 * Retrieves a list of all categories the server is aware of
+	 * and puts them into a HashMap along with the appropriate translation.
+	 */
+	private TypeResolver()
 	{
 		HTTPRequest request = new HTTPRequest();
 		String resultString = "";
@@ -57,7 +56,6 @@ public class TypeResolver
 		JSONParser parser = new JSONParser();
 
 		ArrayList<String> typesList = new ArrayList<String>();
-		String[] typesArray = new String[types.size()];
 		ArrayList<String> error = new ArrayList<String>();
 
 		for (String categoryEntry : parser.deserializeCategories(resultString))
@@ -74,7 +72,7 @@ public class TypeResolver
 				visibleDescription = categoryEntry;
 				error.add(visibleDescription);
 			}
-			types.put(categoryEntry, visibleDescription);
+			TypeResolver.types.put(categoryEntry, visibleDescription);
 			typesList.add(visibleDescription);
 			// Log.i("visibleDescription", visibleDescription);
 		}
@@ -99,18 +97,22 @@ public class TypeResolver
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
+	}
 
-		return typesList.toArray(typesArray);
+	public String[] getAllCategories()
+	{
+		String[] typesArray = new String[TypeResolver.types.size()];
+		return TypeResolver.types.values().toArray(typesArray);
 	}
 
 	public String resolve(String type)
 	{
-		return types.get(type);
+		return TypeResolver.types.get(type);
 	}
 
 	public static String getKeyByValue(String value)
 	{
-		for (Entry<String, String> entry : types.entrySet())
+		for (Entry<String, String> entry : TypeResolver.types.entrySet())
 		{
 			if (value.equals(entry.getValue()))
 			{

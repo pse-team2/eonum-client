@@ -665,16 +665,19 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			Geocoder geocoder = new Geocoder(this);
 			myLocationAddress = geocoder.getFromLocation(this.latitude, this.longitude, 1).get(0);
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
 			Address unknownAddress = new Address(getResources().getConfiguration().locale);
-			myLocationAddress=unknownAddress;
+			myLocationAddress = unknownAddress;
 		}
+
 		String myAddressDescription = "";
 		for (int i = 0; i <= myLocationAddress.getMaxAddressLineIndex(); i++)
 		{
-			myAddressDescription += myLocationAddress.getAddressLine(i) + (i + 1 <= myLocationAddress.getMaxAddressLineIndex() ? "\n" : "");
+			myAddressDescription += myLocationAddress.getAddressLine(i)
+				+ (i + 1 <= myLocationAddress.getMaxAddressLineIndex() ? "\n" : "");
 		}
+
 		// Draw current location
 		GeoPoint initGeoPoint = new GeoPoint((int) (this.latitude * 1000000), (int) (this.longitude * 1000000));
 		OverlayItem overlayitem = new OverlayItem(initGeoPoint, getString(R.string.myposition), myAddressDescription);
@@ -756,7 +759,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	}
 
 	/**
-	 * Perform network check and alert user if nothing works
+	 * Perform network check and alert user if nothing works.
 	 * Make use of {@link #isLocationSensingAvailable()} to test for available location update providers.
 	 * If one was found, everything is fine. Updates are requested and the method returns.
 	 * If this is not the case, the user is informed and assisted to fix the problem by displaying the network
@@ -787,9 +790,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				@Override
 				public void onClick(DialogInterface dialog, int id)
 				{
-					Intent gpsOptionsIntent = new Intent(
-						android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-					startActivity(gpsOptionsIntent);
+					Intent locationSourceIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+					startActivity(locationSourceIntent);
 				}
 			});
 		builder.setNegativeButton(android.R.string.cancel,

@@ -8,7 +8,10 @@ import java.net.URL;
 
 import org.apache.http.util.ByteArrayBuffer;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -19,6 +22,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	URL url;
 	String resultString;
 	private ProgressDialog dialog;
+	private Throwable errorMessage = null;
 
 	public HTTPRequest(double lat1, double long1, double lat2, double long2)
 	{
@@ -99,24 +103,54 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 			{
 				read = bufferedInputStream.read(buf, 0, buf.length);
 				if (read > 0)
+				{
 					byteArrayBuffer.append(buf, 0, read);
+				}
 			}
 			while (read >= 0);
 			this.resultString = new String(byteArrayBuffer.toByteArray());
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			this.errorMessage = e;
 		}
 
-		Log.i(this.getClass().getName(), "Size of HTTP answer: " + resultString.length() + " at " + t.timeElapsed()
-			+ "ms");
+		Log.i(this.getClass().getName(), "Size of HTTP answer: " + resultString.length()
+			+ " at " + t.timeElapsed() + "ms");
 		return resultString;
 	}
 
 	@Override
 	protected void onPostExecute(String resString)
 	{
+		if(this.errorMessage != null)
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
+			builder.setTitle(HealthActivity.mainActivity.getString(R.string.neterror));
+			builder.setMessage(HealthActivity.mainActivity.getString(R.string.no_network_check_settings));
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setPositiveButton(R.string.settings,
+				new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int id)
+					{
+						Intent settingsIntent = new Intent(android.provider.Settings.ACTION_SETTINGS);
+						HealthActivity.mainActivity.startActivity(settingsIntent);
+					}
+				});
+			builder.setNegativeButton(android.R.string.cancel,
+				new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int id)
+					{
+						dialog.cancel();
+					}
+				});
+			AlertDialog alert = builder.create();
+			alert.show();
+		}
 		Log.i(this.getClass().getName(), "Size of results from server in onPostExecute: " + resString.length());
 		this.dialog.dismiss();
 		super.onPostExecute(resString);

@@ -2,7 +2,6 @@
 <resources>
     <!-- English (default) -->
     <string name="app_name">Eonum health</string>
-    <string name="welcome">Welcome screen</string>
     <string name="where">Where</string>
     <string name="what">What</string>
     <string name="search">Search</string>
@@ -19,6 +18,8 @@
     <string name="locationservice">Location service</string>
     <string name="ask_user_to_enable_network">Location sources are currently not available. For accurate location detection:\n\n• Turn on GPS and wireless networks in location settings\n\n• Turn on Wi-Fi</string>
     <string name="settings">Settings</string>
+    <string name="neterror">Network error</string>
+    <string name="no_network_check_settings">There was an error while connecting to the Eonum server.\nPlease make sure you are connected with the internet and try again.</string>
     <string name="provider_status_out_of_service">Provider %s: Status Changed: Out of Service</string>
     <string name="provider_status_temp_univailable">Provider %s: Status Changed: Temporarily Unavailable</string>
     <string name="provider_status_available">Provider %s: Status Changed: Available</string>
