@@ -56,6 +56,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * From there these variables are updated using using the {@link #setLocation(Location)} method.
 	 */
 	private double latitude, longitude;
+	
 	/**
 	 * Variable that is provided from an external source to
 	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.
@@ -63,6 +64,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * the variables {@link #latitude} and {@link #longitude} which are dependent from this value.
 	 */
 	private Location location = null;
+	
 	/** Variables involved in the process of getting location updates. */
 	private LocationManager locMgr;
 	private String locProvider;

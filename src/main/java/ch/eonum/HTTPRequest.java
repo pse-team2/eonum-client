@@ -15,10 +15,12 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
-/** Fetches the raw data from the server */
+/**
+ * Fetches the raw data from the server
+ */
+
 public class HTTPRequest extends AsyncTask<Void, Void, String>
 {
-
 	URL url;
 	String resultString;
 	private ProgressDialog dialog;
@@ -26,7 +28,6 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 
 	public HTTPRequest(double lat1, double long1, double lat2, double long2)
 	{
-
 		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		resultString = "";
 

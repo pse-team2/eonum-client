@@ -10,7 +10,6 @@ import android.util.Log;
  */
 public class MedicalLocation implements Location, Comparable<MedicalLocation>
 {
-
 	TypeResolver resolver = TypeResolver.getInstance();
 	private String name;
 	private String arztTyp;
@@ -76,19 +75,5 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 	public int compareTo(MedicalLocation loc)
 	{
 		return (int) Math.signum(this.distance - loc.getDistance());
-		/*
-		if (this.distance > loc.getDistance()) 
-		{
-			return 1;
-		}
-		else if (this.distance < loc.getDistance()) 
-		{
-			return -1;
-		}
-		else 
-		{
-			return 0;
-		}
-		*/
 	}
 }

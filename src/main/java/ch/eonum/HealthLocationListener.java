@@ -146,7 +146,9 @@ public class HealthLocationListener implements LocationListener
 		return false;
 	}
 
-	/** Checks whether two providers are the same */
+	/**
+	 * Checks whether two providers are the same.
+	 */
 	private boolean isSameProvider(String provider1, String provider2)
 	{
 		if (provider1 == null)
@@ -155,5 +157,4 @@ public class HealthLocationListener implements LocationListener
 		}
 		return provider1.equals(provider2);
 	}
-
 }

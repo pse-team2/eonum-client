@@ -17,8 +17,6 @@ import android.util.Log;
  */
 public class TypeResolver
 {
-
-	// Names (german, plural, male)
 	private static HashMap<String, String> types = new HashMap<String, String>();
 	private static final TypeResolver instance = new TypeResolver();
 
@@ -74,17 +72,16 @@ public class TypeResolver
 			}
 			TypeResolver.types.put(categoryEntry, visibleDescription);
 			typesList.add(visibleDescription);
-			// Log.i("visibleDescription", visibleDescription);
 		}
 
-		// Display missing translation resources
 		if (!error.isEmpty())
 		{
 			Log.w("Resource not found", error.toString());
 			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
 			builder.setCancelable(false);
 			builder.setTitle(HealthActivity.mainActivity.getString(R.string.missing_translations));
-			builder.setMessage(String.format(HealthActivity.mainActivity.getString(R.string.missing_translations_list), error.toString()));
+			builder.setMessage(String.format(HealthActivity.mainActivity.getString(R.string.missing_translations_list),
+				error.toString()));
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setNeutralButton(android.R.string.ok, new OnClickListener()
 			{
@@ -110,6 +107,7 @@ public class TypeResolver
 		return TypeResolver.types.get(type);
 	}
 
+	
 	public static String getKeyByValue(String value)
 	{
 		for (Entry<String, String> entry : TypeResolver.types.entrySet())

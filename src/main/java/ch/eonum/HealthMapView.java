@@ -13,7 +13,10 @@ import com.google.android.maps.MapView;
 
 public class HealthMapView extends MapView
 {
-	// Change listener
+	/**
+	 * On change
+	 */
+	
 	public interface OnChangeListener
 	{
 		public void onChange(MapView view, GeoPoint newCenter, GeoPoint oldCenter, int newZoom, int oldZoom);

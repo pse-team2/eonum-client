@@ -6,7 +6,11 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-/** Fills the data obtained from the server into arrays as defined in {@link MedicalLocation} */
+/**
+ * Fills the data obtained from the server into arrays
+ * as defined in {@link MedicalLocation}
+ */
+
 public class JSONParser
 {
 
@@ -21,12 +25,12 @@ public class JSONParser
 
 			// split up into addresses
 			int MAX_RESULTS = jsonArray.length();
-			
+
 			results = new MedicalLocation[MAX_RESULTS];
 			double latitude, longitude;
 
 			Log.i(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
-			
+
 			for (int i = 0; i < MAX_RESULTS; i++)
 			{
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -48,7 +52,7 @@ public class JSONParser
 			e.printStackTrace();
 		}
 
-		Log.i(this.getClass().getName(), "Finished, return "+results.length+" results");
+		Log.i(this.getClass().getName(), "Finished, return " + results.length + " results");
 		return results;
 	}
 
@@ -64,7 +68,7 @@ public class JSONParser
 			results = new String[jsonArray.length()];
 
 			Log.i(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
-			
+
 			for (int i = 0; i < jsonArray.length(); i++)
 			{
 				String category = jsonArray.getString(i);
@@ -73,7 +77,6 @@ public class JSONParser
 		}
 		catch (JSONException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Log.i(this.getClass().getName(), "Finished, return " + results.length + " results");

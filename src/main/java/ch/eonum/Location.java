@@ -5,9 +5,9 @@ package ch.eonum;
  * Current Implementors are City and MedicalLocation.
  *
  */
+
 public interface Location
 {
 	public String getName();
 	public Double[] getLocation();
-	
 }

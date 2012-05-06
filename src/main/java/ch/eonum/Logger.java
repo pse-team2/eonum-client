@@ -36,7 +36,6 @@ public class Logger
 
 		if (debugMode)
 		{
-
 			byte[] data = new String(timer.timeElapsed() + ";" + line + "\n").getBytes();
 			try
 			{

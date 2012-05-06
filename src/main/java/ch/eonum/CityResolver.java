@@ -7,7 +7,6 @@ import java.util.HashMap;
  */
 public class CityResolver
 {
-
 	public static final HashMap<String, City> cities = new HashMap<String, City>();
 	private static final CityResolver instance = new CityResolver();
 
