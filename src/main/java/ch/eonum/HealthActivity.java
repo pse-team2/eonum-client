@@ -28,7 +28,6 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -114,7 +113,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		Log.i(this.getClass().getName(), "Main Activity started.");
+		Logger.info(this.getClass().getName(), "Main Activity started.");
 		setContentView(R.layout.main);
 		mainActivity = this;
 
@@ -214,7 +213,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			}
 		});
 
-		Log.i(this.getClass().getName(), "Main Activity created.");
+		Logger.info(this.getClass().getName(), "Main Activity created.");
 	}
 
 	/**
@@ -224,7 +223,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void onStart()
 	{
 		super.onStart();
-		Log.i(this.getClass().getName(), "Run onStart()");
+		Logger.info(this.getClass().getName(), "Run onStart()");
 
 		Logger.init();
 		Logger.log("App started.");
@@ -340,7 +339,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		if (equalsPhysicalLocation
 			|| (lowerLeftLatitude == 0 || lowerLeftLongitude == 0 || upperRightLatitude == 0 || upperRightLongitude == 0))
 		{
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Found no corners, querying for Long&Lat.");
+			Logger.info(this.getClass().getName() + ": launchUserDefinedSearch", "Found no corners, querying for Long&Lat.");
 			answer = sendDataToServer(this.latitude, this.longitude);
 		}
 		else
@@ -350,7 +349,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			upperRightLatitude /= 1000000;
 			upperRightLongitude /= 1000000;
 
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Querying for map rectangle.");
+			Logger.info(this.getClass().getName() + ": launchUserDefinedSearch", "Querying for map rectangle.");
 			answer = sendDataToServer(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
 		}
 
@@ -374,7 +373,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected MedicalLocation[] launchUserDefinedSearch(String where, String what)
 	{
 		double searchAtLatitude, searchAtLongitude;
-		Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "Where: " + where + ", What: " + what);
+		Logger.info(this.getClass().getName() + ": launchUserDefinedSearch", "Where: " + where + ", What: " + what);
 
 		// Evaluate TextView searchforWhere
 		if (where.length() != 0)
@@ -392,7 +391,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				e.printStackTrace();
 			}
 
-			Log.i(this.getClass().getName() + ": launchUserDefinedSearch", "resultsList: " + resultsList);
+			Logger.info(this.getClass().getName() + ": launchUserDefinedSearch", "resultsList: " + resultsList);
 			// Inform user if the server returned no results
 			if (resultsList == null || resultsList.isEmpty())
 			{
@@ -536,7 +535,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		for (int i = 0; i < Math.min(MAX_RESULTS, results.length); i++)
 		{
 			filteredResults[i] = results[i];
-			Log.i(this.getClass().getName(), "Dist: " + results[i].getDistance());
+			Logger.info(this.getClass().getName(), "Dist: " + results[i].getDistance());
 		}
 		return filteredResults;
 	}
@@ -550,7 +549,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		double upperRightLongitude)
 	{
 		// Search for results around that point
-		Log.i(this.getClass().getName(), "Map rectangle to query: " + lowerLeftLatitude + "/" + lowerLeftLongitude+ "," + upperRightLatitude + "/" + upperRightLongitude);
+		Logger.info(this.getClass().getName(), "Map rectangle to query: " + lowerLeftLatitude + "/" + lowerLeftLongitude+ "," + upperRightLatitude + "/" + upperRightLongitude);
 		// Send query to server
 		HTTPRequest request = new HTTPRequest(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
 		String resultString = "";
@@ -569,7 +568,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		{
 			e.printStackTrace();
 		}
-		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
+		Logger.info(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
 		JSONParser parser = new JSONParser();
 		return parser.deserializeLocations(resultString);
@@ -583,7 +582,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		// Search for results around that point
 		double d = 0.05;
-		Log.i(this.getClass().getName(), "Single location to query: " + latitude + " : " + longitude);
+		Logger.info(this.getClass().getName(), "Single location to query: " + latitude + " : " + longitude);
 		// Send query to server
 		HTTPRequest request = new HTTPRequest(latitude-d, longitude-d, latitude+d, longitude+d);
 		String resultString = "";
@@ -602,7 +601,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		{
 			e.printStackTrace();
 		}
-		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
+		Logger.info(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
 		JSONParser parser = new JSONParser();
 		return parser.deserializeLocations(resultString);
@@ -612,7 +611,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	{
 		// Search for results around that point
 		double d = 0.05;
-		Log.i(this.getClass().getName(), "Location to query: " + latitude + " : " + latitude + ", limited to category " + category);
+		Logger.info(this.getClass().getName(), "Location to query: " + latitude + " : " + latitude + ", limited to category " + category);
 		// Send query to server
 		HTTPRequest request = new HTTPRequest(latitude-d, longitude-d, latitude+d, longitude+d, category);
 		String resultString = "";
@@ -631,7 +630,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		{
 			e.printStackTrace();
 		}
-		Log.i(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
+		Logger.info(this.getClass().getName(), "Size of results in queryServer: " + resultString.length());
 		// Parse results
 		JSONParser parser = new JSONParser();
 		return parser.deserializeLocations(resultString);
@@ -655,7 +654,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		this.longitude = this.location.getLongitude();
 		// String Text = getString(R.string.location) + ": " + this.latitude + " : " + this.longitude;
 		// Toast.makeText(this, Text, Toast.LENGTH_SHORT).show();
-		Log.i(this.getClass().getName() + ": drawMyLocation", this.latitude + " : " + this.longitude);
+		Logger.info(this.getClass().getName() + ": drawMyLocation", this.latitude + " : " + this.longitude);
 
 		// Remove other points
 		this.itemizedLocationOverlay.clear();
@@ -704,8 +703,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		this.itemizedSearchresultOverlay.clear();
 
 		// Draw results to map
-		Log.i(this.getClass().getName() + ": drawSearchResults", "Draw " + results.length + " results to map");
-		Log.i("GeoPoint", "Start drawing");
+		Logger.info(this.getClass().getName() + ": drawSearchResults", "Draw " + results.length + " results to map");
+		Logger.info("GeoPoint", "Start drawing");
 
 		int count = 0;
 
@@ -715,14 +714,14 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			if (count < 20)
 			{
 				count++;
-				Log.i(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
+				Logger.info(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
 					String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
 				GeoPoint matchingResult = new GeoPoint(
 					(int) (point.getLocation()[0] * 1000000),
 					(int) (point.getLocation()[1] * 1000000)
 					);
 				String email = point.getEmail();
-				if (email.isEmpty())
+				if (email.length() == 0)
 					email = "(keine Email-Adresse)";
 				OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType() + "\n" + point.getAddress() + "\n" + email);
 				this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
@@ -733,7 +732,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		this.mapOverlays.add(this.itemizedLocationOverlay);
 		this.mapOverlays.add(this.itemizedSearchresultOverlay);
 
-		Log.i("GeoPoint", "Finished drawing");
+		Logger.info("GeoPoint", "Finished drawing");
 		// TODO: Center Map and adjust zoom factor so that all results are displayed.
 	}
 

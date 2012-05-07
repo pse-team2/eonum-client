@@ -9,12 +9,18 @@ import android.os.Environment;
 import android.util.Log;
 
 /**
- * Logger which saves logs to SD card of the device.
- * 
+ * This class represents a Logger with two main responsibilities:
+ *  1. Print Logs to the screen (Log.i)
+ *  2. Save logs (i.e. for usability testing) to SD card of the device.
+ *  
+ *  By using one global boolean debugMode, we can assure that the tests will run correctly.
+ *  If not in debug mode, the Logger does nothing.
+ *  
  */
+
 public class Logger
 {
-	private static boolean debugMode = true;
+	static boolean debugMode = false;
 	
 	private static String fileName = "logfile.csv";
 	private static Timer timer;
@@ -24,18 +30,20 @@ public class Logger
 
 	public static void init()
 	{
-		sdCard = Environment.getExternalStorageDirectory();
-		file = new File(sdCard.getAbsolutePath() + "/Logs", fileName);
-		timer = new Timer();
-		Logger.log("Logger initialized.");
+		if (debugMode) {
+			sdCard = Environment.getExternalStorageDirectory();
+			file = new File(sdCard.getAbsolutePath() + "/Logs", fileName);
+			timer = new Timer();
+			Logger.log("Logger initialized.");
+		}
 	}
 
 	public static void log(String line)
 	{
-		Log.i("Logger", ">> logged: " + line);
-
 		if (debugMode)
 		{
+			Logger.info("Logger", ">> logged: " + line);
+			
 			byte[] data = new String(timer.timeElapsed() + ";" + line + "\n").getBytes();
 			try
 			{
@@ -52,6 +60,27 @@ public class Logger
 			{
 				e.printStackTrace();
 			}
+		}
+	}
+
+	public static void info(String tag, String msg)
+	{
+		if (debugMode) {
+			Log.i(tag, msg);
+		}
+	}
+
+	public static void warn(String tag, String msg)
+	{
+		if (debugMode) {
+			Log.w(tag, msg);
+		}
+	}
+
+	public static void error(String tag, String msg)
+	{
+		if (debugMode) {
+			Log.e(tag, msg);
 		}
 	}
 }

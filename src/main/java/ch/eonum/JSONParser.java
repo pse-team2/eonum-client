@@ -4,8 +4,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 /**
  * Fills the data obtained from the server into arrays
  * as defined in {@link MedicalLocation}
@@ -29,7 +27,7 @@ public class JSONParser
 			results = new MedicalLocation[MAX_RESULTS];
 			double latitude, longitude;
 
-			Log.i(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
+			Logger.info(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
 
 			for (int i = 0; i < MAX_RESULTS; i++)
 			{
@@ -55,13 +53,13 @@ public class JSONParser
 			e.printStackTrace();
 		}
 
-		Log.i(this.getClass().getName(), "Finished, return " + results.length + " results");
+		Logger.info(this.getClass().getName(), "Finished, return " + results.length + " results");
 		return results;
 	}
 
 	public String[] deserializeCategories(String str)
 	{
-		Log.i(this.getClass().getName(), "Start deserializing categories");
+		Logger.info(this.getClass().getName(), "Start deserializing categories");
 		String[] results = new String[] {};
 		JSONObject jsonObj;
 		try
@@ -70,7 +68,7 @@ public class JSONParser
 			JSONArray jsonArray = jsonObj.getJSONArray("categories");
 			results = new String[jsonArray.length()];
 
-			Log.i(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
+			Logger.info(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
 
 			for (int i = 0; i < jsonArray.length(); i++)
 			{
@@ -82,7 +80,7 @@ public class JSONParser
 		{
 			e.printStackTrace();
 		}
-		Log.i(this.getClass().getName(), "Finished, return " + results.length + " results");
+		Logger.info(this.getClass().getName(), "Finished, return " + results.length + " results");
 		return results;
 	}
 }

@@ -1,7 +1,5 @@
 package ch.eonum;
 
-import android.util.Log;
-
 /**
  * Represents a single address (data set) returned by the server.
  * Can be a medical practice, hospital, doctor office etc.
@@ -32,7 +30,7 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		this.arztTyp = resolver.resolve(arztTyp);
 		if (this.arztTyp == null)
 		{
-			Log.w("Arzttyp is Null", "this.name = " + this.name + ", this.arztTyp = " + this.arztTyp);
+			Logger.warn("Arzttyp is Null", "this.name = " + this.name + ", this.arztTyp = " + this.arztTyp);
 		}
 		this.distance = 0;
 	}

@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Resources.NotFoundException;
 import android.os.AsyncTask;
-import android.util.Log;
 
 /**
  * Resolves a medical type to a String.
@@ -38,6 +37,8 @@ public class TypeResolver
 	 */
 	private TypeResolver()
 	{
+		if (!Logger.debugMode)
+			return;
 		HTTPRequest request = new HTTPRequest();
 		String resultString = "";
 		AsyncTask<Void, Void, String> httpTask = request.execute();
@@ -55,7 +56,7 @@ public class TypeResolver
 		{
 			e.printStackTrace();
 		}
-		Log.i(this.getClass().getName(), "Size of results in TypeResolver: " + resultString.length());
+		Logger.info(this.getClass().getName(), "Size of results in TypeResolver: " + resultString.length());
 
 		// Parse results
 		JSONParser parser = new JSONParser();
@@ -84,7 +85,7 @@ public class TypeResolver
 
 		if (!error.isEmpty())
 		{
-			Log.w("Resource not found", error.toString());
+			Logger.warn("Resource not found", error.toString());
 			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
 			builder.setCancelable(false);
 			builder.setTitle(HealthActivity.mainActivity.getString(R.string.missing_translations));

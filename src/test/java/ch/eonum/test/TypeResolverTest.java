@@ -13,7 +13,6 @@ import ch.eonum.TypeResolver;
 /* Unit Test */
 public class TypeResolverTest
 {
-
 	@BeforeClass
 	public static void setUpBeforeClass()
 	{

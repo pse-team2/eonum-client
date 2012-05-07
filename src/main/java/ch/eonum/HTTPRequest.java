@@ -13,7 +13,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.util.Log;
 
 /**
  * Fetches the raw data from the server
@@ -88,8 +87,8 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	protected String doInBackground(Void... params)
 	{
 		Timer t = new Timer();
-		Log.i(this.getClass().getName(), "Start reading answer from server at " + t.timeElapsed() + "ms");
-		Log.i(this.getClass().getName(), "   url: " + url);
+		Logger.info(this.getClass().getName(), "Start reading answer from server at " + t.timeElapsed() + "ms");
+		Logger.info(this.getClass().getName(), "   url: " + url);
 
 		final int APPROX_MAX_PAGE_SIZE = 500;
 		try
@@ -116,7 +115,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 			this.errorMessage = e;
 		}
 
-		Log.i(this.getClass().getName(), "Size of HTTP answer: " + resultString.length()
+		Logger.info(this.getClass().getName(), "Size of HTTP answer: " + resultString.length()
 			+ " at " + t.timeElapsed() + "ms");
 		return resultString;
 	}
@@ -152,7 +151,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
-		Log.i(this.getClass().getName(), "Size of results from server in onPostExecute: " + resString.length());
+		Logger.info(this.getClass().getName(), "Size of results from server in onPostExecute: " + resString.length());
 		this.dialog.dismiss();
 		super.onPostExecute(resString);
 	}

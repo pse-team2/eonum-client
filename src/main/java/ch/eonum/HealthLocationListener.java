@@ -4,7 +4,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationProvider;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 public class HealthLocationListener implements LocationListener
@@ -15,11 +14,11 @@ public class HealthLocationListener implements LocationListener
 	@Override
 	public void onLocationChanged(Location newLocation)
 	{
-		Log.i(this.getClass().getName(), "Location changed: " + newLocation.toString());
+		Logger.info(this.getClass().getName(), "Location changed: " + newLocation.toString());
 		Location currentLocation = ((HealthActivity) HealthActivity.mainActivity).getLocation();
 		if (isBetterLocation(newLocation, currentLocation))
 		{
-			Log.i(this.getClass().getName(), "It is a better location");
+			Logger.info(this.getClass().getName(), "It is a better location");
 			((HealthActivity) HealthActivity.mainActivity).setLocation(newLocation);
 		}
 
