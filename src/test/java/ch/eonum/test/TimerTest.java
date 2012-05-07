@@ -8,11 +8,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.eonum.TypeResolver;
+import ch.eonum.Timer;
 
 /* Unit Test */
-public class TypeResolverTest
+public class TimerTest
 {
+	Timer t; 
 	@BeforeClass
 	public static void setUpBeforeClass()
 	{
@@ -26,6 +27,7 @@ public class TypeResolverTest
 	@Before
 	public void setUp()
 	{
+		this.t = new Timer();
 	}
 
 	@After
@@ -34,11 +36,10 @@ public class TypeResolverTest
 	}
 
 	@Test
-	public final void testResolve()
+	public final void testTimer()
 	{
-//		TypeResolver tr = TypeResolver.getInstance();
-//		String desc = tr.resolve("allgemeinaerzte");
-//		assertNotNull(desc);
-//		assertEquals("Allgemeinärzte", desc);
+		
+		double timeElapsed = t.timeElapsed();
+		assertTrue(timeElapsed > 0);
 	}
 }
