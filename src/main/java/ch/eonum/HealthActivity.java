@@ -721,7 +721,10 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 					(int) (point.getLocation()[0] * 1000000),
 					(int) (point.getLocation()[1] * 1000000)
 					);
-				OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType());
+				String email = point.getEmail();
+				if (email.isEmpty())
+					email = "(keine Email-Adresse)";
+				OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType() + "\n" + point.getAddress() + "\n" + email);
 				this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
 			}
 		}
