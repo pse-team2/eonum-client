@@ -35,6 +35,9 @@ public class JSONParser
 			{
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String name = jsonObject.getString("name");
+				String address = jsonObject.getString("address");
+				String email = jsonObject.getString("email");
+				
 				String type = jsonObject.getString("types");
 
 				// regex on category
@@ -44,7 +47,7 @@ public class JSONParser
 				latitude = location.getDouble("lat");
 				longitude = location.getDouble("lng");
 
-				results[i] = new MedicalLocation(name, type, latitude, longitude);
+				results[i] = new MedicalLocation(name, address, email, type, latitude, longitude);
 			}
 		}
 		catch (JSONException e)
