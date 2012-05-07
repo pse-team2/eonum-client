@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 import android.widget.ZoomControls;
 
 import com.google.android.maps.GeoPoint;
@@ -14,9 +13,8 @@ import com.google.android.maps.MapView;
 public class HealthMapView extends MapView
 {
 	/**
-	 * On change
+	 * Describes the method that is invoked when MapView encounters changes.
 	 */
-	
 	public interface OnChangeListener
 	{
 		public void onChange(MapView view, GeoPoint newCenter, GeoPoint oldCenter, int newZoom, int oldZoom);
@@ -59,7 +57,6 @@ public class HealthMapView extends MapView
 			@Override
 			public void onClick(View v)
 			{
-				Toast.makeText(mapContext.getContext(), "Zoom Out Clicked", Toast.LENGTH_LONG).show();
 				Logger.log("Zoomed out.");
 				controller.zoomOut();
 				performMapChanges();
@@ -70,7 +67,6 @@ public class HealthMapView extends MapView
 			@Override
 			public void onClick(View v)
 			{
-				Toast.makeText(mapContext.getContext(), "Zoom In Clicked", Toast.LENGTH_LONG).show();
 				Logger.log("Zoomed in.");
 				controller.zoomIn();
 				performMapChanges();

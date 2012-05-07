@@ -17,6 +17,11 @@ import android.util.Log;
  */
 public class TypeResolver
 {
+	/**
+	 * Stores the values for the different categories as keys and their translations as values.
+	 * As a convention the descriptions are in male plural form.
+	 * The values come from the server and the translations are stored in the strings.xml file.
+	 */
 	private static HashMap<String, String> types = new HashMap<String, String>();
 	private static final TypeResolver instance = new TypeResolver();
 
@@ -27,7 +32,9 @@ public class TypeResolver
 
 	/**
 	 * Retrieves a list of all categories the server is aware of
-	 * and puts them into a HashMap along with the appropriate translation.
+	 * and puts them into {@link #types} along with the appropriate translation.
+	 * If a translation is not listed in the strings.xml file, the identifier from the server is used instead
+	 * and an error message is displayed.
 	 */
 	private TypeResolver()
 	{
@@ -60,6 +67,7 @@ public class TypeResolver
 		{
 			int id = HealthActivity.mainActivity.getResources().getIdentifier(categoryEntry, "string",
 				this.getClass().getPackage().getName());
+				
 			String visibleDescription;
 			try
 			{
@@ -80,8 +88,8 @@ public class TypeResolver
 			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
 			builder.setCancelable(false);
 			builder.setTitle(HealthActivity.mainActivity.getString(R.string.missing_translations));
-			builder.setMessage(String.format(HealthActivity.mainActivity.getString(R.string.missing_translations_list),
-				error.toString()));
+			builder.setMessage(String.format(
+				HealthActivity.mainActivity.getString(R.string.missing_translations_list), error.toString()));
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setNeutralButton(android.R.string.ok, new OnClickListener()
 			{
@@ -102,13 +110,26 @@ public class TypeResolver
 		return TypeResolver.types.values().toArray(typesArray);
 	}
 
+	/**
+	 * Get the translated string for a category key.
+	 * 
+	 * @param type
+	 *            The key for a specific category as delivered by the server at instantiation time.
+	 * @return Corresponding value to be displayed in the application.
+	 */
 	public String resolve(String type)
 	{
 		return TypeResolver.types.get(type);
 	}
 
-	
-	public static String getKeyByValue(String value)
+	/**
+	 * Get the category key for a given category description.
+	 * 
+	 * @param value
+	 *            Description as displayed in the application.
+	 * @return Corresponding value as delivered by the server at instantiation time.
+	 */
+	public String getKeyByValue(String value)
 	{
 		for (Entry<String, String> entry : TypeResolver.types.entrySet())
 		{
