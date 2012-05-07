@@ -477,7 +477,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// Evaluate TextView searchForWhat
 		if (what.length() != 0)
 		{
-			String whatValue = TypeResolver.getKeyByValue(what);
+			String whatValue = TypeResolver.getInstance().getKeyByValue(what);
 			if(whatValue == null)
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);

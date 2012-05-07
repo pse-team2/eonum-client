@@ -10,13 +10,16 @@ public class Timer
 {
 	long _startTime;
 
+	/**
+	 * Creates a new Timer instance or resets an existing one.
+	 */
 	public Timer()
 	{
 		this.reset();
 	}
 
 	/**
-	 * Set Timer back to zero.
+	 * Sets the Timer back to zero.
 	 */
 	public void reset()
 	{
@@ -24,7 +27,8 @@ public class Timer
 	}
 
 	/**
-	 * Returns the time elapsed.
+	 * Returns the time elapsed. Does not reset the timer.
+	 * @return Elapsed time in milliseconds.
 	 */
 	public long timeElapsed()
 	{
@@ -33,6 +37,8 @@ public class Timer
 
 	/**
 	 * Returns the actual time.
+	 * @return Actual System Time in milliseconds.
+	 * @see Date#getTime()
 	 */
 	protected long timeNow()
 	{
