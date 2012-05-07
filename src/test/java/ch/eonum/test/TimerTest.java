@@ -15,9 +15,9 @@ import ch.eonum.Timer;
 /* Unit Test */
 public class TimerTest
 {
-	Timer t; 
+	Timer t;
 	static Mode previousMode;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass()
 	{
@@ -45,9 +45,28 @@ public class TimerTest
 	@Test
 	public final void testTimer()
 	{
-		
 		double timeElapsed = t.timeElapsed();
 		assertTrue(timeElapsed > -1);
 		assertTrue(timeElapsed < 1000);
 	}
+
+	@Test
+	public final void testTimeDelta()
+	{
+		t.reset();
+		try
+		{
+			Thread.sleep(2000);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
+		double timeElapsed = t.timeElapsed();
+		assertTrue(timeElapsed > 1990);
+		assertTrue(timeElapsed < 2010);
+	}
+
 }

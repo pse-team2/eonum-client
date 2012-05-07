@@ -18,7 +18,7 @@ public class JSONParserTest
 {
 	private static Mode previousMode;
 	private String content;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass()
 	{
@@ -35,7 +35,7 @@ public class JSONParserTest
 	@Before
 	public void setUp()
 	{
-		this.content = "{ \"status\": \"OK\",\"results\": [ { \"name\": \"Hans Muster\"," 
+		this.content = "{ \"status\": \"OK\",\"results\": [ { \"name\": \"Hans Muster\","
 			+ "\"address\": \"Bahnhofstrasse, 3000 Bern\", \"email\": \"\", "
 			+ "\"types\": [ \"allgemeinaerzte\" ], \"location\": { \"lat\": 46.12345, \"lng\": 7.54321 } } ] } ";
 	}
@@ -50,12 +50,12 @@ public class JSONParserTest
 	{
 		JSONParser parser = new JSONParser();
 		MedicalLocation[] locations = parser.deserializeLocations(content);
-		
+
 		assertNotNull(locations);
 		MedicalLocation testLocation = locations[0];
-		
+
 		assertNotNull(testLocation);
 		assertEquals("Hans Muster", testLocation.getName());
-		assertEquals("", testLocation.getEmail());		
+		assertEquals("", testLocation.getEmail());
 	}
 }

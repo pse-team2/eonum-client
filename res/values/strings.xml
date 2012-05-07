@@ -30,7 +30,7 @@
     <string name="missing_translations">Error\: Missing translations</string>
     <string name="missing_translations_list">No translations were not found for the following namings:\n%s</string>
     <string name="no_valid_category">\"%s\" is not a valid category</string>
-    <string name="choose_category_from_list">Choose a category from the list</string>
+    <string name="choose_category_from_list">Choose a category from the list or leave it empty to display all categories</string>
     <string name="akupunkturaerzte">Akupunkturärzte</string>
     <string name="allergologen">Allergologen</string>
     <string name="allgemeinaerzte">Allgemeinärzte</string>
