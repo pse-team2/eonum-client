@@ -9,21 +9,27 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.eonum.JSONParser;
+import ch.eonum.Logger;
 import ch.eonum.MedicalLocation;
+import ch.eonum.Mode;
 
 /* Unit Test */
 public class JSONParserTest
 {
+	private static Mode previousMode;
 	private String content;
 	
 	@BeforeClass
 	public static void setUpBeforeClass()
 	{
+		previousMode = Logger.mode;
+		Logger.mode = Mode.TEST;
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass()
 	{
+		Logger.mode = previousMode;
 	}
 
 	@Before

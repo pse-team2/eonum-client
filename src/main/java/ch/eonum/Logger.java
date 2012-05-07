@@ -20,8 +20,10 @@ import android.util.Log;
 
 public class Logger
 {
-	static boolean debugMode = false;
+
+	public static Mode mode = Mode.DEV;
 	
+	private static boolean writeToSD = false;
 	private static String fileName = "logfile.csv";
 	private static Timer timer;
 	private static File file;
@@ -30,9 +32,16 @@ public class Logger
 
 	public static void init()
 	{
-		if (debugMode) {
-			sdCard = Environment.getExternalStorageDirectory();
-			file = new File(sdCard.getAbsolutePath() + "/Logs", fileName);
+		if (mode == Mode.DEV) {
+			if (writeToSD)
+			{
+				sdCard = Environment.getExternalStorageDirectory();
+				file = new File(sdCard.getAbsolutePath() + "/Logs", fileName);
+			}
+			else
+			{
+				file = new File("/dev/null");
+			}
 			timer = new Timer();
 			Logger.log("Logger initialized.");
 		}
@@ -40,7 +49,7 @@ public class Logger
 
 	public static void log(String line)
 	{
-		if (debugMode)
+		if (mode == Mode.DEV)
 		{
 			Logger.info("Logger", ">> logged: " + line);
 			
@@ -65,21 +74,21 @@ public class Logger
 
 	public static void info(String tag, String msg)
 	{
-		if (debugMode) {
+		if (mode == Mode.DEV) {
 			Log.i(tag, msg);
 		}
 	}
 
 	public static void warn(String tag, String msg)
 	{
-		if (debugMode) {
+		if (mode == Mode.DEV) {
 			Log.w(tag, msg);
 		}
 	}
 
 	public static void error(String tag, String msg)
 	{
-		if (debugMode) {
+		if (mode == Mode.DEV) {
 			Log.e(tag, msg);
 		}
 	}

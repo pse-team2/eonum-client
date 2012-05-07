@@ -8,20 +8,27 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ch.eonum.Logger;
+import ch.eonum.Mode;
 import ch.eonum.Timer;
 
 /* Unit Test */
 public class TimerTest
 {
 	Timer t; 
+	static Mode previousMode;
+	
 	@BeforeClass
 	public static void setUpBeforeClass()
 	{
+		previousMode = Logger.mode;
+		Logger.mode = Mode.TEST;
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass()
 	{
+		Logger.mode = previousMode;
 	}
 
 	@Before

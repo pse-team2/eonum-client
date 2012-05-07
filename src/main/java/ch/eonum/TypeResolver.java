@@ -37,8 +37,10 @@ public class TypeResolver
 	 */
 	private TypeResolver()
 	{
-		if (!Logger.debugMode)
+		if (Logger.mode == Mode.TEST)
+		{
 			return;
+		}
 		HTTPRequest request = new HTTPRequest();
 		String resultString = "";
 		AsyncTask<Void, Void, String> httpTask = request.execute();
@@ -68,7 +70,7 @@ public class TypeResolver
 		{
 			int id = HealthActivity.mainActivity.getResources().getIdentifier(categoryEntry, "string",
 				this.getClass().getPackage().getName());
-				
+
 			String visibleDescription;
 			try
 			{
