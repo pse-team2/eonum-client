@@ -40,6 +40,7 @@ public class TimerTest
 	{
 		
 		double timeElapsed = t.timeElapsed();
-		assertTrue(timeElapsed > 0);
+		assertTrue(timeElapsed > -1);
+		assertTrue(timeElapsed < 1000);
 	}
 }
