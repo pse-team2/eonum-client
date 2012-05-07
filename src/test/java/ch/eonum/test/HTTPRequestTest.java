@@ -11,7 +11,6 @@ import org.junit.Test;
 /* Unit Test */
 public class HTTPRequestTest
 {
-
 	@BeforeClass
 	public static void setUpBeforeClass()
 	{
@@ -43,5 +42,4 @@ public class HTTPRequestTest
 	{
 		//fail("Noch nicht implementiert"); // TODO
 	}
-
 }
