@@ -12,15 +12,19 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 {
 	TypeResolver resolver = TypeResolver.getInstance();
 	private String name;
+	private String address;
+	private String email;
 	private String arztTyp;
 	private double latitude;
 	private double longitude;
 	Double[] location = new Double[2];
 	private double distance;
 
-	public MedicalLocation(String name, String arztTyp, double latitude, double longitude)
+	public MedicalLocation(String name, String address, String email, String arztTyp, double latitude, double longitude)
 	{
 		this.name = name;
+		this.address = address;
+		this.email = email;
 		this.latitude = latitude;
 		this.location[0] = latitude;
 		this.longitude = longitude;
@@ -38,6 +42,16 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 	public String getName()
 	{
 		return this.name;
+	}
+	
+	public String getAddress()
+	{
+		return this.address;
+	}
+
+	public String getEmail()
+	{
+		return this.email;
 	}
 
 	public String getType()
