@@ -85,8 +85,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	/* Map */
 	HealthMapView mapView;
 	List<Overlay> mapOverlays;
-	Drawable drawableLocation, drawableSearchresult;
-	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
+	Drawable drawableLocation, drawableDoctors, drawableHospitals;
+	MapItemizedOverlay itemizedLocationOverlay, itemizedDoctorsOverlay, itemizedHospitalsOverlay;
 
 	protected Location getLocation()
 	{
@@ -158,9 +158,11 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 		this.mapOverlays = this.mapView.getOverlays();
 		this.drawableLocation = this.getResources().getDrawable(R.drawable.pin_red);
-		this.drawableSearchresult = this.getResources().getDrawable(R.drawable.pin_green);
+		this.drawableDoctors = this.getResources().getDrawable(R.drawable.pin_green);
+		this.drawableHospitals = this.getResources().getDrawable(R.drawable.pin_blue);
 		this.itemizedLocationOverlay = new MapItemizedOverlay(this.drawableLocation, this);
-		this.itemizedSearchresultOverlay = new MapItemizedOverlay(this.drawableSearchresult, this);
+		this.itemizedDoctorsOverlay = new MapItemizedOverlay(this.drawableDoctors, this);
+		this.itemizedHospitalsOverlay = new MapItemizedOverlay(this.drawableHospitals, this);
 
 		// Use the LocationManager class to obtain GPS locations
 		this.locMgr = (LocationManager) this.getSystemService(LOCATION_SERVICE);
@@ -212,7 +214,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 					InputMethodManager.HIDE_NOT_ALWAYS);
 			}
 		});
-
 		Logger.info(this.getClass().getName(), "Main Activity created.");
 	}
 
@@ -270,9 +271,11 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		Logger.log("App stopped.");
 
 		itemizedLocationOverlay.clear();
-		itemizedSearchresultOverlay.clear();
+		itemizedDoctorsOverlay.clear();
+		itemizedHospitalsOverlay.clear();
 		mapView.invalidateDrawable(drawableLocation);
-		mapView.invalidateDrawable(drawableSearchresult);
+		mapView.invalidateDrawable(drawableDoctors);
+		mapView.invalidateDrawable(drawableHospitals);
 		mapView.invalidate();
 	}
 
@@ -380,14 +383,14 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		{
 			Geocoder geocoder = new Geocoder(this, getResources().getConfiguration().locale);
 			List<Address> resultsList = null;
-			String error = null;
+			String errorMessage = null;
 			try
 			{
 				resultsList = geocoder.getFromLocationName(where + ", Schweiz", 5);
 			}
 			catch (IOException e)
 			{
-				error = e.getMessage();
+				errorMessage = e.getMessage();
 				e.printStackTrace();
 			}
 
@@ -398,7 +401,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCancelable(true);
 				builder.setTitle(getString(R.string.noresults));
-				builder.setMessage(error);
+				builder.setMessage(String.format(getString(R.string.serverresponse), errorMessage));
 				builder.setIcon(android.R.drawable.ic_dialog_alert);
 				builder.setNeutralButton(android.R.string.ok, new OnClickListener()
 				{
@@ -700,7 +703,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	protected void drawSearchResults(MedicalLocation[] results)
 	{
 		// Remove other points
-		this.itemizedSearchresultOverlay.clear();
+		this.itemizedDoctorsOverlay.clear();
+		this.itemizedHospitalsOverlay.clear();
 
 		// Draw results to map
 		Logger.info(this.getClass().getName() + ": drawSearchResults", "Draw " + results.length + " results to map");
@@ -722,15 +726,26 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 					);
 				String email = point.getEmail();
 				if (email.length() == 0)
+				{
 					email = "(keine Email-Adresse)";
+				}
+	
 				OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType() + "\n" + point.getAddress() + "\n" + email);
-				this.itemizedSearchresultOverlay.addOverlay(matchingOverlayitem);
+				if(TypeResolver.getInstance().getKeyByValue(point.getType()) != getString(R.string.spitaeler))
+				{
+					this.itemizedDoctorsOverlay.addOverlay(matchingOverlayitem);
+				}
+				else
+				{
+					this.itemizedHospitalsOverlay.addOverlay(matchingOverlayitem);
+				}
 			}
 		}
 		// putting this lines outside the loop improved the perfomance drastically
 		// TODO Remove old Geopoints
 		this.mapOverlays.add(this.itemizedLocationOverlay);
-		this.mapOverlays.add(this.itemizedSearchresultOverlay);
+		this.mapOverlays.add(this.itemizedDoctorsOverlay);
+		this.mapOverlays.add(this.itemizedHospitalsOverlay);
 
 		Logger.info("GeoPoint", "Finished drawing");
 		// TODO: Center Map and adjust zoom factor so that all results are displayed.
@@ -786,7 +801,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setCancelable(true);
 		builder.setTitle(getString(R.string.locationservice));
-		builder.setMessage(getString(R.string.ask_user_to_enable_network));
+		builder.setMessage(getString(R.string.ask_user_to_enable_location_sources));
 		builder.setIcon(android.R.drawable.ic_dialog_info);
 		builder.setPositiveButton(R.string.settings,
 			new DialogInterface.OnClickListener()
