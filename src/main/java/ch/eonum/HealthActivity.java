@@ -47,7 +47,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 	/* Other static variables */
 	private static final String[] CITIES = CityResolver.getInstance().getAllCities();
-	private static String[] TYPES;
+	private static String[] CATEGORIES;
 
 	/* Location */
 	/**
@@ -75,7 +75,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * {@link #drawMyLocation(int)} to run.
 	 */
 	public static boolean userRequestedMyLocation = true;
-	private CategoryResolver typeResolver;
+	private CategoryResolver categoryResolver;
 
 	/* Location Listener */
 	/** Constants defining when a location update shall be delivered. */
@@ -164,12 +164,12 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		});
 
 		/** AutoCompleteTextView searchforWhat */
-		typeResolver = CategoryResolver.getInstance();
-		TYPES = typeResolver.getAllCategories();
+		categoryResolver = CategoryResolver.getInstance();
+		CATEGORIES = categoryResolver.getAllCategories();
 
 		AutoCompleteTextView searchforWhat = (AutoCompleteTextView) findViewById(R.id.searchforWhat);
 		ArrayAdapter<String> adapterWhat =
-			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, TYPES);
+			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, CATEGORIES);
 		searchforWhat.setAdapter(adapterWhat);
 
 		/** MapView */
@@ -598,7 +598,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		Logger.info(this.getClass().getName(), "Map rectangle to query: " + lowerLeftLatitude + "/"
 			+ lowerLeftLongitude + "," + upperRightLatitude + "/" + upperRightLongitude);
 
-		category = typeResolver.getKeyByValue(category);
+		category = categoryResolver.getKeyByValue(category);
 
 		HTTPRequest request = new HTTPRequest(lowerLeftLatitude, lowerLeftLongitude,
 			upperRightLatitude, upperRightLongitude, category);
