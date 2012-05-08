@@ -82,11 +82,13 @@ public class HealthMapView extends MapView
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		try {
+		try
+		{
 			super.onTouchEvent(event);
 		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			Logger.error("Error", e.toString());
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			Logger.error("Error", "A kitten's just been killed :( - " + e.toString());
 		}
 		if (event.getAction() == MotionEvent.ACTION_UP && !getMapCenter().equals(this.lastCenterPosition)
 			&& this.mapChangeListener != null)
@@ -101,7 +103,6 @@ public class HealthMapView extends MapView
 	private void performMapChanges()
 	{
 		mapChangeListener.onChange(mapContext, getMapCenter(), lastCenterPosition, getZoomLevel(), lastZoomLevel);
-		// Update map values
 		lastCenterPosition = getMapCenter();
 		lastZoomLevel = getZoomLevel();
 	}

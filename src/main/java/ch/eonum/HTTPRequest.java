@@ -9,46 +9,39 @@ import java.net.URL;
 import org.apache.http.util.ByteArrayBuffer;
 
 import android.app.AlertDialog;
-//import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 
 /**
- * Fetches the raw data from the server
+ * Fetches the raw data from the server.
+ * This is done by a reading the answer from the defined server
+ * to a ByteArrayBuffer, which turns out to be quite swift.
  */
 
 public class HTTPRequest extends AsyncTask<Void, Void, String>
 {
 	URL url;
 	String resultString;
-//	private ProgressDialog dialog;
 	private Throwable errorMessage = null;
-
-	public HTTPRequest(double lat1, double long1, double lat2, double long2)
-	{
-//		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
-		resultString = "";
-
-		try
-		{
-			url = new URL("http://77.95.120.72:8080/finder?lat1=" + lat1 + "&long1=" + long1 + "&lat2=" + lat2 + "&long2=" + long2);
-		}
-		catch (MalformedURLException e)
-		{
-			e.printStackTrace();
-		}
-	}
 
 	public HTTPRequest(double lat1, double long1, double lat2, double long2, String category)
 	{
-
-//		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		resultString = "";
+
+		if (category != null)
+		{
+			category = "&category=" + category;
+		}
+		else
+		{
+			category = "";
+		}
 
 		try
 		{
-			url = new URL("http://77.95.120.72:8080/finder?lat1=" + lat1 + "&long1=" + long1 + "&lat2=" + lat2 + "&long2=" + long2 + "&category=" + category);
+			url = new URL("http://77.95.120.72:8080/finder?lat1=" + lat1 + "&long1=" + long1 + "&lat2=" + lat2
+				+ "&long2=" + long2 + category);
 		}
 		catch (MalformedURLException e)
 		{
@@ -58,8 +51,6 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 
 	public HTTPRequest()
 	{
-
-//		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		resultString = "";
 
 		try
@@ -75,11 +66,6 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	@Override
 	protected void onPreExecute()
 	{
-//		this.dialog.setCancelable(true);
-//		this.dialog.setIndeterminate(true);
-//		this.dialog.setTitle(HealthActivity.mainActivity.getString(R.string.pleasewait));
-//		this.dialog.setMessage(HealthActivity.mainActivity.getString(R.string.sendingrequest));
-//		this.dialog.show();
 		super.onPreExecute();
 	}
 
@@ -123,7 +109,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	@Override
 	protected void onPostExecute(String resString)
 	{
-		if(this.errorMessage != null)
+		if (this.errorMessage != null)
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
 			builder.setTitle(HealthActivity.mainActivity.getString(R.string.neterror));
@@ -152,7 +138,6 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 			alert.show();
 		}
 		Logger.info(this.getClass().getName(), "Size of results from server in onPostExecute: " + resString.length());
-		//this.dialog.dismiss();
 		super.onPostExecute(resString);
 	}
 }

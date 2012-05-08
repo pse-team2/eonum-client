@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 /**
  * Fills the data obtained from the server into arrays
- * as defined in {@link MedicalLocation}
+ * as defined in {@link MedicalLocation}.
  */
 
 public class JSONParser
@@ -35,10 +35,10 @@ public class JSONParser
 				String name = jsonObject.getString("name");
 				String address = jsonObject.getString("address");
 				String email = jsonObject.getString("email");
-				
+
 				String type = jsonObject.getString("types");
 
-				// regex on category
+				// Regular expression (REGEX) on category for removing
 				type = type.replaceAll("\\W", "");
 
 				JSONObject location = jsonObject.getJSONObject("location");
