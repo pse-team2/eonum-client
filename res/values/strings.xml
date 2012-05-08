@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- English (default) -->
-    <string name="app_name">Eonum health</string>
+    <string name="app_name">Arzt- und Spitalsuche</string>
     <string name="where">Where</string>
     <string name="what">What</string>
     <string name="search">Search</string>

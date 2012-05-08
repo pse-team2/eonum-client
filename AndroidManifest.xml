@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.eonum" android:versionCode="1" android:versionName="1.0-SNAPSHOT" >
+    package="ch.eonum" android:versionCode="1" android:versionName="1.1-SNAPSHOT" >
 
     <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="15"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

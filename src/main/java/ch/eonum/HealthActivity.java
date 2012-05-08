@@ -569,7 +569,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		for (int i = 0; i < Math.min(MAX_RESULTS, results.length); i++)
 		{
 			filteredResults[i] = results[i];
-			Logger.info(this.getClass().getName(), "Dist: " + results[i].getDistance());
 		}
 		return filteredResults;
 	}
