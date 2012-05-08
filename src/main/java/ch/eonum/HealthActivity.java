@@ -710,35 +710,28 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		Logger.info(this.getClass().getName() + ": drawSearchResults", "Draw " + results.length + " results to map");
 		Logger.info("GeoPoint", "Start drawing");
 
-		int count = 0;
-
 		for (MedicalLocation point : results)
 		{
-			/* at the moment, 20 results are shown */
-			if (count < 20)
+			Logger.info(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
+				String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
+			GeoPoint matchingResult = new GeoPoint(
+				(int) (point.getLocation()[0] * 1000000),
+				(int) (point.getLocation()[1] * 1000000)
+				);
+			String email = point.getEmail();
+			if (email.length() == 0)
 			{
-				count++;
-				Logger.info(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
-					String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getType()));
-				GeoPoint matchingResult = new GeoPoint(
-					(int) (point.getLocation()[0] * 1000000),
-					(int) (point.getLocation()[1] * 1000000)
-					);
-				String email = point.getEmail();
-				if (email.length() == 0)
-				{
-					email = "(keine Email-Adresse)";
-				}
-	
-				OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType() + "\n" + point.getAddress() + "\n" + email);
-				if(TypeResolver.getInstance().getKeyByValue(point.getType()) != getString(R.string.spitaeler))
-				{
-					this.itemizedDoctorsOverlay.addOverlay(matchingOverlayitem);
-				}
-				else
-				{
-					this.itemizedHospitalsOverlay.addOverlay(matchingOverlayitem);
-				}
+				email = "(keine Email-Adresse)";
+			}
+
+			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType() + "\n" + point.getAddress() + "\n" + email);
+			if(TypeResolver.getInstance().getKeyByValue(point.getType()) != getString(R.string.spitaeler))
+			{
+				this.itemizedDoctorsOverlay.addOverlay(matchingOverlayitem);
+			}
+			else
+			{
+				this.itemizedHospitalsOverlay.addOverlay(matchingOverlayitem);
 			}
 		}
 		// putting this lines outside the loop improved the perfomance drastically
