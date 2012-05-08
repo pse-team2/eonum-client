@@ -143,7 +143,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			}
 		});
 
-		// searchBox = (EditText) findViewById(R.id.clEtAddCourse);
 		searchforWhere.setOnKeyListener(new OnKeyListener()
 		{
 			public boolean onKey(View v, int keyCode, KeyEvent event)
@@ -199,6 +198,13 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				Logger.log("Location button pressed.");
 				userRequestedMyLocation = true;
 				drawMyLocation(16);
+				// empty the where and what fields
+				AutoCompleteTextView searchforWhere = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
+				
+				// TODO If available, set text of "where" text field to actual address
+				searchforWhere.setText("");
+				
+				launchSearchFromCurrentLocation(true);
 			}
 		});
 
