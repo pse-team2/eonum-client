@@ -40,6 +40,7 @@ public class TimerTest
 	@After
 	public void tearDown()
 	{
+		this.t.reset();
 	}
 
 	@Test

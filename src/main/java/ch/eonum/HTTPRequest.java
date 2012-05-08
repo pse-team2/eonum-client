@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.apache.http.util.ByteArrayBuffer;
 
 import android.app.AlertDialog;
-//import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -22,13 +20,14 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 {
 	URL url;
 	String resultString;
+	private boolean internetAvailable = true;
 //	private ProgressDialog dialog;
-	private Throwable errorMessage = null;
 
 	public HTTPRequest(double lat1, double long1, double lat2, double long2)
 	{
 //		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
-		resultString = "";
+		this.resultString = "";
+		this.internetAvailable = true;
 
 		try
 		{
@@ -44,7 +43,8 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	{
 
 //		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
-		resultString = "";
+		this.resultString = "";
+		this.internetAvailable = true;
 
 		try
 		{
@@ -60,7 +60,8 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	{
 
 //		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
-		resultString = "";
+		this.resultString = "";
+		this.internetAvailable = true;
 
 		try
 		{
@@ -112,7 +113,8 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 		}
 		catch (IOException e)
 		{
-			this.errorMessage = e;
+			this.internetAvailable = false;
+			e.printStackTrace();
 		}
 
 		Logger.info(this.getClass().getName(), "Size of HTTP answer: " + resultString.length()
@@ -123,7 +125,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	@Override
 	protected void onPostExecute(String resString)
 	{
-		if(this.errorMessage != null)
+		if(!this.internetAvailable)
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
 			builder.setTitle(HealthActivity.mainActivity.getString(R.string.neterror));

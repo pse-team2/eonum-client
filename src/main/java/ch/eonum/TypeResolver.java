@@ -22,10 +22,15 @@ public class TypeResolver
 	 * The values come from the server and the translations are stored in the strings.xml file.
 	 */
 	private static HashMap<String, String> types = new HashMap<String, String>();
-	private static final TypeResolver instance = new TypeResolver();
+	private static TypeResolver instance = new TypeResolver();
+	private static boolean connectionError = true;
 
 	public static TypeResolver getInstance()
 	{
+		if(connectionError)
+		{
+			instance = new TypeResolver();
+		}
 		return instance;
 	}
 
@@ -59,6 +64,13 @@ public class TypeResolver
 			e.printStackTrace();
 		}
 		Logger.info(this.getClass().getName(), "Size of results in TypeResolver: " + resultString.length());
+
+		if(resultString.length() == 0)
+		{
+			connectionError = true;
+			return;
+		}
+		connectionError = false;
 
 		// Parse results
 		JSONParser parser = new JSONParser();

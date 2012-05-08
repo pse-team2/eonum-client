@@ -74,21 +74,24 @@ public class Logger
 
 	public static void info(String tag, String msg)
 	{
-		if (mode == Mode.DEV) {
+		if (mode == Mode.DEV)
+		{
 			Log.i(tag, msg);
 		}
 	}
 
 	public static void warn(String tag, String msg)
 	{
-		if (mode == Mode.DEV) {
+		if (mode == Mode.DEV)
+		{
 			Log.w(tag, msg);
 		}
 	}
 
 	public static void error(String tag, String msg)
 	{
-		if (mode == Mode.DEV) {
+		if (mode == Mode.DEV)
+		{
 			Log.e(tag, msg);
 		}
 	}

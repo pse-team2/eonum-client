@@ -43,6 +43,7 @@ public class JSONParserTest
 	@After
 	public void tearDown()
 	{
+		this.content = "";
 	}
 
 	@Test
