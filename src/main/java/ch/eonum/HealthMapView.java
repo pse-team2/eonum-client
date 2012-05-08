@@ -82,7 +82,12 @@ public class HealthMapView extends MapView
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		super.onTouchEvent(event);
+		try {
+			super.onTouchEvent(event);
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			Logger.error("Error", e.toString());
+		}
 		if (event.getAction() == MotionEvent.ACTION_UP && !getMapCenter().equals(this.lastCenterPosition)
 			&& this.mapChangeListener != null)
 		{

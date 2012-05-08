@@ -9,7 +9,7 @@ import java.net.URL;
 import org.apache.http.util.ByteArrayBuffer;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+//import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -22,12 +22,12 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 {
 	URL url;
 	String resultString;
-	private ProgressDialog dialog;
+//	private ProgressDialog dialog;
 	private Throwable errorMessage = null;
 
 	public HTTPRequest(double lat1, double long1, double lat2, double long2)
 	{
-		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
+//		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		resultString = "";
 
 		try
@@ -43,7 +43,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	public HTTPRequest(double lat1, double long1, double lat2, double long2, String category)
 	{
 
-		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
+//		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		resultString = "";
 
 		try
@@ -59,7 +59,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	public HTTPRequest()
 	{
 
-		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
+//		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		resultString = "";
 
 		try
@@ -75,11 +75,11 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	@Override
 	protected void onPreExecute()
 	{
-		this.dialog.setCancelable(true);
-		this.dialog.setIndeterminate(true);
-		this.dialog.setTitle(HealthActivity.mainActivity.getString(R.string.pleasewait));
-		this.dialog.setMessage(HealthActivity.mainActivity.getString(R.string.sendingrequest));
-		this.dialog.show();
+//		this.dialog.setCancelable(true);
+//		this.dialog.setIndeterminate(true);
+//		this.dialog.setTitle(HealthActivity.mainActivity.getString(R.string.pleasewait));
+//		this.dialog.setMessage(HealthActivity.mainActivity.getString(R.string.sendingrequest));
+//		this.dialog.show();
 		super.onPreExecute();
 	}
 
@@ -152,7 +152,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 			alert.show();
 		}
 		Logger.info(this.getClass().getName(), "Size of results from server in onPostExecute: " + resString.length());
-		this.dialog.dismiss();
+		//this.dialog.dismiss();
 		super.onPostExecute(resString);
 	}
 }
