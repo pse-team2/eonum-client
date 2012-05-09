@@ -12,35 +12,35 @@ import android.content.res.Resources.NotFoundException;
 import android.os.AsyncTask;
 
 /**
- * Resolves a medical type to a String.
+ * Resolves a medical category to a String.
  */
-public class TypeResolver
+public class CategoryResolver
 {
 	/**
 	 * Stores the values for the different categories as keys and their translations as values.
 	 * As a convention the descriptions are in male plural form.
 	 * The values come from the server and the translations are stored in the strings.xml file.
 	 */
-	private static HashMap<String, String> types = new HashMap<String, String>();
-	private static TypeResolver instance = new TypeResolver();
+	private static HashMap<String, String> categories = new HashMap<String, String>();
+	private static CategoryResolver instance = new CategoryResolver();
 	private static boolean connectionError = true;
 
-	public static TypeResolver getInstance()
+	public static CategoryResolver getInstance()
 	{
 		if(connectionError)
 		{
-			instance = new TypeResolver();
+			instance = new CategoryResolver();
 		}
 		return instance;
 	}
 
 	/**
 	 * Retrieves a list of all categories the server is aware of
-	 * and puts them into {@link #types} along with the appropriate translation.
+	 * and puts them into {@link #categories} along with the appropriate translation.
 	 * If a translation is not listed in the strings.xml file, the identifier from the server is used instead
 	 * and an error message is displayed.
 	 */
-	private TypeResolver()
+	private CategoryResolver()
 	{
 		if (Logger.mode == Mode.TEST)
 		{
@@ -63,7 +63,7 @@ public class TypeResolver
 		{
 			e.printStackTrace();
 		}
-		Logger.info(this.getClass().getName(), "Size of results in TypeResolver: " + resultString.length());
+		Logger.info(this.getClass().getName(), "Size of results in CategoryResolver: " + resultString.length());
 
 		if(resultString.length() == 0)
 		{
@@ -75,7 +75,7 @@ public class TypeResolver
 		// Parse results
 		JSONParser parser = new JSONParser();
 
-		ArrayList<String> typesList = new ArrayList<String>();
+		ArrayList<String> categoryList = new ArrayList<String>();
 		ArrayList<String> error = new ArrayList<String>();
 
 		for (String categoryEntry : parser.deserializeCategories(resultString))
@@ -93,8 +93,8 @@ public class TypeResolver
 				visibleDescription = categoryEntry;
 				error.add(visibleDescription);
 			}
-			TypeResolver.types.put(categoryEntry, visibleDescription);
-			typesList.add(visibleDescription);
+			CategoryResolver.categories.put(categoryEntry, visibleDescription);
+			categoryList.add(visibleDescription);
 		}
 
 		if (!error.isEmpty())
@@ -121,20 +121,20 @@ public class TypeResolver
 
 	public String[] getAllCategories()
 	{
-		String[] typesArray = new String[TypeResolver.types.size()];
-		return TypeResolver.types.values().toArray(typesArray);
+		String[] categoriesArray = new String[CategoryResolver.categories.size()];
+		return CategoryResolver.categories.values().toArray(categoriesArray);
 	}
 
 	/**
 	 * Get the translated string for a category key.
 	 * 
-	 * @param type
+	 * @param category
 	 *            The key for a specific category as delivered by the server at instantiation time.
 	 * @return Corresponding value to be displayed in the application.
 	 */
-	public String resolve(String type)
+	public String resolve(String category)
 	{
-		return TypeResolver.types.get(type);
+		return CategoryResolver.categories.get(category);
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class TypeResolver
 	 */
 	public String getKeyByValue(String value)
 	{
-		for (Entry<String, String> entry : TypeResolver.types.entrySet())
+		for (Entry<String, String> entry : CategoryResolver.categories.entrySet())
 		{
 			if (value.equals(entry.getValue()))
 			{

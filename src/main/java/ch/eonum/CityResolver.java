@@ -3,7 +3,7 @@ package ch.eonum;
 import java.util.HashMap;
 
 /**
- * Resolves a city to geographical coordinates
+ * Resolves a city to geographical coordinates.
  */
 public class CityResolver
 {

@@ -88,7 +88,7 @@ public class HealthMapView extends MapView
 		}
 		catch (ArrayIndexOutOfBoundsException e)
 		{
-			Logger.error("Error in super method", e.toString());
+			Logger.error("Error in super method", "A kitten's just been killed :( - " + e.toString());
 			e.printStackTrace();
 		}
 		if (event.getAction() == MotionEvent.ACTION_UP && !getMapCenter().equals(this.lastCenterPosition)

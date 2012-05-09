@@ -3,22 +3,22 @@ package ch.eonum;
 /**
  * Represents a single address (data set) returned by the server.
  * Can be a medical practice, hospital, doctor office etc.
- * Will provide public methods for name, type and location.
- * Type depends on {@link TypeResolver}, which matches the returned categories to names.
+ * Will provide public methods for name, category and location.
+ * Type depends on {@link CategoryResolver}, which matches the returned categories to names.
  */
 public class MedicalLocation implements Location, Comparable<MedicalLocation>
 {
-	TypeResolver resolver = TypeResolver.getInstance();
+	CategoryResolver resolver = CategoryResolver.getInstance();
 	private String name;
 	private String address;
 	private String email;
-	private String arztTyp;
+	private String category;
 	private double latitude;
 	private double longitude;
 	Double[] location = new Double[2];
 	private double distance;
 
-	public MedicalLocation(String name, String address, String email, String arztTyp, double latitude, double longitude)
+	public MedicalLocation(String name, String address, String email, String category, double latitude, double longitude)
 	{
 		this.name = name;
 		this.address = address;
@@ -27,21 +27,21 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		this.location[0] = latitude;
 		this.longitude = longitude;
 		this.location[1] = longitude;
-		this.arztTyp = resolver.resolve(arztTyp);
-		if (this.arztTyp == null)
+		this.category = resolver.resolve(category);
+		if (this.category == null)
 		{
-			Logger.warn("Arzttyp is Null", "this.name = " + this.name + ", this.arztTyp = " + this.arztTyp);
+			Logger.warn("Category is Null", "this.name = " + this.name + ", this.category = " + this.category);
 		}
 		this.distance = 0;
 	}
-	
+
 	/* GETTERS & SETTERS */
 	@Override
 	public String getName()
 	{
 		return this.name;
 	}
-	
+
 	public String getAddress()
 	{
 		return this.address;
@@ -52,14 +52,14 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		return this.email;
 	}
 
-	public String getType()
+	public String getCategory()
 	{
-		return this.arztTyp;
+		return this.category;
 	}
 
-	public void setType(String typ)
+	public void setType(String category)
 	{
-		this.arztTyp = typ;
+		this.category = category;
 	}
 
 	@Override
@@ -75,8 +75,11 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 
 	/**
 	 * Calculate distance from current map center.
-	 * @param latCenter Latitude of map center.
-	 * @param lngCenter Longitude of map center.
+	 * 
+	 * @param latCenter
+	 *            Latitude of map center.
+	 * @param lngCenter
+	 *            Longitude of map center.
 	 * @return The approximate distance of the location from the current center of the map.
 	 */
 	public double setDistance(double latCenter, double lngCenter)
