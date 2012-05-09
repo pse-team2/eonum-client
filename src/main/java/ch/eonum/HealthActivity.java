@@ -93,28 +93,27 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	Drawable drawableLocation, drawableSearchresult;
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
 
-	
 	/* Menu */
 	public boolean onCreateOptionsMenu(Menu menu)
-    {
-    	getMenuInflater().inflate(R.menu.healthactivity_menu, menu);
-    	return super.onCreateOptionsMenu(menu);
-    }
-	
-	public boolean onOptionsItemSelected(MenuItem item)
-    {
-    	switch (item.getItemId())
-    	{
-    	case R.id.menu_mAbout:
-    		Intent intent = new Intent(HealthActivity.this, About.class);
-    		startActivity(intent);
-    		return true;
+	{
+		getMenuInflater().inflate(R.menu.healthactivity_menu, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
 
-		default:
-			return super.onOptionsItemSelected(item);
-    	}
-    }
-	
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case R.id.menu_mAbout:
+				Intent intent = new Intent(HealthActivity.this, About.class);
+				startActivity(intent);
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
 	protected Location getLocation()
 	{
 		return this.location;
@@ -211,7 +210,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				return false;
 			}
 		});
-		
+
 		/** MapView */
 		this.mapView = (HealthMapView) findViewById(R.id.mapview);
 		this.mapView.setBuiltInZoomControls(true);
@@ -247,7 +246,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				launchSearch(true);
 			}
 		});
-
 
 		/** Button "search" */
 		Button search = (Button) findViewById(R.id.search);
@@ -362,25 +360,23 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	public void onChange(MapView view, GeoPoint newCenter, GeoPoint oldCenter, int newZoom, int oldZoom)
 	{
 		this.currentZoomLevel = newZoom;
-		
+
 		launchSearch(false);
 
 		// Do not display error messages if there were no results returned
 		// because we do not want to disturb the user moving around the map.
 	}
-	
+
 	/**
 	 * Launches a full search: Ask server, draw results, and everything inbetween.
-	 * 
 	 */
-	
+
 	public void launchSearch(boolean usePhysicalLocation)
 	{
 		MedicalLocation[] results = launchSearchFromCurrentLocation(usePhysicalLocation);
 		MedicalLocation[] filteredResults = filterResults(results);
 		drawSearchResults(filteredResults);
 	}
-	
 
 	/**
 	 * Depending of the input, this method launches a search with different arguments for the server.
