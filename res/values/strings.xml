@@ -2,7 +2,7 @@
 <resources>
 
     <!-- English (default) -->
-    <string name="app_name">Arzt- und Spitalsuche</string>
+    <string name="app_name">Arztsuche</string>
     <string name="where">Where</string>
     <string name="what">What</string>
     <string name="search">Search</string>
