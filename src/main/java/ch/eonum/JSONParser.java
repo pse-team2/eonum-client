@@ -21,15 +21,15 @@ public class JSONParser
 			JSONObject jsonObj = new JSONObject(str);
 			JSONArray jsonArray = jsonObj.getJSONArray("results");
 
-			// split up into addresses
-			int MAX_RESULTS = jsonArray.length();
+			// Split up into addresses
+			int NUMBER_OF_RESULTS = jsonArray.length();
 
-			results = new MedicalLocation[MAX_RESULTS];
+			results = new MedicalLocation[NUMBER_OF_RESULTS];
 			double latitude, longitude;
 
 			Logger.info(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
 
-			for (int i = 0; i < MAX_RESULTS; i++)
+			for (int i = 0; i < NUMBER_OF_RESULTS; i++)
 			{
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String name = jsonObject.getString("name");

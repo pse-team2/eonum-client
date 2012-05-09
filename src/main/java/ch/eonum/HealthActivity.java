@@ -506,13 +506,11 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			answer = sendDataToServer(searchAtLatitude, searchAtLongitude);
 		}
 
-		ArrayList<MedicalLocation> results = new ArrayList<MedicalLocation>(Arrays.asList(answer));
-
-		return results.toArray(new MedicalLocation[] {});
+		return answer;
 	}
 
 	/**
-	 * Limits number of results to the amount defined in the MAX_RESULTS constant.
+	 * Limits number of results to the amount defined in the MAX_RESULTS constant and removes duplicates.
 	 * 
 	 * @param results
 	 *            Result list from the server.
@@ -532,15 +530,48 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		Arrays.sort(results);
 
 		// Continue only with the nearest MAX_RESULTS results
-		final int MAX_RESULTS = 50;
+		final int MAX_RESULTS = 20;
 		MedicalLocation[] filteredResults = new MedicalLocation[Math.min(MAX_RESULTS, results.length)];
 
+		double lat = (double) (mapView.getMapCenter().getLatitudeE6()) / 1000000;
+		double lng = (double) (mapView.getMapCenter().getLongitudeE6()) / 1000000;
 		for (int i = 0; i < Math.min(MAX_RESULTS, results.length); i++)
 		{
 			filteredResults[i] = results[i];
+			filteredResults[i].setDistance(lat, lng);
 			Logger.info(this.getClass().getName(), "Dist: " + results[i].getDistance());
 		}
-		return filteredResults;
+
+		Logger.info(this.getClass().getName(), "Merge and remove duplicates");
+
+		ArrayList<MedicalLocation> res = new ArrayList<MedicalLocation>(Arrays.asList(filteredResults));
+
+		int count = res.size();
+		for (int i = 0; i < res.size(); i++)
+		{
+			for (int j = i + 1; j < res.size(); j++)
+			{
+				if (res.get(i).getName().equals(res.get(j).getName())
+					&& res.get(i).getAddress().equals(res.get(j).getAddress())
+					&& !res.get(i).getType().equals(res.get(j).getType()))
+				{
+					Logger.warn(this.getClass().getName(), "Found duplicate:");
+					Logger.warn(this.getClass().getName(), "	"+res.get(i).getName()+", "+res.get(i).getAddress()+", "+res.get(i).getType());
+					Logger.warn(this.getClass().getName(), "	"+res.get(j).getName()+", "+res.get(j).getAddress()+", "+res.get(j).getType());
+
+					res.get(i).setType(res.get(i).getType() + "\n" + res.remove(j).getType());
+					count--;
+				}
+			}
+		}
+
+		if (res.size() != count)
+		{
+			throw new RuntimeException("Merging and removing duplicates failed!");
+		}
+		Logger.info(this.getClass().getName(), "Merging and removing duplicates finished");
+
+		return res.toArray(new MedicalLocation[] {});
 	}
 
 	/**
@@ -721,7 +752,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			String email = point.getEmail();
 			if (email.length() == 0)
 			{
-				email = "(keine Email-Adresse)";
+				email = getString(R.string.no_email);
 			}
 
 			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getType() + "\n" + point.getAddress() + "\n" + email);
@@ -735,7 +766,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			}
 		}
 		// putting this lines outside the loop improved the perfomance drastically
-		// TODO Remove old Geopoints
 		this.mapOverlays.add(this.itemizedLocationOverlay);
 		this.mapOverlays.add(this.itemizedDoctorsOverlay);
 		this.mapOverlays.add(this.itemizedHospitalsOverlay);

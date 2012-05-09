@@ -8,8 +8,11 @@ import java.net.URL;
 import org.apache.http.util.ByteArrayBuffer;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 
 /**
@@ -27,7 +30,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	{
 //		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		this.resultString = "";
-		this.internetAvailable = true;
+		internetAvailable = isOnline();
 
 		try
 		{
@@ -44,7 +47,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 
 //		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		this.resultString = "";
-		this.internetAvailable = true;
+		internetAvailable = isOnline();
 
 		try
 		{
@@ -61,7 +64,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 
 //		this.dialog = new ProgressDialog(HealthActivity.mainActivity);
 		this.resultString = "";
-		this.internetAvailable = true;
+		internetAvailable = isOnline();
 
 		try
 		{
@@ -71,6 +74,14 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public boolean isOnline()
+	{
+		ConnectivityManager cMgr =
+			(ConnectivityManager) HealthActivity.mainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo netInfo = cMgr.getActiveNetworkInfo();
+		return (netInfo != null && netInfo.isConnected());
 	}
 
 	@Override

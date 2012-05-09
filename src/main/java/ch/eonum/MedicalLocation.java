@@ -57,6 +57,11 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		return this.arztTyp;
 	}
 
+	public void setType(String typ)
+	{
+		this.arztTyp = typ;
+	}
+
 	@Override
 	public Double[] getLocation()
 	{
