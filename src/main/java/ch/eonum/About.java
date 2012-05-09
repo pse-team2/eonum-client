@@ -11,16 +11,5 @@ public class About extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.about);
-
-		// Button orderButton = (Button) findViewById(R.id.end);
-		//
-		// orderButton.setOnClickListener(new View.OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View view) {
-		// finish();
-		// }
-		//
-		// });
 	}
 }
