@@ -29,6 +29,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
@@ -91,6 +93,28 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	Drawable drawableLocation, drawableSearchresult;
 	MapItemizedOverlay itemizedLocationOverlay, itemizedSearchresultOverlay;
 
+	
+	/* Menu */
+	public boolean onCreateOptionsMenu(Menu menu)
+    {
+    	getMenuInflater().inflate(R.menu.healthactivity_menu, menu);
+    	return super.onCreateOptionsMenu(menu);
+    }
+	
+	public boolean onOptionsItemSelected(MenuItem item)
+    {
+    	switch (item.getItemId())
+    	{
+    	case R.id.menu_mAbout:
+    		Intent intent = new Intent(HealthActivity.this, About.class);
+    		startActivity(intent);
+    		return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+    	}
+    }
+	
 	protected Location getLocation()
 	{
 		return this.location;
@@ -143,21 +167,19 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			}
 		});
 
+		// if enter is tapped, trigger search and hide keyboard
 		searchforWhere.setOnKeyListener(new OnKeyListener()
 		{
 			public boolean onKey(View v, int keyCode, KeyEvent event)
 			{
-				if (event.getAction() == KeyEvent.ACTION_DOWN)
+				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER)
 				{
-					switch (keyCode)
-					{
-						case KeyEvent.KEYCODE_DPAD_CENTER:
-						case KeyEvent.KEYCODE_ENTER:
-							launchUserDefinedSearch();
-							return true;
-						default:
-							break;
-					}
+					launchSearch(false); // trigger search
+					InputMethodManager inputManager = (InputMethodManager) getApplicationContext()
+						.getSystemService(INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), // hide keyboard
+						InputMethodManager.HIDE_NOT_ALWAYS);
+					return true;
 				}
 				return false;
 			}
@@ -172,6 +194,24 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, CATEGORIES);
 		searchforWhat.setAdapter(adapterWhat);
 
+		// if enter is tapped, trigger search and hide keyboard
+		searchforWhat.setOnKeyListener(new OnKeyListener()
+		{
+			public boolean onKey(View v, int keyCode, KeyEvent event)
+			{
+				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER)
+				{
+					launchSearch(false); // trigger search
+					InputMethodManager inputManager = (InputMethodManager) getApplicationContext()
+						.getSystemService(INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), // hide keyboard
+						InputMethodManager.HIDE_NOT_ALWAYS);
+					return true;
+				}
+				return false;
+			}
+		});
+		
 		/** MapView */
 		this.mapView = (HealthMapView) findViewById(R.id.mapview);
 		this.mapView.setBuiltInZoomControls(true);
@@ -200,13 +240,14 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				drawMyLocation(16);
 				// empty the where and what fields
 				AutoCompleteTextView searchforWhere = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
-				
+
 				// TODO If available, set text of "where" text field to actual address
 				searchforWhere.setText("");
-				
-				launchSearchFromCurrentLocation(true);
+
+				launchSearch(true);
 			}
 		});
+
 
 		/** Button "search" */
 		Button search = (Button) findViewById(R.id.search);
@@ -321,24 +362,25 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	public void onChange(MapView view, GeoPoint newCenter, GeoPoint oldCenter, int newZoom, int oldZoom)
 	{
 		this.currentZoomLevel = newZoom;
-
-		MedicalLocation[] results = launchSearchFromCurrentLocation(false);
-		MedicalLocation[] filteredResults = filterResults(results);
-		drawSearchResults(filteredResults);
+		
+		launchSearch(false);
 
 		// Do not display error messages if there were no results returned
 		// because we do not want to disturb the user moving around the map.
 	}
-
+	
 	/**
-	 * Initial search after launch of the application.
+	 * Launches a full search: Ask server, draw results, and everything inbetween.
+	 * 
 	 */
-	public void launchInitialSearch()
+	
+	public void launchSearch(boolean usePhysicalLocation)
 	{
-		MedicalLocation[] results = launchSearchFromCurrentLocation(true);
+		MedicalLocation[] results = launchSearchFromCurrentLocation(usePhysicalLocation);
 		MedicalLocation[] filteredResults = filterResults(results);
 		drawSearchResults(filteredResults);
 	}
+	
 
 	/**
 	 * Depending of the input, this method launches a search with different arguments for the server.
@@ -349,12 +391,12 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * If user input has to be taken into consideration, {@link #launchUserDefinedSearch(String, String)}
 	 * should be used instead.
 	 * 
-	 * @param equalsPhysicalLocation
+	 * @param usePhysicalLocation
 	 *            Set {@code true} if there should be searched for results near the MyLocation marker
 	 *            or {@code false} if it should be the location where the user has just navigated.
 	 * @return Filtered results.
 	 */
-	protected MedicalLocation[] launchSearchFromCurrentLocation(boolean equalsPhysicalLocation)
+	protected MedicalLocation[] launchSearchFromCurrentLocation(boolean usePhysicalLocation)
 	{
 		MedicalLocation[] answer;
 
@@ -367,7 +409,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		double upperRightLatitude = mapView.getMapCenter().getLatitudeE6() + mapView.getLatitudeSpan() / 2;
 		double upperRightLongitude = mapView.getMapCenter().getLongitudeE6() + mapView.getLongitudeSpan() / 2;
 
-		if (equalsPhysicalLocation
+		if (usePhysicalLocation
 			|| (lowerLeftLatitude == 0 || lowerLeftLongitude == 0 || upperRightLatitude == 0 || upperRightLongitude == 0))
 		{
 			Logger.info(this.getClass().getName() + ": launchUserDefinedSearch",
@@ -569,7 +611,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		Arrays.sort(results);
 
 		// Continue only with the nearest MAX_RESULTS results
-		final int MAX_RESULTS = 50;
+		final int MAX_RESULTS = 20;
 		MedicalLocation[] filteredResults = new MedicalLocation[Math.min(MAX_RESULTS, results.length)];
 
 		for (int i = 0; i < Math.min(MAX_RESULTS, results.length); i++)

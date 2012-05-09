@@ -18,11 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayData" >
-        </activity>
-        <activity android:name=".HTTPRequest" >
-        </activity>
-        <activity android:name=".ShowLocation" >
+        
+        <activity android:name=".About" >
         </activity>
 
         <uses-library android:name="com.google.android.maps" />
