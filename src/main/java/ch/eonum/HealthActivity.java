@@ -56,7 +56,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * Variables indicating the last known physical location of the user.
 	 * The value {@link #location} is provided by an external source to
 	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.
-	 * From there these variables are updated using using the {@link #setLocation(Location)} method.
+	 * From there these variables are updated using the {@link #setLocation(Location)} method.
 	 */
 	private double latitude, longitude;
 
@@ -72,6 +72,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	private LocationManager locMgr;
 	private String locProvider;
 	private LocationListener locLst = new HealthLocationListener();
+
 	/**
 	 * Involved in location updates to help decide if location updates should cause
 	 * {@link #drawMyLocation(int)} to run.
@@ -94,24 +95,23 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	MapItemizedOverlay itemizedLocationOverlay, itemizedDoctorsOverlay, itemizedHospitalsOverlay;
 
 	/* Menu */
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.healthactivity_menu, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		switch (item.getItemId())
+		if (item.getItemId() == R.id.menu_mAbout)
 		{
-			case R.id.menu_mAbout:
-				Intent intent = new Intent(HealthActivity.this, About.class);
-				startActivity(intent);
-				return true;
-
-			default:
-				return super.onOptionsItemSelected(item);
+			Intent intent = new Intent(HealthActivity.this, About.class);
+			startActivity(intent);
+			return true;
 		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	protected Location getLocation()
@@ -166,14 +166,15 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			}
 		});
 
-		// if enter is tapped, trigger search and hide keyboard
+		// If enter is tapped, trigger search and hide keyboard
 		searchforWhere.setOnKeyListener(new OnKeyListener()
 		{
+			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)
 			{
 				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER)
 				{
-					launchSearch(false); // trigger search
+					launchSearch(false); // Trigger search
 					InputMethodManager inputManager = (InputMethodManager) getApplicationContext()
 						.getSystemService(INPUT_METHOD_SERVICE);
 					inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), // hide keyboard
@@ -196,11 +197,12 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// if enter is tapped, trigger search and hide keyboard
 		searchforWhat.setOnKeyListener(new OnKeyListener()
 		{
+			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)
 			{
 				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER)
 				{
-					launchSearch(false); // trigger search
+					launchSearch(false); // Trigger search
 					InputMethodManager inputManager = (InputMethodManager) getApplicationContext()
 						.getSystemService(INPUT_METHOD_SERVICE);
 					inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), // hide keyboard
@@ -239,7 +241,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				Logger.log("Location button pressed.");
 				userRequestedMyLocation = true;
 				drawMyLocation(16);
-				// empty the where and what fields
+				// Clear the where and what fields
 				AutoCompleteTextView searchforWhere = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
 
 				// TODO If available, set text of "where" text field to actual address
@@ -372,6 +374,10 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 	/**
 	 * Launches a full search: Ask server, draw results, and everything inbetween.
+	 * 
+	 * @param usePhysicalLocation
+	 *            Set {@code true} if there should be searched for results near the MyLocation marker
+	 *            or {@code false} if it should be the location where the user has just navigated.
 	 */
 
 	public void launchSearch(boolean usePhysicalLocation)
@@ -383,11 +389,13 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 	/**
 	 * Depending of the input, this method launches a search with different arguments for the server.
+	 * <p>
 	 * A search is launched either with the coordinates where the MyLocation marker is placed
 	 * or with the coordinates where the user has just navigated.
+	 * <p>
 	 * This method assumes that no user input is involved here and as such does no input checking
 	 * and no error handling either.
-	 * If user input has to be taken into consideration, {@link #launchUserDefinedSearch(String, String)}
+	 * If user input has to be taken into consideration, {@link #launchUserDefinedSearch()}
 	 * should be used instead.
 	 * 
 	 * @param usePhysicalLocation
@@ -431,17 +439,14 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	}
 
 	/**
-	 * Reads two strings as input and passes them to the server in order to get results.
-	 * Assumes they are coming from the two TextViews {@code searchforWhere} and {@code searchforWhat} and no
-	 * other values should be taken into consideration.
+	 * Parses the two TextViews {@code searchforWhere} and {@code searchforWhat} and passes them to the server in order to get results.
+	 * <p>
+	 * Assumes that no other values should be taken into consideration.
 	 * If this is not the case, {@link #launchSearchFromCurrentLocation(boolean)} might be more suitable.
+	 * <p>
 	 * Handles user interaction in case of an error.
 	 * If an error occurred, the method quits with a {@code null} value.
 	 * 
-	 * @param where
-	 *            Parsed input from TextView {@code searchforWhere}.
-	 * @param what
-	 *            Parsed input from TextView {@code searchforWhat}
 	 * @return Filtered results or {@code null} indicating an error.
 	 */
 	protected MedicalLocation[] launchUserDefinedSearch()
@@ -671,10 +676,10 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		Logger.info(this.getClass().getName(), "Map rectangle to query: " + lowerLeftLatitude + "/"
 			+ lowerLeftLongitude + "," + upperRightLatitude + "/" + upperRightLongitude);
 
-		category = categoryResolver.getKeyByValue(category);
+		String typeKey = categoryResolver.getKeyByValue(category);
 
 		HTTPRequest request = new HTTPRequest(lowerLeftLatitude, lowerLeftLongitude,
-			upperRightLatitude, upperRightLongitude, category);
+			upperRightLatitude, upperRightLongitude, typeKey);
 
 		// Send query to server
 		String resultString = "";
@@ -700,10 +705,10 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	}
 
 	/**
-	 * Draws the actual location
+	 * Draws the current physical location.
 	 * 
 	 * @param zoomLevel
-	 *            Google API zoom level, ranging from 1 (far away) to 16 (near)
+	 *            Google API zoom level, ranging from 1 (far away) to 16 (near).
 	 */
 	protected void drawMyLocation(int zoomLevel)
 	{
@@ -758,7 +763,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * Draws received MedicalLocations as GeoPoints onto the map.
 	 * 
 	 * @param results
-	 *            MedicalLocations to draw
+	 *            MedicalLocations to draw.
 	 */
 	protected void drawSearchResults(MedicalLocation[] results)
 	{
@@ -794,7 +799,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				this.itemizedHospitalsOverlay.addOverlay(matchingOverlayitem);
 			}
 		}
-		// putting this lines outside the loop improved the perfomance drastically
+		// Putting this lines outside the loop improved the performance drastically
 		this.mapOverlays.add(this.itemizedLocationOverlay);
 		this.mapOverlays.add(this.itemizedDoctorsOverlay);
 		this.mapOverlays.add(this.itemizedHospitalsOverlay);
@@ -802,7 +807,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		Logger.info("GeoPoint", "Finished drawing");
 	}
 
-	/** This criteria will settle for less accuracy, high power, and cost */
+	/** This criteria will settle for less accuracy, high power, and cost. */
 	private static Criteria createCoarseCriteria()
 	{
 		Criteria c = new Criteria();
@@ -815,7 +820,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		return c;
 	}
 
-	/** This criteria needs high accuracy, high power, and cost */
+	/** This criteria needs high accuracy, high power, and cost. */
 	private static Criteria createFineCriteria()
 	{
 		Criteria c = new Criteria();
@@ -830,10 +835,12 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 	/**
 	 * Perform network check and alert user if nothing works.
-	 * Make use of {@link #isLocationSensingAvailable()} to test for available location update providers.
-	 * If one was found, everything is fine. Updates are requested and the method returns.
+	 * <p>
+	 * Make use of {@link #isLocationSensingAvailable()} to test for available location update providers. If
+	 * one was found, everything is fine. Updates are requested and the method returns.
+	 * <p>
 	 * If this is not the case, the user is informed and assisted to fix the problem by displaying the network
-	 * and location configuration activity
+	 * and location configuration activity.
 	 */
 	private void locationUpdateOrNetworkFail()
 	{
@@ -876,11 +883,12 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 	/**
 	 * Location provider search
+	 * <p>
 	 * Searches for available location providers and chooses one based on {@link createCoarseCriteria} and
-	 * {@link createFineCriteria}
+	 * {@link createFineCriteria}.
 	 * 
 	 * @return {@code True} if at least one provider was found, {@code False} if no reliable provider for
-	 *         location updates is available
+	 *         location updates is available.
 	 */
 	private boolean isLocationSensingAvailable()
 	{
