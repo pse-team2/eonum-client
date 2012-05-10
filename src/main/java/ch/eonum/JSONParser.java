@@ -5,8 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Fills the data obtained from the server into arrays
- * as defined in {@link MedicalLocation}.
+ * Fills the data obtained from the server into arrays as defined in {@link MedicalLocation}.
  */
 
 public class JSONParser
@@ -38,7 +37,7 @@ public class JSONParser
 
 				String type = jsonObject.getString("types");
 
-				// Regular expression (REGEX) on category for removing
+				// Regular expression (RegEx) on category for removing.
 				type = type.replaceAll("\\W", "");
 
 				JSONObject location = jsonObject.getJSONObject("location");

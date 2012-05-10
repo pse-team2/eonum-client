@@ -114,6 +114,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		return super.onOptionsItemSelected(item);
 	}
 
+	/* Location */
 	protected Location getLocation()
 	{
 		return this.location;
@@ -126,6 +127,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		this.longitude = location.getLongitude();
 	}
 
+	/* Map */
 	protected MapView getMapView()
 	{
 		return this.mapView;
@@ -177,7 +179,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 					launchSearch(false); // Trigger search
 					InputMethodManager inputManager = (InputMethodManager) getApplicationContext()
 						.getSystemService(INPUT_METHOD_SERVICE);
-					inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), // hide keyboard
+					// Hide keyboard
+					inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
 						InputMethodManager.HIDE_NOT_ALWAYS);
 					return true;
 				}
@@ -194,7 +197,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, CATEGORIES);
 		searchforWhat.setAdapter(adapterWhat);
 
-		// if enter is tapped, trigger search and hide keyboard
+		// If enter is tapped, trigger search and hide keyboard
 		searchforWhat.setOnKeyListener(new OnKeyListener()
 		{
 			@Override
@@ -205,7 +208,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 					launchSearch(false); // Trigger search
 					InputMethodManager inputManager = (InputMethodManager) getApplicationContext()
 						.getSystemService(INPUT_METHOD_SERVICE);
-					inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), // hide keyboard
+					// Hide keyboard
+					inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
 						InputMethodManager.HIDE_NOT_ALWAYS);
 					return true;
 				}
@@ -228,7 +232,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		this.itemizedDoctorsOverlay = new MapItemizedOverlay(this.drawableDoctors, this);
 		this.itemizedHospitalsOverlay = new MapItemizedOverlay(this.drawableHospitals, this);
 
-		// Use the LocationManager class to obtain GPS locations
+		// Use the LocationManager class to obtain location updates
 		this.locMgr = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
 		/** ImageButton "getposition" */
@@ -244,8 +248,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				// Clear the where and what fields
 				AutoCompleteTextView searchforWhere = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
 
-				// TODO If available, set text of "where" text field to actual address
-				searchforWhere.setText("");
+				searchforWhere.setText(getAddressFromCurrentLocation());
 
 				launchSearch(true);
 			}
@@ -704,30 +707,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		return parser.deserializeLocations(resultString);
 	}
 
-	/**
-	 * Draws the current physical location.
-	 * 
-	 * @param zoomLevel
-	 *            Google API zoom level, ranging from 1 (far away) to 16 (near).
-	 */
-	protected void drawMyLocation(int zoomLevel)
+	public String getAddressFromCurrentLocation()
 	{
-		// Avoid NullPointerException in case location is not yet available
-		if (this.location == null)
-		{
-			return;
-		}
-
-		this.latitude = this.location.getLatitude();
-		this.longitude = this.location.getLongitude();
-		// String Text = getString(R.string.location) + ": " + this.latitude + " : " + this.longitude;
-		// Toast.makeText(this, Text, Toast.LENGTH_SHORT).show();
-		Logger.info(this.getClass().getName() + ": drawMyLocation", this.latitude + " : " + this.longitude);
-
-		// Remove other points
-		this.itemizedLocationOverlay.clear();
-
-		// Get address from current location
 		Address myLocationAddress;
 		try
 		{
@@ -746,10 +727,36 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			myAddressDescription += myLocationAddress.getAddressLine(i)
 				+ (i + 1 <= myLocationAddress.getMaxAddressLineIndex() ? "\n" : "");
 		}
+		return myAddressDescription;
+	}
+
+	/**
+	 * Draws the current physical location.
+	 * 
+	 * @param zoomLevel
+	 *            Google API zoom level, ranging from 1 (far away) to 16 (near).
+	 */
+	protected void drawMyLocation(int zoomLevel)
+	{
+		// Avoid NullPointerException in case location is not yet available
+		if (this.location == null)
+		{
+			return;
+		}
+
+		this.latitude = this.location.getLatitude();
+		this.longitude = this.location.getLongitude();
+		Logger.info(this.getClass().getName() + ": drawMyLocation", this.latitude + " : " + this.longitude);
+
+		// Remove other points
+		this.itemizedLocationOverlay.clear();
+
+		// Get address from current location
+		String address = getAddressFromCurrentLocation();
 
 		// Draw current location
 		GeoPoint initGeoPoint = new GeoPoint((int) (this.latitude * 1000000), (int) (this.longitude * 1000000));
-		OverlayItem overlayitem = new OverlayItem(initGeoPoint, getString(R.string.myposition), myAddressDescription);
+		OverlayItem overlayitem = new OverlayItem(initGeoPoint, getString(R.string.myposition), address);
 		this.itemizedLocationOverlay.addOverlay(overlayitem);
 		this.mapOverlays.add(this.itemizedLocationOverlay);
 

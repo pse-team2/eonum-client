@@ -128,13 +128,13 @@ public class CategoryResolver
 	/**
 	 * Get the translated string for a category key.
 	 * 
-	 * @param category
+	 * @param key
 	 *            The key for a specific category as delivered by the server at instantiation time.
 	 * @return Corresponding value to be displayed in the application.
 	 */
-	public String resolve(String category)
+	public String resolve(String key)
 	{
-		return CategoryResolver.categories.get(category);
+		return CategoryResolver.categories.get(key);
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class CategoryResolver
 	 * 
 	 * @param value
 	 *            Description as displayed in the application.
-	 * @return Corresponding value as delivered by the server at instantiation time.
+	 * @return Corresponding key as delivered by the server at instantiation time.
 	 */
 	public String getKeyByValue(String value)
 	{

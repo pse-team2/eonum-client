@@ -85,12 +85,12 @@ public class HealthLocationListener implements LocationListener
 	}
 
 	/**
-	 * Determines whether one Location reading is better than the current Location fix
+	 * Determines whether one Location reading is better than the current Location fix.
 	 * 
 	 * @param location
-	 *            The new Location that you want to evaluate
+	 *            The new Location that you want to evaluate.
 	 * @param currentBestLocation
-	 *            The current Location fix, to which you want to compare the new one
+	 *            The current Location fix, to which you want to compare the new one.
 	 * @return If the new location turns out to be more accurate, the method returns {@code true},
 	 *         otherwise {@code false} is returned.
 	 */
