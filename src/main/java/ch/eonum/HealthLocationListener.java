@@ -30,7 +30,7 @@ public class HealthLocationListener implements LocationListener
 		// If it seems the first location update, launch an initial search
 		if (currentLocation == null)
 		{
-			((HealthActivity) HealthActivity.mainActivity).launchInitialSearch();
+			((HealthActivity) HealthActivity.mainActivity).launchSearch(true);
 		}
 	}
 

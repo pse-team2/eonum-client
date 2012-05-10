@@ -1,29 +1,77 @@
-#Some notes
+# Arztsuche für Android
 
+## Introduction
+*Arztsuche für Android* is an Android application originally developed in the course PSE (Praktikum Software engineering) at the university of Berne. The following readme should guide through the basic concepts on how the app works and how to get started with it.
 
-##Deployment with Maven
-**Prerequirements: Maven 3.0.3+ installed.**
+## Documentation
+*Make sure to be aware of the [structure of an Android Project](http://sudarmuthu.com/blog/the-structure-of-an-android-project)*
 
-You need to have adndroid sdk and the needed android maven artifacts in your local repository (as they are not in maven central).
+### HealthActivity ###
+*Make sure to know the basics of the [Activity lifecycle](http://developer.android.com/guide/topics/fundamentals/activities.html)*
 
-For this get the tool from https://github.com/mosabua/maven-android-sdk-deployer and do something like
-export ANDROID_HOME=/path/to/android-sdk-linux/
-mvn clean install -P 2.3.3
+This is the main Activity with the map and all important controls. It is the first (and beside **About**, the only) Activity in the application an therefore manages the map and its movement, button behaviour and background processes like the gathering of the exact actual position.
 
+There are quite some variables and handlers at the beginning. This is because of the Android-style management of buttons and even TextEdit input fields: Inputs from the virtual keyboard or button interaction must be caught using handlers or listeners (e.g. *OnKeyListener*), which are bound to the controls and which behaviour we have to define.
+
+Some important methods in this class are:
+
+*   onStart, onResume are called if the app starts or, in the latter case, if it is resumed.
+*   onPause, onStop are called if the app is hidden (screen lock or the user pressed the home button) or if it is closed (user pressed back button)
+*   sendDataToServer: Takes coordinate points and category as arguments and delegates the query to **HTTPQuery**.
+*   drawSearchResults: Draws the results recieved from the server to the map.
+
+### HTTPRequest, JSONParser ###
+**HTTPRequest** is used to handle connections to the server. All queries are built and executed here.
+
+**JSONParser** parses the answer which we got from HTTPRequest and returns an array of **MedicalLocations**.
+
+### City, MedicalLocation ###
+Basic entities, which are used to represent the data during runtime.
+
+### MapItemizedOverlay, HealtMapView ###
+**MapItemizedOverlay** Represents a entity in an Overlay to be drawn onto the map ('Geopoint'). In *onTap*, we display a small dialog containing the most important information about the selected item.
+
+Everything concerning the map directly is handled in **HealtMapView**, like zooming, touching or displacement.
+
+### CityResolver, CategoryResolver ###
+Resolvers for converting input to formatted output. The **CityResolver** resolves some predefined cities to coordinates, the **CategoryResolver** gets a list with all categories from the server on startup, and resolves a category like *haematologen* to "Hämatologen".
+
+### Mode ###
+Mode is a simple representation of the states of the application. It is used only once in **Logger**, a static class with the purpose of logging all necessary information, and can be set to either TEST, PROD or DEV, which changes the logging and connection behaviour.
+
+### Tests ###
+All functional tests are located in /src/test. They can't cover the full spectrum of the Android application, this would require a separate test project.
+
+## Development
+
+For developing, you might need the following stuff:
+
+*   Eclipse Development Platform
+*   [Android SDK](http://developer.android.com/sdk/index.html)
+*   [Maven 3.0.3+](http://maven.apache.org/)
+*   [m2e Maven to Eclipse Plugin](http://rgladwell.github.com/m2e-android/)
+*   [Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer/wiki)
+
+### Maven Android SDK Deployer ###
+For integrating your Android project into Maven like we've done it on this project, you'll need to get the [Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer/wiki), and build it with the following command:
+
+	export ANDROID_HOME=/path/to/android-sdk-linux/
+	mvn clean install -P 2.3.3
 
 *More on the maven-android-plugin [here] (http://code.google.com/p/maven-android-plugin/wiki/GettingStarted). For Ubuntu users, you may consider this [installation guide] (http://yarovoy.com/post/14363197336/maven-how-to-install-maven-3-on-ubuntu-11-10)*
 
-Make sure a Android device (Android 2.3+) is running!
+### Development with Eclipse ###
+For developing with eclipse, you'll need Eclipse to recognize and work with Maven.
+With the [m2e Maven to Eclipse plugin](http://rgladwell.github.com/m2e-android/), you'll have full support for this and other Android projects.
+
+### Deployment on a test device (or emulator) ###
+First, make sure an Android device (Android 2.3+) is running.
 For building & deploying the application (on Linux) execute the following:
 
-     mvn3 clean install android:deploy -Dandroid.sdk.path=...
+     mvn clean install android:deploy -Dandroid.sdk.path=...
 
 where ... is the path of your android sdk folder, (typically named "android-sdk-linux"). Another option is to add ANDROID_HOME to your path.
 
 The app is then built (first time make take a while) and deployed.
-Contrary to Eclipse it is *not* started, so you'll have to open it manually on your real or virtual device.
+Contrary to Eclipse it is *not* started by default, so you'll have to open it manually on your real or virtual device.
 
-
-##Development with Eclipse
-
-See <http://rgladwell.github.com/m2e-android/> for instructions on how to use the project with eclipse.
