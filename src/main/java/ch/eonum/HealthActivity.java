@@ -720,6 +720,11 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			Address unknownAddress = new Address(getResources().getConfiguration().locale);
 			myLocationAddress = unknownAddress;
 		}
+		catch (IndexOutOfBoundsException e)
+		{
+			Address unknownAddress = new Address(getResources().getConfiguration().locale);
+			myLocationAddress = unknownAddress;
+		}
 
 		String myAddressDescription = "";
 		for (int i = 0; i <= myLocationAddress.getMaxAddressLineIndex(); i++)
