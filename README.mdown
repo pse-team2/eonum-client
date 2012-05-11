@@ -64,6 +64,14 @@ For integrating your Android project into Maven like we've done it on this proje
 For developing with eclipse, you'll need Eclipse to recognize and work with Maven.
 With the [m2e Maven to Eclipse plugin](http://rgladwell.github.com/m2e-android/), you'll have full support for this and other Android projects.
 
+When cloning the Repo, you'll have to "eclipsify" the project: 
+
+	mvn eclipse:eclipse -Dandroid.sdk.path=...
+
+Then you can import it into your eclipse workspace using Import Maven Project > Existing project.
+
+*Do not* import it as "Existing project into workspace" as suggested by eclipse, it will result in Eclipse recognizing it as a pure Java application.
+
 ### Deployment on a test device (or emulator) ###
 First, make sure an Android device (Android 2.3+) is running.
 For building & deploying the application (on Linux) execute the following:
