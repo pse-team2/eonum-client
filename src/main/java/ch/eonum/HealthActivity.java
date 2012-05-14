@@ -49,6 +49,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 	/* Other static variables */
 	private static final String[] CITIES = CityResolver.getInstance().getAllCities();
+
+	private static final int RESULTS_LIMIT = 20;
 	private static String[] CATEGORIES;
 
 	/* Location */
@@ -275,8 +277,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				{
 					if (results.length != 0)
 					{
-						MedicalLocation[] filteredResults = filterResults(results);
-						drawSearchResults(filteredResults);
+						MedicalLocation[] sortedResults = sortResultsByDistance(results);
+						drawSearchResults(sortedResults);
 					}
 					// There is no need to display an error message in case of an empty result list
 					// as the search method already does this.
@@ -386,8 +388,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	public void launchSearch(boolean usePhysicalLocation)
 	{
 		MedicalLocation[] results = launchSearchFromCurrentLocation(usePhysicalLocation);
-		MedicalLocation[] filteredResults = filterResults(results);
-		drawSearchResults(filteredResults);
+		MedicalLocation[] sortedResults = sortResultsByDistance(results);
+		drawSearchResults(sortedResults);
 	}
 
 	/**
@@ -434,8 +436,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			upperRightLongitude /= 1000000;
 
 			Logger.info(this.getClass().getName() + ": launchUserDefinedSearch", "Querying for map rectangle.");
-			answer = sendDataToServer(lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude,
-				what);
+			answer = sendDataToServer(lowerLeftLatitude, lowerLeftLongitude,
+				upperRightLatitude, upperRightLongitude, what);
 		}
 
 		return answer;
@@ -566,6 +568,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		if (what.length() != 0)
 		{
 			String whatValue = CategoryResolver.getInstance().getKeyByValue(what);
+			// User entered an unknown category description
 			if (whatValue == null)
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -589,6 +592,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		}
 		else
 		{
+			// User left category empty
 			answer = sendDataToServer(searchAtLatitude, searchAtLongitude, "");
 		}
 
@@ -596,13 +600,13 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	}
 
 	/**
-	 * Limits number of results to the amount defined in the MAX_RESULTS constant and removes duplicates.
+	 * Sorts the results by their distance.
 	 * 
 	 * @param results
 	 *            Result list from the server.
-	 * @return Result list shortened to the given amount.
+	 * @return Result list sorted in ascending order by their distance.
 	 */
-	private MedicalLocation[] filterResults(MedicalLocation[] results)
+	private MedicalLocation[] sortResultsByDistance(MedicalLocation[] results)
 	{
 		// Calculate distance of all result points from the current displayed position.
 		for (MedicalLocation res : results)
@@ -615,6 +619,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// Sort the list, the higher the index, the longer the distance.
 		Arrays.sort(results);
 
+		/*
 		// Continue only with the nearest MAX_RESULTS results
 		final int MAX_RESULTS = 20;
 		MedicalLocation[] filteredResults = new MedicalLocation[Math.min(MAX_RESULTS, results.length)];
@@ -658,6 +663,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		Logger.info(this.getClass().getName(), "Merging and removing duplicates finished");
 
 		return res.toArray(new MedicalLocation[] {});
+		*/
+
+		return results;
 	}
 
 	/**
@@ -682,7 +690,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		String typeKey = categoryResolver.getKeyByValue(category);
 
 		HTTPRequest request = new HTTPRequest(lowerLeftLatitude, lowerLeftLongitude,
-			upperRightLatitude, upperRightLongitude, typeKey);
+			upperRightLatitude, upperRightLongitude, typeKey, RESULTS_LIMIT);
 
 		// Send query to server
 		String resultString = "";
@@ -717,13 +725,11 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		}
 		catch (IOException e)
 		{
-			Address unknownAddress = new Address(getResources().getConfiguration().locale);
-			myLocationAddress = unknownAddress;
+			return "";
 		}
 		catch (IndexOutOfBoundsException e)
 		{
-			Address unknownAddress = new Address(getResources().getConfiguration().locale);
-			myLocationAddress = unknownAddress;
+			return "";
 		}
 
 		String myAddressDescription = "";

@@ -27,24 +27,25 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	String resultString;
 	private boolean internetAvailable = true;
 
-	public HTTPRequest(double lat1, double long1, double lat2, double long2, String category)
+	public HTTPRequest(double lat1, double long1, double lat2, double long2, String category, int count)
 	{
 		this.resultString = "";
 		internetAvailable = isOnline();
+		String urlCategory;
 
 		if (category != null)
 		{
-			category = "&category=" + category;
+			urlCategory = "&category=" + category;
 		}
 		else
 		{
-			category = "";
+			urlCategory = "";
 		}
 
 		try
 		{
 			url = new URL("http://77.95.120.72:8080/finder?lat1=" + lat1 + "&long1=" + long1 + "&lat2=" + lat2
-				+ "&long2=" + long2 + category);
+				+ "&long2=" + long2 + urlCategory + "&count=" + count);
 		}
 		catch (MalformedURLException e)
 		{
@@ -52,6 +53,10 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 		}
 	}
 
+	/**
+	 * This constructor provides {@link CategoryResolver#CategoryResolver} with all available categories in
+	 * the database.
+	 */
 	public HTTPRequest()
 	{
 		this.resultString = "";
