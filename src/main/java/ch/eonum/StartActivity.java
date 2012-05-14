@@ -8,7 +8,6 @@ import android.os.Bundle;
  * Startup Activity which calls the HealthActivity.
  * This class serves testing purposes and could present
  * a startup screen in a later stage.
- *
  */
 public class StartActivity extends Activity
 {

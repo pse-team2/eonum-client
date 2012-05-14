@@ -160,7 +160,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
 				String cityString = String.valueOf(((AutoCompleteTextView) findViewById(R.id.searchforWhere)).getText());
-				City city = CityResolver.getInstance().getCoordinates(cityString);
+				City city = CityResolver.getInstance().getCity(cityString);
 				GeoPoint cityPoint = new GeoPoint(
 					(int) (city.getLocation()[0] * 1000000),
 					(int) (city.getLocation()[1] * 1000000));
@@ -247,9 +247,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				Logger.log("Location button pressed.");
 				userRequestedMyLocation = true;
 				drawMyLocation(16);
-				// Clear the where and what fields
+				// Clear the where field
 				AutoCompleteTextView searchforWhere = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
-
+				// If possible, write current location address to what field
 				searchforWhere.setText(getAddressFromCurrentLocation());
 
 				launchSearch(true);
@@ -378,7 +378,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	}
 
 	/**
-	 * Launches a full search: Ask server, draw results, and everything inbetween.
+	 * Performs a complete search process: Ask server, sort results and draw results.
 	 * 
 	 * @param usePhysicalLocation
 	 *            Set {@code true} if there should be searched for results near the MyLocation marker
@@ -715,6 +715,12 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		return parser.deserializeLocations(resultString);
 	}
 
+	/**
+	 * Transforms the current location coordinates into an address.
+	 * 
+	 * @return Address of the current physical location or an empty String if the search failed.
+	 * @see Geocoder
+	 */
 	public String getAddressFromCurrentLocation()
 	{
 		Address myLocationAddress;

@@ -56,7 +56,7 @@ public class CityResolverTest
 		assertNull(this.cityResolver);
 		this.cityResolver = CityResolver.getInstance();
 
-		City city = this.cityResolver.getCoordinates("Bern");
+		City city = this.cityResolver.getCity("Bern");
 		assertEquals("Bern", city.getName());
 		Double[] testValue = city.getLocation();
 		assertNotNull(testValue);

@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class Timer
 {
-	long _startTime;
+	private long _startTime;
 
 	/**
 	 * Creates a new Timer instance or resets an existing one.
@@ -22,7 +22,7 @@ public class Timer
 	 */
 	public void reset()
 	{
-		_startTime = this.timeNow();
+		this._startTime = this.timeNow();
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class Timer
 	 */
 	public long timeElapsed()
 	{
-		return this.timeNow() - _startTime;
+		return this.timeNow() - this._startTime;
 	}
 
 	/**

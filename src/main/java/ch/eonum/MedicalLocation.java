@@ -75,6 +75,7 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 
 	/**
 	 * Calculate distance from current map center.
+	 * Used to prefer results with a shorter distance from the current physical location.
 	 * 
 	 * @param latCenter
 	 *            Latitude of map center.
@@ -84,8 +85,8 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 	 */
 	public double setDistance(double latCenter, double lngCenter)
 	{
-		double deltaLat = Math.abs(latCenter - latitude);
-		double deltaLng = Math.abs(lngCenter - longitude);
+		double deltaLat = Math.abs(latCenter - this.latitude);
+		double deltaLng = Math.abs(lngCenter - this.longitude);
 
 		this.distance = Math.sqrt(Math.pow(deltaLat, 2) + Math.pow(deltaLng, 2));
 		return this.distance;

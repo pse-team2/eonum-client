@@ -4,12 +4,19 @@ import java.util.HashMap;
 
 /**
  * Resolves a city to geographical coordinates.
+ * Provides the names and hard coded coordinates of the 120 largest Swiss cities.
  */
 public class CityResolver
 {
-	public static final HashMap<String, City> cities = new HashMap<String, City>();
+	private static final HashMap<String, City> cities = new HashMap<String, City>();
 	private static final CityResolver instance = new CityResolver();
 
+	/**
+	 * Built as a Singleton, the list does not have to be created more than once.
+	 * 
+	 * @return An already existing instance if there has been created one before.
+	 *         Otherwise a new instance is created and returned.
+	 */
 	public static CityResolver getInstance()
 	{
 		return instance;
@@ -139,7 +146,7 @@ public class CityResolver
 		cities.put("Zürich", new City("Zürich", 47.36667, 8.55));
 	}
 
-	public City getCoordinates(String type)
+	public City getCity(String type)
 	{
 		return cities.get(type);
 	}

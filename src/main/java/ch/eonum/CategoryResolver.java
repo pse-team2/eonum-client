@@ -12,7 +12,7 @@ import android.content.res.Resources.NotFoundException;
 import android.os.AsyncTask;
 
 /**
- * Resolves a medical category to a String.
+ * Resolves a medical category to a String and the other way around.
  */
 public class CategoryResolver
 {
@@ -25,6 +25,12 @@ public class CategoryResolver
 	private static CategoryResolver instance = new CategoryResolver();
 	private static boolean connectionError = true;
 
+	/**
+	 * Built as a Singleton to avoid retrieving the category keys every time all over again.
+	 * 
+	 * @return A new instance of CategoryResolver or an already existing one depending of the prior
+	 *         availability of an Internet connection.
+	 */
 	public static CategoryResolver getInstance()
 	{
 		if(connectionError)
@@ -119,6 +125,11 @@ public class CategoryResolver
 		}
 	}
 
+	/**
+	 * Used after instantiation time, this method returns all translation Strings of the available categories.
+	 * 
+	 * @return All category description Strings.
+	 */
 	public String[] getAllCategories()
 	{
 		String[] categoriesArray = new String[CategoryResolver.categories.size()];
@@ -130,7 +141,7 @@ public class CategoryResolver
 	 * 
 	 * @param key
 	 *            The key for a specific category as delivered by the server at instantiation time.
-	 * @return Corresponding value to be displayed in the application.
+	 * @return Corresponding value how it will be displayed in the application.
 	 */
 	public String resolve(String key)
 	{

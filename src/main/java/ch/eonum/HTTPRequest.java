@@ -17,7 +17,7 @@ import android.os.AsyncTask;
 
 /**
  * Fetches the raw data from the server.
- * This is done by a reading the answer from the defined server
+ * This is done by reading the answer from the defined server
  * to a ByteArrayBuffer, which turns out to be quite swift.
  */
 
@@ -27,6 +27,24 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	String resultString;
 	private boolean internetAvailable = true;
 
+	/**
+	 * Prepares a regular search with certain delimiters.
+	 * 
+	 * @param lat1
+	 *            Latitude of the lower left corner of the visible map.
+	 * @param long1
+	 *            Longitude of the lower left corner of the visible map.
+	 * @param lat2
+	 *            Latitude of the upper right corner of the visible map.
+	 * @param long2
+	 *            Longitude of the upper right corner of the visible map.
+	 * @param category
+	 *            Display only results which match the given category. Valid Strings are keys from
+	 *            {@link CategoryResolver} as sent by the server at instantiation time.
+	 * @param count
+	 *            Limit the number of results that should be delivered from the server.
+	 * @see CategoryResolver#getKeyByValue(String)
+	 */
 	public HTTPRequest(double lat1, double long1, double lat2, double long2, String category, int count)
 	{
 		this.resultString = "";
