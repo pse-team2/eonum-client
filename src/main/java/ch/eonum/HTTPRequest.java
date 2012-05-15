@@ -49,8 +49,8 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 	{
 		this.resultString = "";
 		internetAvailable = isOnline();
-		String urlCategory;
 
+		String urlCategory;
 		if (category != null)
 		{
 			urlCategory = "&category=" + category;
@@ -60,10 +60,20 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 			urlCategory = "";
 		}
 
+		String urlCount;
+		if (count >= 0)
+		{
+			urlCount = "&count=" + count;
+		}
+		else
+		{
+			urlCount = "";
+		}
+
 		try
 		{
 			url = new URL("http://77.95.120.72:8080/finder?lat1=" + lat1 + "&long1=" + long1 + "&lat2=" + lat2
-				+ "&long2=" + long2 + urlCategory + "&count=" + count);
+				+ "&long2=" + long2 + urlCategory + urlCount);
 		}
 		catch (MalformedURLException e)
 		{
