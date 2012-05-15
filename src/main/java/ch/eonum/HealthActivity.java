@@ -55,15 +55,16 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	/* Location */
 	/**
 	 * Variables indicating the last known physical location of the user.
+	 * <p>
 	 * The value {@link #location} is provided by an external source to
-	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.
+	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.<br>
 	 * From there these variables are updated using the {@link #setLocation(Location)} method.
 	 */
 	private double latitude, longitude;
 
 	/**
 	 * Variable that is provided from an external source to
-	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.
+	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.<br>
 	 * From there the method {@link #setLocation(Location)} is used to update
 	 * the variables {@link #latitude} and {@link #longitude} which are dependent from this value.
 	 */
@@ -362,6 +363,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 
 	/**
 	 * This method is triggered every time the user moves onwards on the map.
+	 * <p>
 	 * It calculates the new location and visible map rectangle.
 	 * After this it launches a new search from the targeted location.
 	 */
@@ -383,7 +385,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 *            Set {@code true} if there should be searched for results near the MyLocation marker
 	 *            or {@code false} if it should be the location where the user has just navigated.
 	 */
-
 	public void launchSearch(boolean usePhysicalLocation)
 	{
 		MedicalLocation[] results = launchSearchFromCurrentLocation(usePhysicalLocation);
@@ -397,8 +398,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * A search is launched either with the coordinates where the MyLocation marker is placed
 	 * or with the coordinates where the user has just navigated.
 	 * <p>
-	 * This method assumes that no user input is involved here and as such does no input checking
-	 * and no error handling either.
+	 * This method assumes that no user input is involved here
+	 * and as such does no input checking and no error handling either.<br>
 	 * If user input has to be taken into consideration, {@link #launchUserDefinedSearch()}
 	 * should be used instead.
 	 * 
@@ -445,7 +446,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	/**
 	 * Parses the two TextViews {@code searchforWhere} and {@code searchforWhat} and passes them to the server in order to get results.
 	 * <p>
-	 * Assumes that no other values should be taken into consideration.
+	 * Assumes that no other values should be taken into consideration.<br>
 	 * If this is not the case, {@link #launchSearchFromCurrentLocation(boolean)} might be more suitable.
 	 * <p>
 	 * Handles user interaction in case of an error.
@@ -488,7 +489,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCancelable(true);
 				builder.setTitle(getString(R.string.noresults));
-				builder.setMessage(String.format(getString(R.string.serverresponse), errorMessage));
+				builder.setMessage(getString(R.string.serverresponse, errorMessage));
 				builder.setIcon(android.R.drawable.ic_dialog_alert);
 				builder.setNeutralButton(android.R.string.ok, new OnClickListener()
 				{
@@ -513,7 +514,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 						+ resultsList.get(i).getAddressLine(1);
 				}
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(String.format(getString(R.string.ambiguousresults), resultsList.size()));
+				builder.setTitle(getString(R.string.ambiguousresults, resultsList.size()));
 				builder.setItems(ambiguousList, new DialogInterface.OnClickListener()
 				{
 					@Override
@@ -571,7 +572,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			if (whatValue == null)
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(String.format(getString(R.string.no_valid_category), what));
+				builder.setTitle(getString(R.string.no_valid_category, what));
 				builder.setMessage(R.string.choose_category_from_list);
 				builder.setIcon(android.R.drawable.ic_dialog_info);
 				builder.setNeutralButton(android.R.string.cancel, new OnClickListener()
@@ -766,8 +767,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				email = getString(R.string.no_email);
 			}
 
-			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getCategories() + "\n" + point.getAddress() + "\n" + email);
-			if(CategoryResolver.getInstance().getKeyByValue(point.getCategories()) != getString(R.string.spitaeler))
+			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getCategories()
+				+ "\n" + point.getAddress() + "\n" + email);
+			if (CategoryResolver.getInstance().getKeyByValue(point.getCategories()) != getString(R.string.spitaeler))
 			{
 				this.itemizedDoctorsOverlay.addOverlay(matchingOverlayitem);
 			}
@@ -814,8 +816,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 * Perform network check and alert user if nothing works.
 	 * <p>
 	 * Make use of {@link #isLocationSensingAvailable()} to test for available location update providers. If
-	 * one was found, everything is fine. Updates are requested and the method returns.
-	 * <p>
+	 * one was found, everything is fine. Updates are requested and the method returns.<br>
 	 * If this is not the case, the user is informed and assisted to fix the problem by displaying the network
 	 * and location configuration activity.
 	 */
@@ -828,11 +829,9 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			return;
 		}
 
-		Toast.makeText(this, getString(R.string.fail_no_provider), Toast.LENGTH_LONG).show();
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setCancelable(true);
-		builder.setTitle(getString(R.string.locationservice));
+		builder.setTitle(getString(R.string.fail_no_provider));
 		builder.setMessage(getString(R.string.ask_user_to_enable_location_sources));
 		builder.setIcon(android.R.drawable.ic_dialog_info);
 		builder.setPositiveButton(R.string.settings,

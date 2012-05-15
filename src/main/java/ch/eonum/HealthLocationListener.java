@@ -38,16 +38,16 @@ public class HealthLocationListener implements LocationListener
 	public void onProviderDisabled(String provider)
 	{
 		Toast.makeText(HealthActivity.mainActivity,
-			HealthActivity.mainActivity.getString(R.string.gpsdisabled),
-			Toast.LENGTH_SHORT).show();
+			HealthActivity.mainActivity.getString(R.string.provider_disabled, provider),
+			Toast.LENGTH_LONG).show();
 	}
 
 	@Override
 	public void onProviderEnabled(String provider)
 	{
 		Toast.makeText(HealthActivity.mainActivity,
-			HealthActivity.mainActivity.getString(R.string.gpsenabled),
-			Toast.LENGTH_SHORT).show();
+			HealthActivity.mainActivity.getString(R.string.provider_enabled, provider),
+			Toast.LENGTH_LONG).show();
 	}
 
 	@Override
@@ -60,21 +60,21 @@ public class HealthLocationListener implements LocationListener
 			{
 				Toast.makeText(HealthActivity.mainActivity,
 					HealthActivity.mainActivity.getString(R.string.provider_status_out_of_service, provider),
-					Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_LONG).show();
 				break;
 			}
 			case LocationProvider.TEMPORARILY_UNAVAILABLE:
 			{
 				Toast.makeText(HealthActivity.mainActivity,
 					HealthActivity.mainActivity.getString(R.string.provider_status_temp_univailable, provider),
-					Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_LONG).show();
 				break;
 			}
 			case LocationProvider.AVAILABLE:
 			{
 				Toast.makeText(HealthActivity.mainActivity,
 					HealthActivity.mainActivity.getString(R.string.provider_status_available, provider),
-					Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_LONG).show();
 				break;
 			}
 			default:

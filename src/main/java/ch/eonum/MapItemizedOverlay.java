@@ -46,8 +46,8 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 	@Override
 	protected boolean onTap(int index)
 	{
-		// TODO For calling telephone and email intents, we'll 
-		// have to switch to Popup (android.widget.PopupMenu)
+		// TODO For calling telephone and email intents, we'll have to switch to Popup
+		// (android.widget.PopupMenu)
 		OverlayItem item = this.mOverlays.get(index);
 		Logger.log("Pressed on Geopoint " + item.getTitle() + ".");
 

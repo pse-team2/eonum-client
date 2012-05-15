@@ -33,7 +33,7 @@ public class CategoryResolver
 	 */
 	public static synchronized CategoryResolver getInstance()
 	{
-		if(connectionError)
+		if (connectionError)
 		{
 			instance = new CategoryResolver();
 		}
@@ -71,7 +71,7 @@ public class CategoryResolver
 		}
 		Logger.info(this.getClass().getName(), "Size of results in CategoryResolver: " + resultString.length());
 
-		if(resultString.length() == 0)
+		if (resultString.length() == 0)
 		{
 			connectionError = true;
 			return;
@@ -109,8 +109,8 @@ public class CategoryResolver
 			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
 			builder.setCancelable(false);
 			builder.setTitle(HealthActivity.mainActivity.getString(R.string.missing_translations));
-			builder.setMessage(String.format(
-				HealthActivity.mainActivity.getString(R.string.missing_translations_list), error.toString()));
+			builder.setMessage(HealthActivity.mainActivity.getString(R.string.missing_translations_list,
+				error.toString()));
 			builder.setIcon(android.R.drawable.ic_dialog_alert);
 			builder.setNeutralButton(android.R.string.ok, new OnClickListener()
 			{

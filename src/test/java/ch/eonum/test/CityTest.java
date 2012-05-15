@@ -44,7 +44,7 @@ public class CityTest
 	public final void testCity()
 	{
 		City Bern = new City("Bern", 46.123, 7.501);
-		
+
 		assertNotNull(Bern);
 		assertEquals("Bern", Bern.getName());
 		assertTrue(46.123 == Bern.getLocation()[0]);

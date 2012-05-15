@@ -47,7 +47,7 @@ public class JSONParserTest
 		String content = "{ \"status\": \"OK\",\"results\": [ { \"name\": \"Hans Muster\","
 			+ "\"address\": \"Bahnhofstrasse, 3000 Bern\", \"email\": \"\", "
 			+ "\"types\": [ \"allgemeinaerzte\" ], \"location\": { \"lat\": 46.12345, \"lng\": 7.54321 } } ] } ";
-		
+
 		JSONParser parser = new JSONParser();
 		MedicalLocation[] locations = parser.deserializeLocations(content);
 
@@ -59,14 +59,14 @@ public class JSONParserTest
 		assertEquals("Bahnhofstrasse, 3000 Bern", testLocation.getAddress());
 		assertEquals("", testLocation.getEmail());
 	}
-	
+
 	@Test
 	public final void testDeserializeErnstHasli()
 	{
 		String content = "{ \"status\": \"OK\",\"results\": [ { \"name\": \"Ernst Hasli\","
 			+ "\"address\": \"Kleines Gässli 5, 1234 Beispielsdorf\", \"email\": \"ernst_58@hotmail.com\", "
 			+ "\"types\": [ \"allergologen\" ], \"location\": { \"lat\": 45.1, \"lng\": 7.61 } } ] } ";
-		
+
 		JSONParser parser = new JSONParser();
 		MedicalLocation[] locations = parser.deserializeLocations(content);
 
