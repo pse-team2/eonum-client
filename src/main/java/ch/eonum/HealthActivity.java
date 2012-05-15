@@ -1,7 +1,6 @@
 package ch.eonum;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -619,52 +618,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		// Sort the list, the higher the index, the longer the distance.
 		Arrays.sort(results);
 
-		/*
-		// Continue only with the nearest MAX_RESULTS results
-		final int MAX_RESULTS = 20;
-		MedicalLocation[] filteredResults = new MedicalLocation[Math.min(MAX_RESULTS, results.length)];
-
-		double lat = (double) (mapView.getMapCenter().getLatitudeE6()) / 1000000;
-		double lng = (double) (mapView.getMapCenter().getLongitudeE6()) / 1000000;
-		for (int i = 0; i < Math.min(MAX_RESULTS, results.length); i++)
-		{
-			filteredResults[i] = results[i];
-			filteredResults[i].setDistance(lat, lng);
-			Logger.info(this.getClass().getName(), "Dist: " + results[i].getDistance());
-		}
-
-		Logger.info(this.getClass().getName(), "Merge and remove duplicates");
-
-		ArrayList<MedicalLocation> res = new ArrayList<MedicalLocation>(Arrays.asList(filteredResults));
-
-		int count = res.size();
-		for (int i = 0; i < res.size(); i++)
-		{
-			for (int j = i + 1; j < res.size(); j++)
-			{
-				if (res.get(i).getName().equals(res.get(j).getName())
-					&& res.get(i).getAddress().equals(res.get(j).getAddress())
-					&& !res.get(i).getCategory().equals(res.get(j).getCategory()))
-				{
-					Logger.warn(this.getClass().getName(), "Found duplicate:");
-					Logger.warn(this.getClass().getName(), "	"+res.get(i).getName()+", "+res.get(i).getAddress()+", "+res.get(i).getCategory());
-					Logger.warn(this.getClass().getName(), "	"+res.get(j).getName()+", "+res.get(j).getAddress()+", "+res.get(j).getCategory());
-
-					res.get(i).setType(res.get(i).getCategory() + "\n" + res.remove(j).getCategory());
-					count--;
-				}
-			}
-		}
-
-		if (res.size() != count)
-		{
-			throw new RuntimeException("Merging and removing duplicates failed!");
-		}
-		Logger.info(this.getClass().getName(), "Merging and removing duplicates finished");
-
-		return res.toArray(new MedicalLocation[] {});
-		*/
-
 		return results;
 	}
 
@@ -742,7 +695,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		for (int i = 0; i <= myLocationAddress.getMaxAddressLineIndex(); i++)
 		{
 			myAddressDescription += myLocationAddress.getAddressLine(i)
-				+ (i + 1 <= myLocationAddress.getMaxAddressLineIndex() ? "\n" : "");
+				+ (i + 1 < myLocationAddress.getMaxAddressLineIndex() ? "\n" : "");
 		}
 		return myAddressDescription;
 	}
@@ -802,7 +755,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		for (MedicalLocation point : results)
 		{
 			Logger.info(String.format("GeoPoint is at %f : %f", point.getLocation()[0], point.getLocation()[1]),
-				String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getCategory()));
+				String.format("Draw GeoPoint \"%s (%s)\"", point.getName(), point.getCategories()));
 			GeoPoint matchingResult = new GeoPoint(
 				(int) (point.getLocation()[0] * 1000000),
 				(int) (point.getLocation()[1] * 1000000)
@@ -813,8 +766,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				email = getString(R.string.no_email);
 			}
 
-			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getCategory() + "\n" + point.getAddress() + "\n" + email);
-			if(CategoryResolver.getInstance().getKeyByValue(point.getCategory()) != getString(R.string.spitaeler))
+			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getCategories() + "\n" + point.getAddress() + "\n" + email);
+			if(CategoryResolver.getInstance().getKeyByValue(point.getCategories()) != getString(R.string.spitaeler))
 			{
 				this.itemizedDoctorsOverlay.addOverlay(matchingOverlayitem);
 			}

@@ -22,16 +22,16 @@ public class CategoryResolver
 	 * The values come from the server and the translations are stored in the strings.xml file.
 	 */
 	private static HashMap<String, String> categories = new HashMap<String, String>();
-	private static CategoryResolver instance = new CategoryResolver();
+	private static CategoryResolver instance;
 	private static boolean connectionError = true;
 
 	/**
-	 * Built as a Singleton to avoid retrieving the category keys every time all over again.
+	 * Built as a Singleton to avoid retrieving the category keys all over again.
 	 * 
 	 * @return A new instance of CategoryResolver or an already existing one depending of the prior
 	 *         availability of an Internet connection.
 	 */
-	public static CategoryResolver getInstance()
+	public static synchronized CategoryResolver getInstance()
 	{
 		if(connectionError)
 		{

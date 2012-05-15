@@ -35,16 +35,20 @@ public class JSONParser
 				String address = jsonObject.getString("address");
 				String email = jsonObject.getString("email");
 
-				String type = jsonObject.getString("types");
-
-				// Regular expression (RegEx) on category for removing.
-				type = type.replaceAll("\\W", "");
+				JSONArray jsonTypes = jsonObject.getJSONArray("types");
+				String[] types = new String[jsonTypes.length()];
+				for (int j = 0; j < jsonTypes.length(); j++)
+				{
+					String category = jsonTypes.getString(j);
+					// Remove all non-word characters
+					types[j] = category.replaceAll("\\W", "");
+				}
 
 				JSONObject location = jsonObject.getJSONObject("location");
 				latitude = location.getDouble("lat");
 				longitude = location.getDouble("lng");
 
-				results[i] = new MedicalLocation(name, address, email, type, latitude, longitude);
+				results[i] = new MedicalLocation(name, address, email, types, latitude, longitude);
 			}
 		}
 		catch (JSONException e)
