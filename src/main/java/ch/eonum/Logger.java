@@ -10,7 +10,7 @@ import android.util.Log;
 
 /**
  * This class represents a Logger with two main responsibilities:
- * 1. Print Logs to the screen (Log.i)
+ * 1. Print Logs to the screen (using android.util.Log)
  * 2. Save logs (i.e. for usability testing) to SD card of the device.
  * By using one global Mode "mode", we can assure that the tests will run correctly.
  * If the "TEST" or "PROD" mode is set, the Logger does nothing.

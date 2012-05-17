@@ -26,7 +26,7 @@ public class Timer
 	}
 
 	/**
-	 * Returns the time elapsed. Does not reset the timer.
+	 * Returns the time elapsed but does not reset the timer.
 	 * 
 	 * @return Elapsed time in milliseconds.
 	 */

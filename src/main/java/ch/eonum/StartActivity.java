@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 /**
- * Startup Activity which calls the HealthActivity.
- * This class serves testing purposes and could present
+ * Startup Activity which starts HealthActivity and then exits itself.
+ * This class serves for testing purposes and could present
  * a startup screen in a later stage.
  */
 public class StartActivity extends Activity

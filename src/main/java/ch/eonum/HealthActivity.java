@@ -39,7 +39,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 public class HealthActivity extends MapActivity implements HealthMapView.OnChangeListener
 {
@@ -117,7 +116,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	}
 
 	/* Location */
-	protected Location getLocation()
+	public Location getLocation()
 	{
 		return this.location;
 	}
@@ -249,7 +248,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				drawMyLocation(16);
 				// Clear the where field
 				AutoCompleteTextView searchforWhere = (AutoCompleteTextView) findViewById(R.id.searchforWhere);
-				// If possible, write current location address to what field
+				// If possible, write current location address to where field
 				searchforWhere.setText(getAddressFromCurrentLocation());
 
 				launchSearch(true);
@@ -280,7 +279,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 						MedicalLocation[] sortedResults = sortResultsByDistance(results);
 						drawSearchResults(sortedResults);
 					}
-					// There is no need to display an error message in case of an empty result list
+					// There is no need to display an error message here in case of an empty result list
 					// as the search method already does this.
 				}
 				// getApplicationContext().getSystemService(LOCATION_SERVICE);
@@ -696,7 +695,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 		for (int i = 0; i <= myLocationAddress.getMaxAddressLineIndex(); i++)
 		{
 			myAddressDescription += myLocationAddress.getAddressLine(i)
-				+ (i + 1 < myLocationAddress.getMaxAddressLineIndex() ? "\n" : "");
+				+ (i + 1 <= myLocationAddress.getMaxAddressLineIndex() ? "\n" : "");
 		}
 		return myAddressDescription;
 	}

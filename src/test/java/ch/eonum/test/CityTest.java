@@ -2,9 +2,7 @@ package ch.eonum.test;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -28,16 +26,6 @@ public class CityTest
 	public static void tearDownAfterClass()
 	{
 		Logger.mode = previousMode;
-	}
-
-	@Before
-	public void setUp()
-	{
-	}
-
-	@After
-	public void tearDown()
-	{
 	}
 
 	@Test
