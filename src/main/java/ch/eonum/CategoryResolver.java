@@ -12,7 +12,7 @@ import android.content.res.Resources.NotFoundException;
 import android.os.AsyncTask;
 
 /**
- * Resolves a medical category to a String and the other way around.
+ * Resolves a medical category to a String and vice versa.
  */
 public class CategoryResolver
 {
