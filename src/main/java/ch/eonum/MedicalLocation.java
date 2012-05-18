@@ -28,6 +28,7 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		this.longitude = longitude;
 		this.location[1] = longitude;
 		this.categories = new String[types.length];
+		
 		for (int i = 0; i < types.length; i++)
 		{
 			this.categories[i] = resolver.resolve(types[i]);
@@ -66,7 +67,7 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		String categoryList = "";
 		for (int i = 0; i < this.categories.length; i++)
 		{
-			categoryList += this.categories[i] + (i + 1 < this.categories.length ? "\n" : "");
+			categoryList += this.categories[i] + (i + 1 < this.categories.length ? ", " : "");
 		}
 		return categoryList;
 	}

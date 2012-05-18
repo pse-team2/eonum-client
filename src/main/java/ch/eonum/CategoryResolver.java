@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
-//import android.app.AlertDialog;
-//import android.content.DialogInterface;
-//import android.content.DialogInterface.OnClickListener;
 import android.content.res.Resources.NotFoundException;
 import android.os.AsyncTask;
 
@@ -105,7 +102,7 @@ public class CategoryResolver
 
 		if (!error.isEmpty())
 		{
-			Logger.error(this.getClass().getName(), "Some categories couldn't be resolved: "+error.toString());
+			Logger.error(this.getClass().getName(), "Some categories couldn't be resolved: " + error.toString());
 		}
 	}
 
