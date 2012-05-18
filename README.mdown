@@ -14,7 +14,7 @@ Documentation
 
 This is the main part of the application. This activity contains the map and all important controls. It is the first (and beside **About**, the only) activity in the application that is presented to the user at start time. It manages the display of the map, its reaction to movement and tapping, handles button clicks and background processes like the gathering of the exact physical position.
 
-There are quite some variables and handlers listed at the beginning. This is because of the Android-style management of buttons and even TextEdit input fields: Inputs from the virtual keyboard or button interaction must be caught using handlers or listeners (i.e. *OnKeyListener*), which are bound to the controls and which behaviour we have to define.
+There are quite some variables and handlers listed at the beginning. This is because of the Android-style management of buttons and even TextEdit input fields: Inputs from the virtual keyboard or button interaction must be caught using handlers or listeners (e.g. *OnKeyListener*), which are bound to the controls and which behaviour we have to define.
 
 Some of the most important methods in this class are:
 
