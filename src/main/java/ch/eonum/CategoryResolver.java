@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+//import android.app.AlertDialog;
+//import android.content.DialogInterface;
+//import android.content.DialogInterface.OnClickListener;
 import android.content.res.Resources.NotFoundException;
 import android.os.AsyncTask;
 
@@ -103,26 +103,26 @@ public class CategoryResolver
 			categoryList.add(visibleDescription);
 		}
 
-		if (!error.isEmpty())
-		{
-			Logger.warn("Resource not found", error.toString());
-			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
-			builder.setCancelable(false);
-			builder.setTitle(HealthActivity.mainActivity.getString(R.string.missing_translations));
-			builder.setMessage(HealthActivity.mainActivity.getString(R.string.missing_translations_list,
-				error.toString()));
-			builder.setIcon(android.R.drawable.ic_dialog_alert);
-			builder.setNeutralButton(android.R.string.ok, new OnClickListener()
-			{
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					dialog.dismiss();
-				}
-			});
-			AlertDialog alert = builder.create();
-			alert.show();
-		}
+//		if (!error.isEmpty())
+//		{
+//			Logger.warn("Resource not found", error.toString());
+//			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
+//			builder.setCancelable(false);
+//			builder.setTitle(HealthActivity.mainActivity.getString(R.string.missing_translations));
+//			builder.setMessage(HealthActivity.mainActivity.getString(R.string.missing_translations_list,
+//				error.toString()));
+//			builder.setIcon(android.R.drawable.ic_dialog_alert);
+//			builder.setNeutralButton(android.R.string.ok, new OnClickListener()
+//			{
+//				@Override
+//				public void onClick(DialogInterface dialog, int which)
+//				{
+//					dialog.dismiss();
+//				}
+//			});
+//			AlertDialog alert = builder.create();
+//			alert.show();
+//		}
 	}
 
 	/**
