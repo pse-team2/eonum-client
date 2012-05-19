@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- English (default) -->
+    <!-- Deutsch (Standardsprache) -->
     <string name="app_name">Arztsuche</string>
     <string name="where">Wo</string>
     <string name="what">Was</string>
