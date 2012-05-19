@@ -677,21 +677,24 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	 */
 	public String getAddressFromCurrentLocation()
 	{
+		List<Address> myLocationAddressList;
 		Address myLocationAddress;
 		try
 		{
 			Geocoder geocoder = new Geocoder(this);
-			myLocationAddress = geocoder.getFromLocation(this.latitude, this.longitude, 1).get(0);
+			myLocationAddressList = geocoder.getFromLocation(this.latitude, this.longitude, 1);
 		}
 		catch (IOException e)
 		{
 			return "";
 		}
-		catch (IndexOutOfBoundsException e)
+
+		if (myLocationAddressList == null || myLocationAddressList.isEmpty())
 		{
 			return "";
 		}
 
+		myLocationAddress = myLocationAddressList.get(0);
 		String myAddressDescription = "";
 		for (int i = 0; i <= myLocationAddress.getMaxAddressLineIndex(); i++)
 		{
