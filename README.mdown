@@ -3,7 +3,7 @@ Arztsuche für Android
 
 Introduction
 ------------
-*Arztsuche für Android* is an Android application originally developed in the course PSE (Praktikum Software Engineering) at the University of Berne in spring 2012. The following Readme should guide you through the basic concepts on how the application is designed, how it works and how to get started with it.
+*Arztsuche für Android* is an Android application originally developed in the course PSE (German: Praktikum Software Engineering) at the University of Berne in spring 2012. The following Readme should guide you through the basic concepts on how the application is designed, how it works and how to get started with it.
 
 Documentation
 -------------
@@ -12,14 +12,14 @@ Documentation
 ### HealthActivity
 *Make sure to know the basics of the [Activity lifecycle](http://developer.android.com/guide/topics/fundamentals/activities.html)*
 
-This is the main part of the application. This activity contains the map and all important controls. It is the activity that is presented to the user at start time. It manages the display of the map, its reaction to movement and tapping and handles button clicks and background processes like the gathering of the exact physical position.
+This is the main part of the application. This activity contains the map and all important controls. It is the activity that is presented to the user at start time. It manages the display of the map, its reaction to movement and tapping as well as button clicks and background processes like the gathering of the exact physical position.
 
-There is a range of variables and handlers listed at the beginning. This is because of the Android-style management of buttons and even TextEdit input fields: Inputs from the virtual keyboard or button interaction must be caught using handlers or listeners (e.g. *OnKeyListener*), which are bound to the controls and which behaviour we have to define.
+There is a range of variables and handlers listed at the beginning. This is because of the Android-style management of buttons and even TextEdit input fields: Inputs from the virtual keyboard or button interaction must be caught using handlers or listeners (i.e. *OnKeyListener*), which are bound to the controls and which behaviour we have to define.
 
 Some of the most important methods in this class are:
 
-*   `onStart()`, `onResume()`: They are called if the app starts or, in the latter case, if it is resumed.
-*   `onPause()`, `onStop()`: Called if the app is hidden (screen lock or the user pressed the home button) or if it is closed (user pressed back button).
+*   `onStart()`, `onResume()`: They are called if the application starts or, in the latter case, if it is resumed.
+*   `onPause()`, `onStop()`: Called if the application is hidden (screen lock or the user pressed the home button) or if it is closed (user pressed back button).
 *   `sendDataToServer()`: Takes coordinate points, a category String and a number (to limit the number of results) as arguments and delegates the query to **HTTPRequest**.
 *   `drawSearchResults()`: Draws the results received from the server to the map.
 
@@ -36,7 +36,7 @@ Results are not directly drawn to the map. They are drawn to separate **Overlays
 
 In *onTap()* a small dialog is displayed, containing the most important information about the selected item.
 
-Everything which concerns the map directly is handled in **HealthMapView**, like zooming, touching or relocation. For the ease of use it defines an anonymous inner interface `OnChangeListener`, that is implemented by the main class **HealthActivity**.
+Everything that concerns the map directly is handled in **HealthMapView**, like zooming, touching or relocation. For the ease of use it defines an anonymous inner interface `OnChangeListener`, that is implemented by the main class **HealthActivity**.
 
 ### CityResolver, CategoryResolver
 They "translate" values to associated data. For some predefined cities **CityResolver** provides the coordinates, **CategoryResolver** gets a list with all available categories from the server at startup time and translates a category key like "haematologen" to an user readable value like "Hämatologen".
@@ -45,8 +45,8 @@ They "translate" values to associated data. For some predefined cities **CityRes
 **Mode** is a simple representation of the states the application can run with:
 
 *   **DEV** stands for development, which enables debugging output and logging.
-*   **PROD** means production and sets all parameters to productive.
-*   **TEST** represents the test mode in which certain data connectivity is disabled and JUnit tests are save to be run.
+*   **PROD** means production and omits debug messages.
+*   **TEST** is used to disable certain data connectivity in order to allow some JUnit tests run safely.
 
 **Mode** is used only once in **Logger**, a static class with the purpose of logging all necessary information. It can be set to either TEST, PROD or DEV, which changes the logging and connection behaviour.
 
@@ -56,11 +56,11 @@ All functional tests are located in /src/test. A separate project is set up in t
 Development
 -----------
 
-For developing, you might need the following:
+For developing, you might need at least the following programs or any higher version of it:
 
-*   [Eclipse Development Platform 3.7.1+](http://eclipse.org/downloads/)
+*   [Eclipse Development Platform 3.7.1](http://eclipse.org/downloads/)
 *   [Android SDK](http://developer.android.com/sdk/index.html) and the ADT (Android Development Tools) Plugin
-*   [Maven 3.0.3+](http://maven.apache.org/)
+*   [Maven 3.0.3](http://maven.apache.org/)
 *   [m2e Maven to Eclipse Plugin](http://rgladwell.github.com/m2e-android/)
 *   [Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer/wiki)
 
@@ -109,5 +109,5 @@ This allows you to omit the path in future commands:
 
     mvn clean install android:deploy
 
-The app is then built (first time might take a while) and deployed.
+The application is then built (first time might take a while) and deployed.
 Contrary to Eclipse it is *not* started by default, so you will have to open it manually on your real or virtual device.
