@@ -33,7 +33,7 @@ public class JSONParserTest
 	public final void testDeserializeHansMuster()
 	{
 		String content = "{ \"status\": \"OK\",\"results\": [ { \"name\": \"Hans Muster\","
-			+ "\"address\": \"Bahnhofstrasse, 3000 Bern\", \"email\": \"\", "
+			+ "\"address\": \"Bahnhofstrasse, 3000 Bern\", \"email\": \"\", \"tel\": \"\","
 			+ "\"types\": [ \"allgemeinaerzte\" ], \"location\": { \"lat\": 46.12345, \"lng\": 7.54321 } } ] } ";
 
 		JSONParser parser = new JSONParser();
@@ -52,7 +52,7 @@ public class JSONParserTest
 	public final void testDeserializeErnstHasli()
 	{
 		String content = "{ \"status\": \"OK\",\"results\": [ { \"name\": \"Ernst Hasli\","
-			+ "\"address\": \"Kleines Gässli 5, 1234 Beispielsdorf\", \"email\": \"ernst_58@hotmail.com\", "
+			+ "\"address\": \"Kleines Gässli 5, 1234 Beispielsdorf\", \"email\": \"ernst_58@hotmail.com\",  \"tel\": \"\","
 			+ "\"types\": [ \"allergologen\" ], \"location\": { \"lat\": 45.1, \"lng\": 7.61 } } ] } ";
 
 		JSONParser parser = new JSONParser();
