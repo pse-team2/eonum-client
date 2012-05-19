@@ -54,7 +54,7 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 		OverlayItem item = this.mOverlays.get(index);
 		Logger.log("Touched Geopoint " + item.getTitle() + ".");
 
-		if (item.getTitle().equals("Meine Position"))
+		if (item.getTitle().equals(HealthActivity.mainActivity.getString(R.string.myposition)))
 		{
 			showMyPositionDialog(item);
 		}
@@ -74,21 +74,22 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 		builder.setTitle(item.getTitle());
 		builder.setItems(items, new DialogInterface.OnClickListener()
 		{
-			// on click, trigger the appropriate intent
+			// On click, trigger the appropriate intent
+			@Override
 			public void onClick(DialogInterface dialog, int item)
 			{
-				if (item == 0) // category
+				if (item == 0) // Category
 				{
-					// do nothing (at the moment)
+					// TODO: Do nothing (at the moment)
 				}
-				else if (item == 1) // address
+				else if (item == 1) // Address
 				{
 					String address = items[item].replace(",", "+");
 					String uri = "geo:" + 0 + "," + 0 + "?q=" + address;
 					System.out.println("address to be given: " + address);
 					mContext.startActivity(new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri)));
 				}
-				else if (item == 2) // email
+				else if (item == 2) // Email
 				{
 					if (!items[item].equals(mContext.getString(R.string.no_email)))
 					{
@@ -105,8 +106,8 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 						toast.show();
 					}
 				}
-				else  if (item == 3) // email
-				// maybe telephone, not used yet
+				else  if (item == 3) // Email
+				// Maybe telephone, not used yet
 				{
 					if (!items[item].equals(mContext.getString(R.string.no_tel)))
 					{
@@ -132,6 +133,7 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 		builder.setTitle(item.getTitle());
 		builder.setItems(new String[] {item.getSnippet()}, new DialogInterface.OnClickListener()
 		{
+			@Override
 			public void onClick(DialogInterface dialog, int item)
 			{
 			}
