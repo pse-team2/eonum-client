@@ -66,7 +66,7 @@ public class HealthLocationListener implements LocationListener
 			case LocationProvider.TEMPORARILY_UNAVAILABLE:
 			{
 				Toast.makeText(HealthActivity.mainActivity,
-					HealthActivity.mainActivity.getString(R.string.provider_status_temp_univailable, provider),
+					HealthActivity.mainActivity.getString(R.string.provider_status_temp_unavailable, provider),
 					Toast.LENGTH_LONG).show();
 				break;
 			}

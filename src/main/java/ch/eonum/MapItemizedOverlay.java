@@ -104,7 +104,7 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 						}
 						else
 						{
-							Toast toast = Toast.makeText(mContext, R.string.sorry_no_email, Toast.LENGTH_SHORT);
+							Toast toast = Toast.makeText(mContext, R.string.there_is_no_email, Toast.LENGTH_SHORT);
 							toast.show();
 						}
 						break;
@@ -112,7 +112,7 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 					case 3: // Email, maybe telephone, not used yet
 						if (!items[item].equals(mContext.getString(R.string.no_tel)))
 						{
-							// Just dial, not call the number. ACTION_CALL would call the number 
+							// Just dial, do not call the number. ACTION_CALL would call the number 
 							// and requires the 'android.permission.CALL_PHONE' permission.
 							Intent callIntent = new Intent(Intent.ACTION_DIAL);
 							callIntent.setData(Uri.parse("tel:" + items[item]));
@@ -120,7 +120,7 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 						}
 						else
 						{
-							Toast toast = Toast.makeText(mContext, R.string.sorry_no_tel, Toast.LENGTH_SHORT);
+							Toast toast = Toast.makeText(mContext, R.string.there_is_no_tel, Toast.LENGTH_SHORT);
 							toast.show();
 						}
 						break;
