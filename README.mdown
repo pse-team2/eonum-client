@@ -58,7 +58,7 @@ Development
 For developing, you might need the following stuff:
 
 *   [Eclipse Development Platform 3.7.1 (Indigo)](http://eclipse.org/downloads/) or higher
-*   [Android SDK](http://developer.android.com/sdk/index.html)
+*   [Android SDK](http://developer.android.com/sdk/index.html) and the ADT (Android Development Tools) Plugin
 *   [Maven 3.0.3](http://maven.apache.org/) or higher
 *   [m2e Maven to Eclipse Plugin](http://rgladwell.github.com/m2e-android/)
 *   [Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer/wiki)
