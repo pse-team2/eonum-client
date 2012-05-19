@@ -761,14 +761,22 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				(int) (point.getLocation()[0] * 1000000),
 				(int) (point.getLocation()[1] * 1000000)
 				);
+			
 			String email = point.getEmail();
+			String tel = point.getTelephone();
+			
 			if (email.length() == 0)
 			{
 				email = getString(R.string.no_email);
 			}
+			
+			if (tel.length() == 0)
+			{
+				tel = getString(R.string.no_tel);
+			}
 
 			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getCategories()
-				+ "\n" + point.getAddress() + "\n" + email);
+				+ "\n" + point.getAddress() + "\n" + email + "\n" + tel);
 			if (CategoryResolver.getInstance().getKeyByValue(point.getCategories()) != getString(R.string.spitaeler))
 			{
 				this.itemizedDoctorsOverlay.addOverlay(matchingOverlayitem);

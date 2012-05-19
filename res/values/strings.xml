@@ -28,6 +28,8 @@
     <string name="choose_category_from_list">Bitte wählen Sie eine Kategorie aus der Liste oder lassen Sie das Feld leer, um alle anzuzeigen.</string>
     <string name="no_email">(keine E-Mail-Adresse)</string>
     <string name="sorry_no_email">Leider ist für diesen Eintrag keine E-Mail-Adresse vorhanden.</string>
+    <string name="no_tel">(keine Telefonnummer)</string>
+    <string name="sorry_no_tel">Leider ist für diesen Eintrag keine Telefonnummer vorhanden.</string>
     <string name="spitaeler">Spitäler</string>
     <string name="akupunkturaerzte">Akupunkturärzte</string>
     <string name="allergologen">Allergologen</string>

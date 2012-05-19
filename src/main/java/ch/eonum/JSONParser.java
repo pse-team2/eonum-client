@@ -32,6 +32,7 @@ public class JSONParser
 			{
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String name = jsonObject.getString("name");
+				String tel = jsonObject.getString("tel");
 				String address = jsonObject.getString("address");
 				String email = jsonObject.getString("email");
 
@@ -50,7 +51,7 @@ public class JSONParser
 				latitude = location.getDouble("lat");
 				longitude = location.getDouble("lng");
 
-				results[i] = new MedicalLocation(name, address, email, types, latitude, longitude);
+				results[i] = new MedicalLocation(name, address, email, tel, types, latitude, longitude);
 			}
 		}
 		catch (JSONException e)

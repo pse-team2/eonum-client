@@ -105,12 +105,22 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 						toast.show();
 					}
 				}
-				else
-				// maybe telephone, not used yed
+				else  if (item == 3) // email
+				// maybe telephone, not used yet
 				{
-					Intent callIntent = new Intent(Intent.ACTION_CALL);
-					callIntent.setData(Uri.parse("tel:" + items[item]));
-					mContext.startActivity(callIntent);
+					if (!items[item].equals(mContext.getString(R.string.no_tel)))
+					{
+						// Just dial, not call the number. ACTION_CALL would call the number 
+						// and requires the 'android.permission.CALL_PHONE' permission.
+						Intent callIntent = new Intent(Intent.ACTION_DIAL);
+						callIntent.setData(Uri.parse("tel:" + items[item]));
+						mContext.startActivity(callIntent);
+					}
+					else
+					{
+						Toast toast = Toast.makeText(mContext, R.string.sorry_no_tel, Toast.LENGTH_SHORT);
+						toast.show();
+					}
 				}
 			}
 		}).show();
