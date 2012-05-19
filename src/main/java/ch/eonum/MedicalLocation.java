@@ -12,22 +12,25 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 	private String name;
 	private String address;
 	private String email;
+	private String tel;
 	private String[] categories;
 	private double latitude;
 	private double longitude;
 	Double[] location = new Double[2];
 	private double distance;
 
-	public MedicalLocation(String name, String address, String email, String[] types, double latitude, double longitude)
+	public MedicalLocation(String name, String address, String email, String tel, String[] types, double latitude, double longitude)
 	{
 		this.name = name;
 		this.address = address;
 		this.email = email;
+		this.tel = tel;
 		this.latitude = latitude;
 		this.location[0] = latitude;
 		this.longitude = longitude;
 		this.location[1] = longitude;
 		this.categories = new String[types.length];
+
 		for (int i = 0; i < types.length; i++)
 		{
 			this.categories[i] = resolver.resolve(types[i]);
@@ -55,6 +58,11 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 	{
 		return this.email;
 	}
+	
+	public String getTelephone()
+	{
+		return this.tel;
+	}
 
 	/**
 	 * If there is more than one category entry the categories are each listed on a new line.
@@ -66,7 +74,7 @@ public class MedicalLocation implements Location, Comparable<MedicalLocation>
 		String categoryList = "";
 		for (int i = 0; i < this.categories.length; i++)
 		{
-			categoryList += this.categories[i] + (i + 1 < this.categories.length ? "\n" : "");
+			categoryList += this.categories[i] + (i + 1 < this.categories.length ? ", " : "");
 		}
 		return categoryList;
 	}

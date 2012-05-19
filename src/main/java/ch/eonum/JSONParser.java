@@ -21,34 +21,37 @@ public class JSONParser
 			JSONArray jsonArray = jsonObj.getJSONArray("results");
 
 			// Split up into addresses
-			int NUMBER_OF_RESULTS = jsonArray.length();
+			int numberOfResults = jsonArray.length();
 
-			results = new MedicalLocation[NUMBER_OF_RESULTS];
+			results = new MedicalLocation[numberOfResults];
 			double latitude, longitude;
 
 			Logger.info(this.getClass().getName(), "Start parsing " + jsonArray.length() + " results");
 
-			for (int i = 0; i < NUMBER_OF_RESULTS; i++)
+			for (int i = 0; i < numberOfResults; i++)
 			{
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String name = jsonObject.getString("name");
+				String tel = jsonObject.getString("tel");
 				String address = jsonObject.getString("address");
 				String email = jsonObject.getString("email");
 
 				JSONArray jsonTypes = jsonObject.getJSONArray("types");
 				String[] types = new String[jsonTypes.length()];
-				for (int j = 0; j < jsonTypes.length(); j++)
+				
+				types = jsonTypes.getString(0).split(",");
+				
+				// Remove all non-word characters
+				for (int j = 0; j < types.length; j++)
 				{
-					String category = jsonTypes.getString(j);
-					// Remove all non-word characters
-					types[j] = category.replaceAll("\\W", "");
+					types[j] = types[j].replaceAll("\\W", "");
 				}
-
+				
 				JSONObject location = jsonObject.getJSONObject("location");
 				latitude = location.getDouble("lat");
 				longitude = location.getDouble("lng");
 
-				results[i] = new MedicalLocation(name, address, email, types, latitude, longitude);
+				results[i] = new MedicalLocation(name, address, email, tel, types, latitude, longitude);
 			}
 		}
 		catch (JSONException e)

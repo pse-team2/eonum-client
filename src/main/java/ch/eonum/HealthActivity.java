@@ -55,8 +55,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	/**
 	 * Variables indicating the last known physical location of the user.
 	 * <p>
-	 * The value {@link #location} is provided by an external source to
-	 * the {@link HealthLocationListener#onLocationChanged(Location)} method.<br>
+	 * The value {@link #location} is provided by an external source to the
+	 * {@link HealthLocationListener#onLocationChanged(Location)} method.<br>
 	 * From there these variables are updated using the {@link #setLocation(Location)} method.
 	 */
 	private double latitude, longitude;
@@ -362,8 +362,8 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	/**
 	 * This method is triggered every time the user moves onwards on the map.
 	 * <p>
-	 * It calculates the new location and visible map rectangle.
-	 * After this it launches a new search from the targeted location.
+	 * It calculates the new location and visible map rectangle. After this it launches a new search from the
+	 * targeted location.
 	 */
 	@Override
 	public void onChange(MapView view, GeoPoint newCenter, GeoPoint oldCenter, int newZoom, int oldZoom)
@@ -393,13 +393,13 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	/**
 	 * Depending of the input, this method launches a search with different arguments for the server.
 	 * <p>
-	 * A search is launched either with the coordinates where the MyLocation marker is placed
-	 * or with the coordinates where the user has just navigated.
+	 * A search is launched either with the coordinates where the MyLocation marker is placed or with the
+	 * coordinates where the user has just navigated.
 	 * <p>
-	 * This method assumes that no user input is involved here
-	 * and as such does no input checking and no error handling either.<br>
-	 * If user input has to be taken into consideration, {@link #launchUserDefinedSearch()}
-	 * should be used instead.
+	 * This method assumes that no user input is involved here and as such does no input checking and no error
+	 * handling either.<br>
+	 * If user input has to be taken into consideration, {@link #launchUserDefinedSearch()} should be used
+	 * instead.
 	 * 
 	 * @param usePhysicalLocation
 	 *            Set {@code true} if there should be searched for results near the MyLocation marker
@@ -442,13 +442,14 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 	}
 
 	/**
-	 * Parses the two TextViews {@code searchforWhere} and {@code searchforWhat} and passes them to the server in order to get results.
+	 * Parses the two TextViews {@code searchforWhere} and {@code searchforWhat} and passes them to the server
+	 * in order to get results.
 	 * <p>
 	 * Assumes that no other values should be taken into consideration.<br>
 	 * If this is not the case, {@link #launchSearchFromCurrentLocation(boolean)} might be more suitable.
 	 * <p>
-	 * Handles user interaction in case of an error.
-	 * If an error occurred, the method quits with a {@code null} value.
+	 * Handles user interaction in case of an error. If an error occurred, the method quits with a
+	 * {@code null} value.
 	 * 
 	 * @return Filtered results or {@code null} indicating an error.
 	 */
@@ -764,14 +765,22 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 				(int) (point.getLocation()[0] * 1000000),
 				(int) (point.getLocation()[1] * 1000000)
 				);
+			
 			String email = point.getEmail();
+			String tel = point.getTelephone();
+			
 			if (email.length() == 0)
 			{
 				email = getString(R.string.no_email);
 			}
+			
+			if (tel.length() == 0)
+			{
+				tel = getString(R.string.no_tel);
+			}
 
 			OverlayItem matchingOverlayitem = new OverlayItem(matchingResult, point.getName(), point.getCategories()
-				+ "\n" + point.getAddress() + "\n" + email);
+				+ "\n" + point.getAddress() + "\n" + email + "\n" + tel);
 			if (CategoryResolver.getInstance().getKeyByValue(point.getCategories()) != getString(R.string.spitaeler))
 			{
 				this.itemizedDoctorsOverlay.addOverlay(matchingOverlayitem);
