@@ -78,65 +78,66 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 			@Override
 			public void onClick(DialogInterface dialog, int item)
 			{
-				if (item == 0) // Category
+				switch (item)
 				{
-					// TODO: Do nothing (at the moment)
-				}
-				else if (item == 1) // Address
-				{
-					String address = items[item].replace(",", "+");
-					String uri = "geo:" + 0 + "," + 0 + "?q=" + address;
-					System.out.println("address to be given: " + address);
-					mContext.startActivity(new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri)));
-				}
-				else if (item == 2) // Email
-				{
-					if (!items[item].equals(mContext.getString(R.string.no_email)))
-					{
-						final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-						emailIntent.setType("plain/text");
-						emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {items[item]});
-						emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
-						emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
-						mContext.startActivity(Intent.createChooser(emailIntent, "E-Mail senden"));
-					}
-					else
-					{
-						Toast toast = Toast.makeText(mContext, R.string.sorry_no_email, Toast.LENGTH_SHORT);
-						toast.show();
-					}
-				}
-				else  if (item == 3) // Email
-				// Maybe telephone, not used yet
-				{
-					if (!items[item].equals(mContext.getString(R.string.no_tel)))
-					{
-						// Just dial, not call the number. ACTION_CALL would call the number 
-						// and requires the 'android.permission.CALL_PHONE' permission.
-						Intent callIntent = new Intent(Intent.ACTION_DIAL);
-						callIntent.setData(Uri.parse("tel:" + items[item]));
-						mContext.startActivity(callIntent);
-					}
-					else
-					{
-						Toast toast = Toast.makeText(mContext, R.string.sorry_no_tel, Toast.LENGTH_SHORT);
-						toast.show();
-					}
+					case 0: // Category
+						System.out.println();
+						// TODO: Do nothing (at the moment)
+						break;
+
+					case 1: // Address
+						String address = items[item].replace(",", "+");
+						String uri = "geo:" + 0 + "," + 0 + "?q=" + address;
+						System.out.println("address to be given: " + address);
+						mContext.startActivity(new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri)));
+						break;
+
+					case 2: // Email
+						if (!items[item].equals(mContext.getString(R.string.no_email)))
+						{
+							final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+							emailIntent.setType("plain/text");
+							emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {items[item]});
+							emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
+							emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+							mContext.startActivity(Intent.createChooser(emailIntent, "E-Mail senden"));
+						}
+						else
+						{
+							Toast toast = Toast.makeText(mContext, R.string.sorry_no_email, Toast.LENGTH_SHORT);
+							toast.show();
+						}
+						break;
+
+					case 3: // Email, maybe telephone, not used yet
+						if (!items[item].equals(mContext.getString(R.string.no_tel)))
+						{
+							// Just dial, not call the number. ACTION_CALL would call the number 
+							// and requires the 'android.permission.CALL_PHONE' permission.
+							Intent callIntent = new Intent(Intent.ACTION_DIAL);
+							callIntent.setData(Uri.parse("tel:" + items[item]));
+							mContext.startActivity(callIntent);
+						}
+						else
+						{
+							Toast toast = Toast.makeText(mContext, R.string.sorry_no_tel, Toast.LENGTH_SHORT);
+							toast.show();
+						}
+						break;
+
+					default:
+						break;
 				}
 			}
-		}).show();
+		});
+		builder.show();
 	}
 
 	private void showMyPositionDialog(OverlayItem item)
 	{
 		AlertDialog.Builder builder = new AlertDialog.Builder(this.mContext);
 		builder.setTitle(item.getTitle());
-		builder.setItems(new String[] {item.getSnippet()}, new DialogInterface.OnClickListener()
-		{
-			@Override
-			public void onClick(DialogInterface dialog, int item)
-			{
-			}
-		}).show();
+		builder.setItems(new String[] {item.getSnippet()}, null);
+		builder.show();
 	}
 }
