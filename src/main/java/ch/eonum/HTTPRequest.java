@@ -158,6 +158,7 @@ public class HTTPRequest extends AsyncTask<Void, Void, String>
 		if (!this.internetAvailable)
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(HealthActivity.mainActivity);
+			builder.setCancelable(false);
 			builder.setTitle(HealthActivity.mainActivity.getString(R.string.neterror));
 			builder.setMessage(HealthActivity.mainActivity.getString(R.string.no_network_check_settings));
 			builder.setIcon(android.R.drawable.ic_dialog_alert);

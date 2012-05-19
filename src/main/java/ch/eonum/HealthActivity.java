@@ -282,7 +282,6 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 					// There is no need to display an error message here in case of an empty result list
 					// as the search method already does this.
 				}
-				// getApplicationContext().getSystemService(LOCATION_SERVICE);
 				InputMethodManager inputManager = (InputMethodManager) getApplicationContext().getSystemService(
 					INPUT_METHOD_SERVICE);
 				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
@@ -513,6 +512,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 						+ resultsList.get(i).getAddressLine(1);
 				}
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setCancelable(false);
 				builder.setTitle(getString(R.string.ambiguousresults, resultsList.size()));
 				builder.setItems(ambiguousList, new DialogInterface.OnClickListener()
 				{
@@ -571,6 +571,7 @@ public class HealthActivity extends MapActivity implements HealthMapView.OnChang
 			if (whatValue == null)
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setCancelable(false);
 				builder.setTitle(getString(R.string.no_valid_category, what));
 				builder.setMessage(R.string.choose_category_from_list);
 				builder.setIcon(android.R.drawable.ic_dialog_info);
