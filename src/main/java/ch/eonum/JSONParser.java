@@ -37,14 +37,12 @@ public class JSONParser
 				String email = jsonObject.getString("email");
 
 				JSONArray jsonTypes = jsonObject.getJSONArray("types");
-				String[] types = new String[jsonTypes.length()];
-				
-				types = jsonTypes.getString(0).split(",");
+				String[] types = jsonTypes.getString(0).split(", ");
 				
 				// Remove all non-word characters
-				for (int j = 0; j < types.length; j++)
+				for (String type : types)
 				{
-					types[j] = types[j].replaceAll("\\W", "");
+					type = type.replaceAll("\\W", "");
 				}
 				
 				JSONObject location = jsonObject.getJSONObject("location");
