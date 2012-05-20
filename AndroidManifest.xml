@@ -28,7 +28,6 @@
         </activity>
         	<activity android:name=".HealthActivity" >
         </activity>
-        
 
         <uses-library android:name="com.google.android.maps" />
     </application>

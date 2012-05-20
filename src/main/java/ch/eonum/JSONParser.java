@@ -44,7 +44,7 @@ public class JSONParser
 				{
 					type = type.replaceAll("\\W", "");
 				}
-				
+
 				JSONObject location = jsonObject.getJSONObject("location");
 				latitude = location.getDouble("lat");
 				longitude = location.getDouble("lng");

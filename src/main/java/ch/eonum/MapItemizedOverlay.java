@@ -97,14 +97,13 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem>
 				switch (position)
 				{
 					case 0: // Category
-						System.out.println();
 						// TODO: Do nothing (at the moment)
 						break;
 
 					case 1: // Address
 						String address = items[position].replace(",", "+");
 						String uri = "geo:" + 0 + "," + 0 + "?q=" + address;
-						System.out.println("address to be given: " + address);
+						Logger.info(mContext.getClass().getName(), "Address to be given: " + address);
 						mContext.startActivity(new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri)));
 						break;
 
