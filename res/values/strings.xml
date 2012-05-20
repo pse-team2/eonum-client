@@ -15,10 +15,10 @@
     <string name="settings">Einstellungen</string>
     <string name="neterror">Netzwerkfehler</string>
     <string name="no_network_check_settings">Beim Aufbau der Verbindung zum Server ist ein Fehler aufgetreten.\nBitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind und probieren Sie es erneut.</string>
-    <string name="provider_status_out_of_service">Standortdienst %s: Ausser Betrieb</string>
-    <string name="provider_status_temp_unavailable">Standortdienst %s: Momentan nicht verfügbar</string>
-    <string name="provider_status_available">Standortdienst %s: Verfügbar</string>
-    <string name="provider_status_unknown">Standortdienst %s: Unbekannter Status</string>
+    <string name="provider_status_out_of_service">Standortdienst \"%s\": Ausser Betrieb</string>
+    <string name="provider_status_temp_unavailable">Standortdienst \"%s\": Momentan nicht verfügbar</string>
+    <string name="provider_status_available">Standortdienst \"%s\": Verfügbar</string>
+    <string name="provider_status_unknown">Standortdienst \"%s\": Unbekannter Status</string>
     <string name="fail_no_provider">Fehler: Kein Standortdienst verfügbar</string>
     <string name="myposition">Mein Standort</string>
     <string name="category">Arztkategorie</string>
