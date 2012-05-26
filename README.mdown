@@ -9,6 +9,11 @@ Documentation
 -------------
 *Make sure to be aware of the [structure of an Android Project](http://sudarmuthu.com/blog/the-structure-of-an-android-project)*
 
+### AndroidManifest.xml
+The Android Manifest contains information about the project. It contains a section with the tag **uses-sdk**. It describes the SDK features that the containing package must be running on to operate correctly.
+
+At the time of this writing, the smallest version number the application requires is API 7 (Android 2.1) and the version number the application is targeting is API 15 (Android 4.0.3). These two versions together with the most recent version of the Android SDK should be chosen when installing the Android SDK.
+
 ### HealthActivity
 *Make sure to know the basics of the [Activity lifecycle](http://developer.android.com/guide/topics/fundamentals/activities.html)*
 
@@ -34,7 +39,7 @@ Basic entities, which are used to represent the data during runtime. They both i
 ### MapItemizedOverlay, HealthMapView
 Results are not directly drawn to the map. They are drawn to separate **Overlays**. A single result represents an **MapItemizedOverlay** entity on top of an Overlay that is drawn to the map. The corresponding datatype used for this purpose is called `Geopoint`.
 
-In *onTap()* a small dialog is displayed, containing the most important information about the selected item.
+In *onTap()* a small dialogue is displayed, containing the most important information about the selected item.
 
 Everything that concerns the map directly is handled in **HealthMapView**, like zooming, touching or relocation. For the ease of use it defines an anonymous inner interface `OnChangeListener`, that is implemented by the main class **HealthActivity**.
 
@@ -50,8 +55,10 @@ They "translate" values to associated data. For some predefined cities **CityRes
 
 **Mode** is used only once in **Logger**, a static class with the purpose of logging all necessary information. It can be set to either TEST, PROD or DEV, which changes the logging and connection behaviour.
 
-## Tests
+### Tests
 All functional tests are located in /src/test. A separate project is set up in the repository *eonum-client-test*, which covers also some use cases.
+
+- - - - -
 
 Development
 -----------
@@ -59,43 +66,87 @@ Development
 For developing, you might need at least the following programs or any higher version of it:
 
 *   [Eclipse Development Platform 3.7.1](http://eclipse.org/downloads/)
-*   [Android SDK](http://developer.android.com/sdk/index.html) and the ADT (Android Development Tools) Plugin
 *   [Maven 3.0.3](http://maven.apache.org/)
+*   [Android SDK](http://developer.android.com/sdk/index.html) and the ADT (Android Development Tools) Plugin
 *   [m2e Maven to Eclipse Plugin](http://rgladwell.github.com/m2e-android/)
 *   [Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer/wiki)
 
 Some of the applications might be already available in the package repositories of your distribution.
+*For Ubuntu users, you may consider this [installation guide] (http://yarovoy.com/post/14363197336/maven-how-to-install-maven-3-on-ubuntu-11-10)*
+
+__For the further steps it is assumed that you have Eclipse and Maven installed and running.__
 
 ### Installation
 
 First of all install the Android SDK and the ADT Plugin as described in [Installing the SDK](http://developer.android.com/sdk/installing.html).
 
+When you are asked to install platforms and packages in the Android SDK Manager, refer to the section about the *AndroidManifest.xml* file to determine which versions to install.
+At all events also install the **SDK Platform** and **Google APIs** in addition to your choice.
+
+#### Maven Integration for Eclipse
+
+The project uses [Apache Maven](http://maven.apache.org/) that takes care of all tasks related to build, compile, test, integrate, verify, install and deploy the entire application.
+For development with Eclipse, you need Eclipse to recognize and work with Maven.
+
+With the [Android Configurator for M2E](http://rgladwell.github.com/m2e-android/), a Maven Integration Plugin for Eclipse, you will have full support for this and other Android projects.\*
+
+As of Eclipse Indigo, no separate update site for the M2E Plugin is needed. M2E can be found in the pre-configured *Indigo* update repository *http://download.eclipse.org/releases/indigo/*.
+
+From within Eclipse, select the menu item *Help*, *Install New Software...*, then select the "Indigo" update site from the dropdown list.
+If the site is not listed in the menu, either enable it in the repository or add it manually to the list (*Add* in the top-right corner).
+
+After you selected the site, it can take up to a few minutes before the software choices can be expanded in the table in this dialog. 
+Once the list appears, search for **M2E - Maven Integration for Eclipse** under the category **General Purpose Tools**.
+
+Restart Eclipse after the installation has completed.
+
+More information about the M2E Plugin in general is available on the [Eclipsepedia](http://wiki.eclipse.org/M2E).
+
+\* **Remark:** *The instructions on this site explain how to create a new Android project along with Maven support. If you want to import and develop an existing project, stick with these instructions.*
+
 #### Maven Android SDK Deployer
 
-For integrating your Android project into Maven, you will need to install the [Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer/wiki) and build it with the following command:
+At this point Maven is not yet aware about additional dependencies required for the Android project because they are not in the Maven repository by default.
+
+For integrating your Android project into Maven, you will need the [Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer/wiki) that provides Maven with the necessary Android libraries.
+
+Clone it to your Eclipse workspace directory with
+
+    git clone https://github.com/mosabua/maven-android-sdk-deployer.git
+
+Navigate to the newly created project directory and build it with the following command:
 
     mvn clean install -P 2.3.3 -Dandroid.sdk.path=<path to android-sdk>
 
-where `2.3.3` is the Android version you want to deploy.
+where `<path to android-sdk>` is the path to your Android SDK folder, (typically named "android-sdk-linux").
+The argument `2.3.3` is the Android version you want to deploy. The option `-P` can be added multiple times for different versions.
 
-*More on the maven-android-plugin [here] (http://code.google.com/p/maven-android-plugin/wiki/GettingStarted). For Ubuntu users, you may consider this [installation guide] (http://yarovoy.com/post/14363197336/maven-how-to-install-maven-3-on-ubuntu-11-10)*
+If the build fails, verify that everything the builder wants to deploy is installed via the Android SDK Manager.
 
-#### Development with Eclipse 
-For development with Eclipse, you will need Eclipse to recognize and work with Maven.
-With the [m2e Maven to Eclipse plugin](http://rgladwell.github.com/m2e-android/), you will have full support for this and other Android projects.
+#### Development in Eclipse
 
-After cloning the Repo, you will have to "eclipsify" the project: 
+Now go back to your Eclipse workspace and start cloning the main project:
+
+    git clone https://github.com/pse-team2/eonum-client.git
+
+After cloning the Repo, you will have to "eclipsify" the project. In the project directory execute:
 
     mvn eclipse:eclipse -Dandroid.sdk.path=<path to android-sdk>
 
 Then you can import it into your Eclipse workspace using *Import*, *Maven Project* > *Existing project*.
 
-**Note:** *Do not* import it as "Existing project into workspace" as suggested by Eclipse, it will result in Eclipse recognizing it as a pure Java application.
+**Note:** If the build fails, there might be various issues for this. They are explained at the [documentation page of the Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer#maven-android-sdk-deployer).
 
-### Deployment on a test device (or emulator)
-If you run the application from Eclipse, the virtual machine is started automatically. Otherwise you have to do some preparations.
+**Important:** **Do not** import it as *Existing project into workspace* as suggested by Eclipse, it will result in Eclipse recognizing it as a pure Java application.
+
+### Deployment on a test device or an emulator
+If you would like to run the application from Eclipse, you have to set up an Android Virtual Device (AVD). The [Hello Android Tutorial](http://developer.android.com/resources/tutorials/hello-world.html) explains how this can be achieved.
+
+If you prefer to run it from the command line you have to do some preparations.
+
 First, make sure an Android device (Android 2.3 or higher) is running.
-For building and deploying the application (on Linux) execute the following command:
+
+For building and deploying the application (on Linux) execute the following command in the project directory:
 
     mvn clean install android:deploy -Dandroid.sdk.path=<path to android-sdk>
 
